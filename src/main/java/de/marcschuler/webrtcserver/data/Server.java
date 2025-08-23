@@ -1,9 +1,13 @@
 package de.marcschuler.webrtcserver.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.ToString;
 
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,4 +23,9 @@ public class Server {
 
     @NotNull
     private Channel defaultChannel;
+
+    @JsonIgnore
+    @ToString.Exclude
+    private PrivateKey privateKey;
+    private PublicKey publicKey;
 }

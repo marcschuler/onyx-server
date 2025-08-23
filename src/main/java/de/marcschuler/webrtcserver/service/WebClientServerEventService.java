@@ -19,14 +19,14 @@ public class WebClientServerEventService {
 
     @EventListener
     public void onLogin(ClientEvent<LoginEvent> event) {
-        log.info("Client login as {}", event.getEvent().getUsername());
+        log.info("User login as {}", event.getEvent().getUsername());
         event.getClient().setUsername(event.getEvent().getUsername());
         webSocketSignalingService.moveClient(event.getClient(), serverInfoService.getServerInfo().getDefaultChannel());
     }
 
     @EventListener
     public void onChannelChangeRequest(ClientEvent<ChannelChangeRequest> event) {
-        log.info("Client {} wants to change channel to {}", event.getClient().getUsername(), event.getEvent().getChannelId());
+        log.info("User {} wants to change channel to {}", event.getClient().getUsername(), event.getEvent().getChannelId());
         var channel = serverInfoService.channelById(event.getEvent().getChannelId()).get();
         webSocketSignalingService.moveClient(event.getClient(), channel);
     }

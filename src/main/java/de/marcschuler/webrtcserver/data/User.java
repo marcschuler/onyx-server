@@ -1,5 +1,6 @@
 package de.marcschuler.webrtcserver.data;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -20,11 +21,13 @@ public class User {
     private String username;
 
     @NotNull
+    @Column(nullable = false, unique = true)
     private PublicKey publicKey;
 
     @NotNull
     private ClientState state;
 
+    @Column(nullable = false)
     private Instant knownSince;
     private Instant lastSeen;
 }

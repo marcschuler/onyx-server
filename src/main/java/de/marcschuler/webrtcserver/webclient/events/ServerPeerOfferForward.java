@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.Map;
 @Data
 @AllArgsConstructor
-public class ServerPeerOfferForward extends Event{
+public class ServerPeerOfferForward extends EventBody {
     private String clientTo;
     private String clientFrom;
     private Map<String,Object> offer;

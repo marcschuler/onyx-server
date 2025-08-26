@@ -9,3 +9,9 @@ spring:
     password: webrtc
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
+
+
+iris:
+  auth:
+    challenge:
+      validMinutes: 5

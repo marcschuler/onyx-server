@@ -7,14 +7,14 @@ import lombok.Setter;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", visible = true)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = LoginEvent.class, name = "CLIENT_LOGIN_EVENT"),
+        @JsonSubTypes.Type(value = LoginEventBody.class, name = "CLIENT_LOGIN_EVENT"),
         @JsonSubTypes.Type(value = ChannelChangeRequest.class, name = "CLIENT_CHANNEL_CHANGE_REQUEST"),
         @JsonSubTypes.Type(value = ClientPeerOffer.class, name = "CLIENT_PEER_OFFER"),
         @JsonSubTypes.Type(value = ServerPeerOfferForward.class, name = "SERVER_PEER_OFFER_FORWARD")
 })
 @Getter
 @Setter
-public abstract class Event {
+public abstract class EventBody {
 
     protected EventType type;
 

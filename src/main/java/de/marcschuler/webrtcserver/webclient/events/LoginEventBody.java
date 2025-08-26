@@ -3,6 +3,6 @@ package de.marcschuler.webrtcserver.webclient.events;
 import lombok.Data;
 
 @Data
-public class LoginEvent extends Event {
+public class LoginEventBody extends EventBody {
     private String username;
 }

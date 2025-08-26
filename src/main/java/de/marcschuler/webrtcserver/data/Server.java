@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.ToString;
 
+import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.List;
@@ -26,6 +27,5 @@ public class Server {
 
     @JsonIgnore
     @ToString.Exclude
-    private PrivateKey privateKey;
-    private PublicKey publicKey;
+    private KeyPair keys;
 }

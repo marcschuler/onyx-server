@@ -1,5 +1,6 @@
-package de.marcschuler.webrtcserver.service;
+package de.marcschuler.webrtcserver.service.webclient;
 
+import de.marcschuler.webrtcserver.service.ServerInfoService;
 import de.marcschuler.webrtcserver.webclient.error.ClientSecurityViolationException;
 import de.marcschuler.webrtcserver.webclient.events.ClientEvent;
 import de.marcschuler.webrtcserver.webclient.events.ClientPeerOffer;
@@ -16,15 +17,15 @@ import java.io.IOException;
 @Slf4j
 public class WebClientPeerEventService {
 
-    private final WebSocketSignalingService webSocketSignalingService;
+    private final WebClientConnectionService webClientConnectionService;
     private final ServerInfoService serverInfoService;
 
     @EventListener
     public void onOffer(ClientEvent<ClientPeerOffer> event) throws IOException, ClientSecurityViolationException {
         var clientFrom = event.getClient().getUsername();
-        log.info("Forwarding peer offer from {} to {}", clientFrom, event.getEvent().getClientTo());
-        var clientTo = webSocketSignalingService.clientFromId(event.getEvent().getClientTo()).get();
-        var forwardEvent = new ServerPeerOfferForward(event.getEvent().getClientTo(), clientFrom, event.getEvent().getOffer());
-        webSocketSignalingService.sendToClient(clientTo, forwardEvent);
+        log.info("Forwarding peer offer from {} to {}", clientFrom, event.getBody().getClientTo());
+        var clientTo = webClientConnectionService.clientFromSessionId(event.getBody().getClientTo()).get();
+        var forwardEvent = new ServerPeerOfferForward(event.getBody().getClientTo(), clientFrom, event.getBody().getOffer());
+        webClientConnectionService.sendToClient(clientTo, forwardEvent);
     }
 }

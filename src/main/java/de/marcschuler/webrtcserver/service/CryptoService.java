@@ -7,6 +7,8 @@ import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
 import java.security.*;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 @Service
@@ -37,6 +39,12 @@ public class CryptoService {
         MessageDigest digest = MessageDigest.getInstance(HASHING_ALGORITHM);
         byte[] encodedhash = digest.digest(publicKey.getEncoded());
         return Base64.getEncoder().encodeToString(encodedhash);
+    }
+
+    public PublicKey parsePublicKey(byte[] keyBytes) throws InvalidKeySpecException, NoSuchAlgorithmException {
+        X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
+        KeyFactory keyFactory = KeyFactory.getInstance("Ed25519");
+        return keyFactory.generatePublic(spec);
     }
 
     /**

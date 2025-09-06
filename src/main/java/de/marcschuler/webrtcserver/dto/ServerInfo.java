@@ -24,5 +24,6 @@ public class ServerInfo {
         private UUID id;
         private String name;
         private byte[] publicKey;
+        private int user;
     }
 }

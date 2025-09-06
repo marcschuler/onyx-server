@@ -1,19 +1,20 @@
 package de.marcschuler.webrtcserver.data;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+@Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Channel {
-    @NotNull
+    @Id
     private UUID id;
-    @Size(min = 3, max = 64)
     private String name;
 }

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SignedContent<T> {
     @NotNull
-    private T content;
+    private String content;
     @NotNull
     private String contentSignature;
 }

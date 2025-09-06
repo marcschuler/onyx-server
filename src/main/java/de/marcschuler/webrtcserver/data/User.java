@@ -1,6 +1,7 @@
 package de.marcschuler.webrtcserver.data;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -10,7 +11,7 @@ import lombok.Data;
 import java.security.PublicKey;
 import java.time.Instant;
 
-@Email
+@Entity(name="user_table")//TODO terrible fix
 @Data
 public class User {
     @Id
@@ -21,7 +22,7 @@ public class User {
     private String username;
 
     @NotNull
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 1024)
     private PublicKey publicKey;
 
     @NotNull

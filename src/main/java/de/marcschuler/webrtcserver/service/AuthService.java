@@ -4,6 +4,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -61,13 +62,14 @@ public class AuthService {
         synchronized (challenges) {
            return challenges.stream()
                    .filter(c -> c.getChallenge().equals(challenge))
-                   .anyMatch(c -> c.getValidUntil().isBefore(Instant.now()));
+                   .anyMatch(c -> c.getValidUntil().isAfter(Instant.now()));
         }
     }
 
 
     @Data
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class AuthChallenge {
         @NotNull
         private String challenge;

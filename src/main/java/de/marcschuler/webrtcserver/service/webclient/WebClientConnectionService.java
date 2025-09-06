@@ -1,6 +1,8 @@
 package de.marcschuler.webrtcserver.service.webclient;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.NamedType;
 import de.marcschuler.webrtcserver.data.Channel;
 import de.marcschuler.webrtcserver.service.AuthService;
 import de.marcschuler.webrtcserver.service.ServerInfoService;
@@ -12,9 +14,11 @@ import de.marcschuler.webrtcserver.webclient.events.EventBody;
 import de.marcschuler.webrtcserver.webclient.events.ServerInfoEventBody;
 import de.marcschuler.webrtcserver.webclient.events.auth.AuthChallengeRequest;
 import de.marcschuler.webrtcserver.webclient.events.auth.AuthChallengeResponse;
+import jakarta.annotation.PostConstruct;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.reflections.Reflections;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
@@ -23,6 +27,8 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.List;
 import java.util.Vector;
@@ -36,10 +42,26 @@ public class WebClientConnectionService extends TextWebSocketHandler {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final AuthService authService;
 
+    private final ObjectMapper objectMapper;
+
     private final List<WebClient> sessions = new Vector<>();
 
     private final List<Class<? extends EventBody>> allowedEventsWhenUnauthorized = List.of(AuthChallengeResponse.class);
 
+    @PostConstruct
+    public void init() {
+        var names = new ArrayList<String>();
+        new Reflections("de.marcschuler.webrtcserver.webclient.events")
+                .getSubTypesOf(EventBody.class)
+                .stream()
+                .filter(c -> !Modifier.isAbstract(c.getModifiers()))
+                .filter(c -> !Modifier.isInterface(c.getModifiers()))
+                .forEach(c -> {
+                    names.add(c.getSimpleName());
+                    objectMapper.registerSubtypes(new NamedType(c, c.getSimpleName()));
+                });
+        log.info("Initialised events {}", names);
+    }
 
     @Override
     public synchronized void afterConnectionEstablished(WebSocketSession session) throws IOException {
@@ -53,7 +75,7 @@ public class WebClientConnectionService extends TextWebSocketHandler {
     @Override
     public synchronized void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         log.info("Received message {} from {}", new String(message.asBytes()), session);
-        var event = new ObjectMapper().readValue(message.asBytes(), EventBody.class);
+        var event = objectMapper.readValue(message.asBytes(), EventBody.class);
         var client = clientFromSession(session).get();
 
         if (!client.getState().isInteractionAllowed()) {
@@ -63,7 +85,7 @@ public class WebClientConnectionService extends TextWebSocketHandler {
             }
         }
 
-        log.info("Sending event {} to bus", event.getType());
+        log.info("Sending event {} to bus", event.getClass().getSimpleName());
         applicationEventPublisher.publishEvent(new ClientEvent<>(event, client));
     }
 
@@ -72,9 +94,9 @@ public class WebClientConnectionService extends TextWebSocketHandler {
         sendUpdateServerTree();
     }
 
+    @Deprecated
     public void sendUpdateServerTree() {
         var serverInfo = new ServerInfoEventBody(serverInfoService.getServerInfov0(), sessions);
-        serverInfo.setType(EventBody.EventType.SERVER_INFO_TREE);
         for (WebClient session : this.sessions) {
             try {
                 sendToClient(session, serverInfo);
@@ -98,20 +120,20 @@ public class WebClientConnectionService extends TextWebSocketHandler {
     }
 
     public void sendToClient(WebClient client, EventBody eventBody) throws IOException {
-        var data = new ObjectMapper().writeValueAsBytes(eventBody);
+        var data = objectMapper.writeValueAsBytes(eventBody);
         client.getSession().sendMessage(new TextMessage(data));
     }
 
-    public void sendToAllClients(EventBody eventBody){
-        sendToClients(sessions,eventBody);
+    public void sendToAllClients(EventBody eventBody) {
+        sendToClients(sessions, eventBody);
     }
 
     public void sendToClients(List<WebClient> clients, EventBody eventBody) {
         var exceptions = false;
-        for(var client: clients){
+        for (var client : clients) {
             try {
                 sendToClient(client, eventBody);
-            }catch (IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
                 exceptions = true;
             }

@@ -1,5 +1,6 @@
 package de.marcschuler.webrtcserver.data;
 
+import jakarta.persistence.Embeddable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
@@ -9,4 +10,5 @@ import java.util.UUID;
 public class Message {
     @Id
     private UUID id;
+
 }

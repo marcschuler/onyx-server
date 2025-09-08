@@ -34,10 +34,10 @@ public class ServerInfoService {
         return new ServerInfo("0.0.0", details);
     }
 
-    public Optional<Channel> channelById(String channelId) {
+    public Optional<Channel> channelById(UUID channelId) {
         return getServerInfov0().getSections().stream()
                 .flatMap(section -> section.getChannels().stream())
-                .filter(channel -> channel.getId().toString().equals(channelId))
+                .filter(channel -> channel.getId().equals(channelId))
                 .findFirst();
     }
 }

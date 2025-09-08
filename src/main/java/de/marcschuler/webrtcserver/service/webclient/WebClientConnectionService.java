@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import de.marcschuler.webrtcserver.data.Channel;
+import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.AuthService;
 import de.marcschuler.webrtcserver.service.ServerInfoService;
 import de.marcschuler.webrtcserver.webclient.KickReason;
@@ -14,7 +15,10 @@ import de.marcschuler.webrtcserver.webclient.events.EventBody;
 import de.marcschuler.webrtcserver.webclient.events.ServerInfoEventBody;
 import de.marcschuler.webrtcserver.webclient.events.auth.AuthChallengeRequest;
 import de.marcschuler.webrtcserver.webclient.events.auth.AuthChallengeResponse;
+import de.marcschuler.webrtcserver.webclient.events.client.ClientChannelJoinEvent;
+import de.marcschuler.webrtcserver.webclient.events.client.ClientChannelLeaveEvent;
 import jakarta.annotation.PostConstruct;
+import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +47,8 @@ public class WebClientConnectionService extends TextWebSocketHandler {
     private final AuthService authService;
 
     private final ObjectMapper objectMapper;
+
+    private final ServerMapper serverMapper;
 
     private final List<WebClient> sessions = new Vector<>();
 
@@ -90,21 +96,22 @@ public class WebClientConnectionService extends TextWebSocketHandler {
     }
 
     public void moveClient(WebClient client, Channel channel) {
+        var channelBefore = client.getChannel();
         client.setChannel(channel);
-        sendUpdateServerTree();
-    }
 
-    @Deprecated
-    public void sendUpdateServerTree() {
-        var serverInfo = new ServerInfoEventBody(serverInfoService.getServerInfov0(), sessions);
-        for (WebClient session : this.sessions) {
-            try {
-                sendToClient(session, serverInfo);
-            } catch (IOException e) {
-                log.error("Could not send to client {}", session, e);
-            }
+        if (channel!=null){
+            sendToAllClients(new ClientChannelJoinEvent(
+                    serverMapper.mapToDTO(client.getUser()),
+                    channel.getId()
+            ));
+        }else if (channelBefore != null){
+            sendToAllClients(new ClientChannelLeaveEvent(serverMapper.mapToDTO(client.getUser())));
+        }else{
+            log.warn("Ignored channel change request because moving from null to null");
         }
     }
+
+
 
     /**
      * Kicks a client
@@ -145,8 +152,9 @@ public class WebClientConnectionService extends TextWebSocketHandler {
     @Override
     public synchronized void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         log.info("Session for ws:{} closed because {}", session.getId(), status);
-        sessions.remove(clientFromSession(session).get());
-        sendUpdateServerTree();
+        var client = clientFromSession(session).get();
+        sessions.remove(client);
+        moveClient(client,null); //TODO may send another event type?
     }
 
 
@@ -160,6 +168,10 @@ public class WebClientConnectionService extends TextWebSocketHandler {
         return this.sessions.stream()
                 .filter(s -> s.getSession() == session)
                 .findFirst();
+    }
+
+    public List<WebClient> clients(){
+        return this.sessions;
     }
 
 }

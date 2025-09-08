@@ -7,6 +7,7 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.OctetKeyPair;
+import com.nimbusds.jose.util.Base64URL;
 import de.marcschuler.webrtcserver.dto.SignedContent;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -15,6 +16,9 @@ import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.security.*;
+import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.EdECKey;
+import java.security.interfaces.EdECPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
@@ -51,16 +55,24 @@ public class CryptoService {
         return Base64.getEncoder().encodeToString(encodedhash);
     }
 
-    public JWK exportPublicKey(PublicKey publicKey){
+    public JWK exportPublicKey(PublicKey publicKey) {
         return new OctetKeyPair.Builder((OctetKeyPair) publicKey)
                 .keyID(generateKeyId(publicKey))
                 .build();
     }
 
     public JsonNode exportPublicKeyToJSON(PublicKey publicKey) throws JsonProcessingException {
-        var jwk= new OctetKeyPair.Builder((OctetKeyPair) publicKey)
-                .keyID(generateKeyId(publicKey))
+        var keyBytes = publicKey.getEncoded();
+        // Extract raw 32-byte key (skip first 12 bytes of X.509 header)
+        // X.509 Ed25519 public keys have 12-byte prefix, adjust if needed
+        byte[] rawKey = new byte[32];
+        System.arraycopy(keyBytes, keyBytes.length - 32, rawKey, 0, 32);
+
+        // Create JWK
+        OctetKeyPair jwk = new OctetKeyPair.Builder(Curve.Ed25519, Base64URL.encode(rawKey))
+                .keyID("my-key-id")
                 .build();
+
         return objectMapper.readTree(jwk.toJSONString());
     }
 

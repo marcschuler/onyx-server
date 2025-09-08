@@ -5,15 +5,18 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
 import de.marcschuler.webrtcserver.data.ClientState;
 import de.marcschuler.webrtcserver.data.User;
+import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.AuthService;
 import de.marcschuler.webrtcserver.service.CryptoService;
 import de.marcschuler.webrtcserver.service.UserService;
 import de.marcschuler.webrtcserver.service.webclient.WebClientConnectionService;
 import de.marcschuler.webrtcserver.service.webclient.WebClientDataService;
+import de.marcschuler.webrtcserver.webclient.WebClient;
 import de.marcschuler.webrtcserver.webclient.WebClientState;
 import de.marcschuler.webrtcserver.webclient.events.ClientEvent;
 import de.marcschuler.webrtcserver.webclient.events.auth.AuthChallengeResponse;
 import de.marcschuler.webrtcserver.webclient.events.auth.AuthSuccessEvent;
+import de.marcschuler.webrtcserver.webclient.events.client.ClientChannelJoinEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -39,6 +42,8 @@ public class WebClientAuthHandler {
     private final AuthService authService;
     private final CryptoService cryptoService;
     private final UserService userService;
+
+    private final ServerMapper serverMapper;
 
     @EventListener
     public void onLogin(ClientEvent<AuthChallengeResponse> event) throws IOException {
@@ -86,6 +91,15 @@ public class WebClientAuthHandler {
 
         var serverTreeChangeEvent = webClientDataService.createServerTreeChangeEvent(event.getClient());
         webClientConnectionService.sendToClient(event.getClient(), serverTreeChangeEvent);
+
+        for (WebClient client : webClientConnectionService.clients()) {
+            if (client != event.getClient() && client.getChannel() != null) {
+                webClientConnectionService.sendToClient(event.getClient(), new ClientChannelJoinEvent(
+                        serverMapper.mapToDTO(client.getUser()),
+                        client.getChannel().getId()
+                ));
+            }
+        }
     }
 
 }

@@ -164,6 +164,12 @@ public class WebClientConnectionService extends TextWebSocketHandler {
                 .findFirst();
     }
 
+    public Optional<WebClient> clientFromKeyId(@NotNull String id){
+        return this.sessions.stream()
+                .filter(s -> s.getUser().getId().equals(id))
+                .findFirst();
+    }
+
     public Optional<WebClient> clientFromSession(@NonNull WebSocketSession session) {
         return this.sessions.stream()
                 .filter(s -> s.getSession() == session)

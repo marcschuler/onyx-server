@@ -70,7 +70,7 @@ public class CryptoService {
 
         // Create JWK
         OctetKeyPair jwk = new OctetKeyPair.Builder(Curve.Ed25519, Base64URL.encode(rawKey))
-                .keyID("my-key-id")
+                .keyID(generateKeyId(publicKey))
                 .build();
 
         return objectMapper.readTree(jwk.toJSONString());
@@ -139,8 +139,8 @@ public class CryptoService {
         return objectMapper.readValue(content.getContent(), clazz);
     }
 
-    public <T> T verifyContent(SignedContent<T> content, PublicKey publicKey) throws InvalidKeyException, JsonProcessingException, SignatureException, NoSuchAlgorithmException {
-        return verifyContent(content, (Class<T>) JsonNode.class, publicKey);
+    public <T> JsonNode verifyContent(SignedContent<T> content, PublicKey publicKey) throws InvalidKeyException, JsonProcessingException, SignatureException, NoSuchAlgorithmException {
+        return verifyContent((SignedContent<JsonNode>) content,JsonNode.class, publicKey);
     }
 
 }

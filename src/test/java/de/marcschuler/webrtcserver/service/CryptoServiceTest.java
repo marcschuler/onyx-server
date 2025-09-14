@@ -18,7 +18,7 @@ import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.text.ParseException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Slf4j
@@ -45,11 +45,25 @@ class CryptoServiceTest {
 
     @Test
     void testKeyId() throws IOException, ParseException, InvalidKeySpecException, JOSEException {
-       // log.info(cryptoService.exportPublicKeyToJSON(cryptoService.generateKeyPair().getPublic()).toString());
 
         ClassPathResource resource = new ClassPathResource("crypto/publickey-1.txt");
         String content = Files.readString(resource.getFile().toPath());
         var key = cryptoService.parsePublicKey(JWK.parse(content));
-        assertEquals("i2lMeB/Sw94WvkLiAccs9/HE7g2RMazoqKl0hqSeW+k=",cryptoService.generateKeyId(key));
+        assertEquals("i2lMeB/Sw94WvkLiAccs9/HE7g2RMazoqKl0hqSeW+k=", cryptoService.generateKeyId(key));
+    }
+
+    @Test
+    void testJWKExportImport() throws JsonProcessingException, ParseException, InvalidKeySpecException, JOSEException, SignatureException, NoSuchAlgorithmException, InvalidKeyException {
+        var keyPair = cryptoService.generateKeyPair();
+        var publicJWK = cryptoService.exportPublicKeyToJSON(keyPair.getPublic()).toString();
+        var importedKey = cryptoService.parsePublicKey(JWK.parse(publicJWK));
+
+
+        var content = cryptoService.signContent("Test String", keyPair.getPrivate());
+
+        //Normal and exported+imported public key should behave equally
+        cryptoService.verifyContent(content,keyPair.getPublic());
+        cryptoService.verifyContent(content,importedKey);
+
     }
 }

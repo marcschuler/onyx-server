@@ -3,6 +3,7 @@ package de.marcschuler.webrtcserver.webclient.handler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
+import de.marcschuler.webrtcserver.config.WebRTConfig;
 import de.marcschuler.webrtcserver.data.ClientState;
 import de.marcschuler.webrtcserver.data.User;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
@@ -11,12 +12,14 @@ import de.marcschuler.webrtcserver.service.CryptoService;
 import de.marcschuler.webrtcserver.service.UserService;
 import de.marcschuler.webrtcserver.service.webclient.WebClientConnectionService;
 import de.marcschuler.webrtcserver.service.webclient.WebClientDataService;
+import de.marcschuler.webrtcserver.webclient.KickReason;
 import de.marcschuler.webrtcserver.webclient.WebClient;
 import de.marcschuler.webrtcserver.webclient.WebClientState;
 import de.marcschuler.webrtcserver.webclient.events.ClientEvent;
 import de.marcschuler.webrtcserver.webclient.events.auth.AuthChallengeResponse;
 import de.marcschuler.webrtcserver.webclient.events.auth.AuthSuccessEvent;
 import de.marcschuler.webrtcserver.webclient.events.client.ClientChannelJoinEvent;
+import de.marcschuler.webrtcserver.webclient.events.peer.IceServerData;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -45,9 +48,11 @@ public class WebClientAuthHandler {
 
     private final ServerMapper serverMapper;
 
+    private final WebRTConfig webRTConfig;
+
     @EventListener
     public void onLogin(ClientEvent<AuthChallengeResponse> event) throws IOException {
-        log.info("Responding to auth chellenge");
+        log.info("Responding to auth challenge");
         var content = event.getBody().getChallenge();
         var username = event.getBody().getUsername();
         PublicKey publicKey;
@@ -72,6 +77,11 @@ public class WebClientAuthHandler {
         }
 
         var keyId = cryptoService.generateKeyId(publicKey);
+        if (webClientConnectionService.clientFromKeyId(keyId).isPresent()) {
+            log.info("Client {} is already connected. Kicking new instance", event.getClient().getUser().getUsername());
+            webClientConnectionService.kickClient(event.getClient(), KickReason.ALREADY_CONNECTED);
+            return;
+        }
         var user = userService.findById(keyId)
                 .orElseGet(() -> {
                     log.info("New user connected: {} ({})", keyId, username);
@@ -88,6 +98,11 @@ public class WebClientAuthHandler {
         event.getClient().setState(WebClientState.LOGGED_IN);
         userService.save(user);
         webClientConnectionService.sendToClient(event.getClient(), new AuthSuccessEvent());
+
+        //Send ICE config
+        var iceServerData = new IceServerData();
+        iceServerData.setIceServers(serverMapper.mapToDTO(webRTConfig.getConfig().getIce()));
+        webClientConnectionService.sendToClient(event.getClient(), iceServerData);
 
         var serverTreeChangeEvent = webClientDataService.createServerTreeChangeEvent(event.getClient());
         webClientConnectionService.sendToClient(event.getClient(), serverTreeChangeEvent);

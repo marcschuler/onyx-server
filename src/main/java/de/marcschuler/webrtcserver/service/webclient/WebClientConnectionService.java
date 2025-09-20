@@ -17,6 +17,7 @@ import de.marcschuler.webrtcserver.webclient.events.auth.AuthChallengeRequest;
 import de.marcschuler.webrtcserver.webclient.events.auth.AuthChallengeResponse;
 import de.marcschuler.webrtcserver.webclient.events.client.ClientChannelJoinEvent;
 import de.marcschuler.webrtcserver.webclient.events.client.ClientChannelLeaveEvent;
+import de.marcschuler.webrtcserver.webclient.events.connection.KickMessage;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;
@@ -122,6 +123,11 @@ public class WebClientConnectionService extends TextWebSocketHandler {
      */
     public void kickClient(WebClient client, KickReason reason) throws IOException {
         log.info("Kicking client {} for reason: {}", client, reason);
+        try {
+            sendToClient(client, new KickMessage(reason));
+        }catch (Exception e){ //we can ignore this
+            log.warn("Kicking message failed", e);
+        }
         sessions.remove(client);
         client.getSession().close();
     }
@@ -165,8 +171,9 @@ public class WebClientConnectionService extends TextWebSocketHandler {
     }
 
     public Optional<WebClient> clientFromKeyId(@NotNull String id){
+        // User might be null if a client is connected for the first time but hasn't authenticated
         return this.sessions.stream()
-                .filter(s -> s.getUser().getId().equals(id))
+                .filter(s -> s.getUser()!=null &&  s.getUser().getId().equals(id))
                 .findFirst();
     }
 

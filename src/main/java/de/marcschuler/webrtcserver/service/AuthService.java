@@ -35,6 +35,9 @@ public class AuthService {
 
     @PostConstruct
     void init() {
+        if (validMinutes <= 0) {
+            throw new IllegalStateException("challenge validMinutes must be greater than 0 an");
+        }
         //Remove old challenges
         executorService.scheduleAtFixedRate(() -> {
             synchronized (challenges) {
@@ -44,7 +47,7 @@ public class AuthService {
     }
 
     public AuthChallenge createChallenge() {
-        var challenge = new AuthChallenge(cryptoService.generateChallenge(), Instant.now().plus(5, ChronoUnit.MINUTES));
+        var challenge = new AuthChallenge(cryptoService.generateChallenge(), Instant.now().plus(validMinutes, ChronoUnit.MINUTES));
         synchronized (challenges) {
             challenges.add(challenge);
         }

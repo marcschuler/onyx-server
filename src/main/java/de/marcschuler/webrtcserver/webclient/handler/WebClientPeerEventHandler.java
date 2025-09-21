@@ -15,6 +15,11 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+/**
+ * Forwards SDP data.
+ * We are only a proxy that allows clients to forward the data and connect
+ * TODO more security checks: Can clients connect? (same channel? permissions?)
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -29,8 +34,12 @@ public class WebClientPeerEventHandler {
         log.info("Forwarding peer offer from {} to {}", clientFrom, event.getBody().getClientTo());
         var clientTo = webClientConnectionService.clientFromKeyId(event.getBody().getClientTo()).get();
         var forwardEvent = new PeerOfferForward(event.getClient().getUser().getId(), event.getBody().getOffer());
-        if (!event.getClient().getUser().getId().equals(clientTo.getUser().getId())) {
-            log.warn("Clients try to connect to each other without being in the same channel");
+
+
+        var clientFromChannel = event.getClient().getChannel();
+        var clientToChannel = clientTo.getChannel();
+        if (clientToChannel == null || !clientToChannel.equals(clientFromChannel)) {
+            log.warn("Clients try to connect to each other without being in the same channel {}<->{}", clientFromChannel, clientToChannel);
         }
         webClientConnectionService.sendToClient(clientTo, forwardEvent);
     }
@@ -41,8 +50,11 @@ public class WebClientPeerEventHandler {
         log.info("Forwarding peer answer from {} to {}", clientFrom, event.getBody().getClientTo());
         var clientTo = webClientConnectionService.clientFromKeyId(event.getBody().getClientTo()).get();
         var forwardEvent = new PeerAnswerForward(event.getClient().getUser().getId(), event.getBody().getAnswer());
-        if (!event.getClient().getUser().getId().equals(clientTo.getUser().getId())) {
-            log.warn("Clients try to connect to each other without being in the same channel");
+
+        var clientFromChannel = event.getClient().getChannel();
+        var clientToChannel = clientTo.getChannel();
+        if (clientToChannel == null || !clientToChannel.equals(clientFromChannel)) {
+            log.warn("Clients try to connect to each other without being in the same channel {}<->{}", clientFromChannel, clientToChannel);
         }
         webClientConnectionService.sendToClient(clientTo, forwardEvent);
     }

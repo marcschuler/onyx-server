@@ -24,6 +24,7 @@ public class Server {
 
     @NotNull
     @OneToMany(cascade = CascadeType.ALL)
+    @OrderColumn
     private List<Section> sections;
 
     @NotNull

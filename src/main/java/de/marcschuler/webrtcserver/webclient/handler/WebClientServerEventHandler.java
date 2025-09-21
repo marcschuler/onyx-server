@@ -4,12 +4,16 @@ import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.ServerInfoService;
 import de.marcschuler.webrtcserver.service.webclient.WebClientConnectionService;
 import de.marcschuler.webrtcserver.webclient.events.ClientEvent;
+import de.marcschuler.webrtcserver.webclient.events.channel.ChannelDetailRequest;
+import de.marcschuler.webrtcserver.webclient.events.channel.ChannelDetailResponse;
 import de.marcschuler.webrtcserver.webclient.events.client.ClientChannelChangeRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
@@ -27,5 +31,16 @@ public class WebClientServerEventHandler {
         log.info("User {} wants to change channel to {}", event.getClient().getUser().getUsername(), event.getBody().getChannelId());
         var channel = serverInfoService.channelById(event.getBody().getChannelId()).get();
         webClientConnectionService.moveClient(event.getClient(), channel);
+    }
+
+    @EventListener
+    @Transactional
+    public void onChannelDetailRequest(ClientEvent<ChannelDetailRequest> event) throws IOException {
+        var channel = serverInfoService.channelById(event.getBody().getChannelId()).get();
+
+        var response = new ChannelDetailResponse(serverMapper.mapToDTO(channel));
+        response.setRespondsTo(event.getBody().getRequestId());
+        webClientConnectionService.sendToClient(event.getClient(),
+                response);
     }
 }

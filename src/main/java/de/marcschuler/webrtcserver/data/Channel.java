@@ -1,8 +1,6 @@
 package de.marcschuler.webrtcserver.data;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,4 +16,8 @@ public class Channel {
     private UUID id;
     @Column(nullable = false)
     private String name;
+
+    @ManyToOne
+    @JoinColumn(name="channels")
+    private Section section;
 }

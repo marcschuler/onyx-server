@@ -18,7 +18,7 @@ public class Section {
     private UUID id;
     private String name;
     @NotNull
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "section", orphanRemoval = true)
     @OrderColumn
     private List<Channel> channels;
 }

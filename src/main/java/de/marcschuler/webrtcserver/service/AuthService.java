@@ -1,5 +1,7 @@
 package de.marcschuler.webrtcserver.service;
 
+import de.marcschuler.webrtcserver.data.User;
+import io.jsonwebtoken.Jwts;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -10,12 +12,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Vector;
+import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -26,18 +27,25 @@ public class AuthService {
 
     private final CryptoService cryptoService;
 
+    private final ServerService serverService;
+
     private final ScheduledExecutorService executorService;
 
     private final List<AuthChallenge> challenges = new ArrayList<>();
 
-    @Value("${iris.auth.challenge.validMinutes}")
-    private int validMinutes;
+    @Value("${iris.auth.challenge.expiration}")
+    private int authExpiration;
+
+    @Value("${iris.auth.jwt.expiration}")
+    private long jwtExpiration;
 
     @PostConstruct
     void init() {
-        if (validMinutes <= 0) {
-            throw new IllegalStateException("challenge validMinutes must be greater than 0 an");
-        }
+        if (authExpiration <= 0)
+            throw new IllegalStateException("challenge expiration must be greater than 0");
+        if (jwtExpiration <= 0)
+            throw new IllegalStateException("jwt expiration must be greater than 0");
+
         //Remove old challenges
         executorService.scheduleAtFixedRate(() -> {
             synchronized (challenges) {
@@ -47,7 +55,7 @@ public class AuthService {
     }
 
     public AuthChallenge createChallenge() {
-        var challenge = new AuthChallenge(cryptoService.generateChallenge(), Instant.now().plus(validMinutes, ChronoUnit.MINUTES));
+        var challenge = new AuthChallenge(cryptoService.generateChallenge(), Instant.now().plus(authExpiration, ChronoUnit.SECONDS));
         synchronized (challenges) {
             challenges.add(challenge);
         }
@@ -67,6 +75,34 @@ public class AuthService {
                    .filter(c -> c.getChallenge().equals(challenge))
                    .anyMatch(c -> c.getValidUntil().isAfter(Instant.now()));
         }
+    }
+
+    /**
+     * Creates an jwt
+     * @param user the user
+     * @return the jwt as string
+     */
+    public String createJWT(User user){
+        return Jwts.builder()
+                .subject(user.getId())
+                .issuer("webrtc-server")
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + jwtExpiration * 1000))
+                .signWith(serverService.getServer().getKeys().getPrivate())
+                .compact();
+    }
+
+    /**
+     * Validates the jwt
+     * @param jwt the jwt
+     * @return the user id
+     */
+    public String verifyJWT(String jwt) {
+        var claims = Jwts.parser()
+                .verifyWith(serverService.getServer().getKeys().getPublic())
+                .build()
+                .parseSignedClaims(jwt);
+        return claims.getBody().getSubject();
     }
 
 

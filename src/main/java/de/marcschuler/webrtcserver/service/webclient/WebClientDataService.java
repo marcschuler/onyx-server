@@ -24,4 +24,15 @@ public class WebClientDataService {
     public ServerTreeChangeEvent createServerTreeChangeEvent(WebClient webClient) {
         return serverMapper.mapToDTO(serverService.getServer());
     }
+
+    @Transactional
+    public void updateServerTree() {
+        for (WebClient client : webClientConnectionService.clients()) {
+            try {
+                webClientConnectionService.sendToClient(client, createServerTreeChangeEvent(client));
+            } catch (Exception e) {
+                log.error("Could not send update", e);
+            }
+        }
+    }
 }

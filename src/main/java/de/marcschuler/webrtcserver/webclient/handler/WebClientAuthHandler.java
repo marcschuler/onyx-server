@@ -97,7 +97,10 @@ public class WebClientAuthHandler {
         event.getClient().setUser(user);
         event.getClient().setState(WebClientState.LOGGED_IN);
         userService.save(user);
-        webClientConnectionService.sendToClient(event.getClient(), new AuthSuccessEvent());
+
+        var authSuccessEvent = new AuthSuccessEvent();
+        authSuccessEvent.setJwt(authService.createJWT(user));
+        webClientConnectionService.sendToClient(event.getClient(),authSuccessEvent);
 
         //Send ICE config
         var iceServerData = new IceServerData();

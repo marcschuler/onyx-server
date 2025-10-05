@@ -1,11 +1,10 @@
 package de.marcschuler.webrtcserver.webclient.events.server;
 
-import de.marcschuler.webrtcserver.dto.SectionReference;
+import de.marcschuler.webrtcserver.dto.SectionDTO;
 import de.marcschuler.webrtcserver.webclient.events.EventBody;
 import lombok.Data;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Sends the whole section tree (sections, channels, clients)
@@ -19,6 +18,6 @@ public class ServerTreeChangeEvent extends EventBody {
 
     private String name;
 
-    private List<SectionReference> sections;
+    private List<SectionDTO> sections;
 
 }

@@ -8,13 +8,12 @@ import de.marcschuler.webrtcserver.data.Channel;
 import de.marcschuler.webrtcserver.data.Section;
 import de.marcschuler.webrtcserver.data.Server;
 import de.marcschuler.webrtcserver.data.User;
-import de.marcschuler.webrtcserver.dto.ChannelReference;
-import de.marcschuler.webrtcserver.dto.SectionReference;
-import de.marcschuler.webrtcserver.dto.UserReference;
+import de.marcschuler.webrtcserver.dto.*;
 import de.marcschuler.webrtcserver.service.CryptoService;
 import de.marcschuler.webrtcserver.webclient.events.peer.IceServerData;
 import de.marcschuler.webrtcserver.webclient.events.server.ServerTreeChangeEvent;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.security.PublicKey;
@@ -26,11 +25,23 @@ public abstract class ServerMapper {
     @Autowired
     private CryptoService cryptoService;
 
-    public abstract ServerTreeChangeEvent mapToDTO(Server server);
+    /**
+     * SERVER
+     */
+    public abstract ServerTreeChangeEvent mapToChangeEvent(Server server);
+    public abstract ServerDTO mapToDTO(Server server);
+    public abstract Server update(@MappingTarget Server server, ServerWritableDTO dto);
 
-    public abstract SectionReference mapToDTO(Section section);
+    /**
+     * SECTIONS
+     */
+    public abstract Section mapFromDTO(SectionDTO channel);
+    public abstract Section mapFromDTO(SectionWriteDTO channel);
+    public abstract Section update(@MappingTarget Section section, SectionWriteDTO dto);
+    public abstract SectionDTO mapToDTO(Section section);
 
     public abstract ChannelReference mapToDTO(Channel channel);
+    public abstract Channel mapFromDTO(ChannelReference channel);
 
     public abstract UserReference mapToDTO(User user);
 

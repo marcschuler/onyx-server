@@ -1,23 +1,29 @@
 package de.marcschuler.webrtcserver.controller.v0;
 
-import de.marcschuler.webrtcserver.data.Server;
-import de.marcschuler.webrtcserver.dto.ServerInfo;
-import de.marcschuler.webrtcserver.service.ServerInfoService;
+import de.marcschuler.webrtcserver.dto.SectionDTO;
+import de.marcschuler.webrtcserver.dto.ServerDTO;
+import de.marcschuler.webrtcserver.dto.ServerWritableDTO;
+import de.marcschuler.webrtcserver.mapper.ServerMapper;
+import de.marcschuler.webrtcserver.service.ServerService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/v0")
+@RequestMapping("/v0/server/")
 @RequiredArgsConstructor
 public class ServerController {
 
-    private final ServerInfoService serverInfoService;
+    private final ServerService serverService;
 
-    @GetMapping("info/server")
-    public ServerInfo serverInfo() {
-        return serverInfoService.serverInfo();
+    private final ServerMapper serverMapper;
+
+    @PutMapping("{sectionId}")
+    public ServerDTO edit(@RequestBody ServerWritableDTO serverDto, @PathVariable UUID serverId) {
+        var server = serverService.get(serverId).orElseThrow();
+        serverMapper.update(server,serverDto);
+        serverService.save(server);
+        return serverMapper.mapToDTO(server);
     }
-
 }

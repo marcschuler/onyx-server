@@ -1,4 +1,4 @@
-package de.marcschuler.webrtcserver.service.webclient;
+package de.marcschuler.webrtcserver.service.websocket;
 
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.ServerService;
@@ -12,9 +12,9 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class WebClientDataService {
+public class WebSocketService {
 
-    private final WebClientConnectionService webClientConnectionService;
+    private final WebSocketConnectionService webSocketConnectionService;
     private final ServerService serverService;
 
     private final ServerMapper serverMapper;
@@ -22,16 +22,16 @@ public class WebClientDataService {
 
     @Transactional
     public ServerTreeChangeEvent createServerTreeChangeEvent(WebClient webClient) {
-        return serverMapper.mapToDTO(serverService.getServer());
+        return serverMapper.mapToChangeEvent(serverService.getServer());
     }
 
     @Transactional
     public void updateServerTree() {
-        for (WebClient client : webClientConnectionService.clients()) {
+        for (WebClient client : webSocketConnectionService.clients()) {
             try {
-                webClientConnectionService.sendToClient(client, createServerTreeChangeEvent(client));
+                webSocketConnectionService.sendToClient(client, createServerTreeChangeEvent(client));
             } catch (Exception e) {
-                log.error("Could not send update", e);
+                log.error("Could not send server tree update", e);
             }
         }
     }

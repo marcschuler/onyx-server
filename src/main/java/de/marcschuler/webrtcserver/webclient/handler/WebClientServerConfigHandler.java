@@ -4,25 +4,22 @@ import de.marcschuler.webrtcserver.data.Channel;
 import de.marcschuler.webrtcserver.error.webclient.NotFoundException;
 import de.marcschuler.webrtcserver.service.ChannelService;
 import de.marcschuler.webrtcserver.service.SectionService;
-import de.marcschuler.webrtcserver.service.webclient.WebClientConnectionService;
-import de.marcschuler.webrtcserver.service.webclient.WebClientDataService;
+import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
+import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
 import de.marcschuler.webrtcserver.webclient.events.ClientEvent;
 import de.marcschuler.webrtcserver.webclient.events.config.ChannelCreateRequest;
-import de.marcschuler.webrtcserver.webclient.events.peer.PeerOffer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class WebClientServerConfigHandler {
 
-    private final WebClientConnectionService webClientConnectionService;
-    private final WebClientDataService webClientDataService;
+    private final WebSocketConnectionService webSocketConnectionService;
+    private final WebSocketService webSocketService;
 
     private final ChannelService channelService;
     private final SectionService sectionService;
@@ -36,6 +33,6 @@ public class WebClientServerConfigHandler {
         channel.setSection(section);
         channelService.create(channel);
 
-        webClientDataService.updateServerTree();
+        webSocketService.updateServerTree();
     }
 }

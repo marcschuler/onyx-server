@@ -1,8 +1,8 @@
 package de.marcschuler.webrtcserver.webclient.handler;
 
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
-import de.marcschuler.webrtcserver.service.ServerInfoService;
-import de.marcschuler.webrtcserver.service.webclient.WebClientConnectionService;
+import de.marcschuler.webrtcserver.service.ChannelService;
+import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
 import de.marcschuler.webrtcserver.webclient.events.ClientEvent;
 import de.marcschuler.webrtcserver.webclient.events.channel.ChannelDetailRequest;
 import de.marcschuler.webrtcserver.webclient.events.channel.ChannelDetailResponse;
@@ -20,8 +20,8 @@ import java.io.IOException;
 @Slf4j
 public class WebClientServerEventHandler {
 
-    private final WebClientConnectionService webClientConnectionService;
-    private final ServerInfoService serverInfoService;
+    private final WebSocketConnectionService webSocketConnectionService;
+    private final ChannelService channelService;
 
     private final ServerMapper serverMapper;
 
@@ -29,18 +29,18 @@ public class WebClientServerEventHandler {
     @Transactional
     public void onChannelChangeRequest(ClientEvent<ClientChannelChangeRequest> event) {
         log.info("User {} wants to change channel to {}", event.getClient().getUser().getUsername(), event.getBody().getChannelId());
-        var channel = serverInfoService.channelById(event.getBody().getChannelId()).get();
-        webClientConnectionService.moveClient(event.getClient(), channel);
+        var channel = channelService.get(event.getBody().getChannelId()).get();
+        webSocketConnectionService.moveClient(event.getClient(), channel);
     }
 
     @EventListener
     @Transactional
     public void onChannelDetailRequest(ClientEvent<ChannelDetailRequest> event) throws IOException {
-        var channel = serverInfoService.channelById(event.getBody().getChannelId()).get();
+        var channel = channelService.get(event.getBody().getChannelId()).get();
 
         var response = new ChannelDetailResponse(serverMapper.mapToDTO(channel));
         response.setRespondsTo(event.getBody().getRequestId());
-        webClientConnectionService.sendToClient(event.getClient(),
+        webSocketConnectionService.sendToClient(event.getClient(),
                 response);
     }
 }

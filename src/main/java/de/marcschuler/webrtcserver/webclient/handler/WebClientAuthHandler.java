@@ -10,8 +10,8 @@ import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.AuthService;
 import de.marcschuler.webrtcserver.service.CryptoService;
 import de.marcschuler.webrtcserver.service.UserService;
-import de.marcschuler.webrtcserver.service.webclient.WebClientConnectionService;
-import de.marcschuler.webrtcserver.service.webclient.WebClientDataService;
+import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
+import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
 import de.marcschuler.webrtcserver.webclient.KickReason;
 import de.marcschuler.webrtcserver.webclient.WebClient;
 import de.marcschuler.webrtcserver.webclient.WebClientState;
@@ -39,8 +39,8 @@ import java.time.Instant;
 @Slf4j
 public class WebClientAuthHandler {
 
-    private final WebClientConnectionService webClientConnectionService;
-    private final WebClientDataService webClientDataService;
+    private final WebSocketConnectionService webSocketConnectionService;
+    private final WebSocketService webSocketService;
 
     private final AuthService authService;
     private final CryptoService cryptoService;
@@ -77,9 +77,9 @@ public class WebClientAuthHandler {
         }
 
         var keyId = cryptoService.generateKeyId(publicKey);
-        if (webClientConnectionService.clientFromKeyId(keyId).isPresent()) {
+        if (webSocketConnectionService.clientFromKeyId(keyId).isPresent()) {
             log.info("Client {} is already connected. Kicking new instance", event.getClient().getUser().getUsername());
-            webClientConnectionService.kickClient(event.getClient(), KickReason.ALREADY_CONNECTED);
+            webSocketConnectionService.kickClient(event.getClient(), KickReason.ALREADY_CONNECTED);
             return;
         }
         var user = userService.findById(keyId)
@@ -100,19 +100,19 @@ public class WebClientAuthHandler {
 
         var authSuccessEvent = new AuthSuccessEvent();
         authSuccessEvent.setJwt(authService.createJWT(user));
-        webClientConnectionService.sendToClient(event.getClient(),authSuccessEvent);
+        webSocketConnectionService.sendToClient(event.getClient(),authSuccessEvent);
 
         //Send ICE config
         var iceServerData = new IceServerData();
         iceServerData.setIceServers(serverMapper.mapToDTO(webRTConfig.getConfig().getIce()));
-        webClientConnectionService.sendToClient(event.getClient(), iceServerData);
+        webSocketConnectionService.sendToClient(event.getClient(), iceServerData);
 
-        var serverTreeChangeEvent = webClientDataService.createServerTreeChangeEvent(event.getClient());
-        webClientConnectionService.sendToClient(event.getClient(), serverTreeChangeEvent);
+        var serverTreeChangeEvent = webSocketService.createServerTreeChangeEvent(event.getClient());
+        webSocketConnectionService.sendToClient(event.getClient(), serverTreeChangeEvent);
 
-        for (WebClient client : webClientConnectionService.clients()) {
+        for (WebClient client : webSocketConnectionService.clients()) {
             if (client != event.getClient() && client.getChannel() != null) {
-                webClientConnectionService.sendToClient(event.getClient(), new ClientChannelJoinEvent(
+                webSocketConnectionService.sendToClient(event.getClient(), new ClientChannelJoinEvent(
                         serverMapper.mapToDTO(client.getUser()),
                         client.getChannel().getId()
                 ));

@@ -1,18 +1,15 @@
-package de.marcschuler.webrtcserver.service.webclient;
+package de.marcschuler.webrtcserver.service.websocket;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import de.marcschuler.webrtcserver.data.Channel;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.AuthService;
-import de.marcschuler.webrtcserver.service.ServerInfoService;
 import de.marcschuler.webrtcserver.webclient.KickReason;
 import de.marcschuler.webrtcserver.webclient.WebClient;
 import de.marcschuler.webrtcserver.webclient.WebClientState;
 import de.marcschuler.webrtcserver.webclient.events.ClientEvent;
 import de.marcschuler.webrtcserver.webclient.events.EventBody;
-import de.marcschuler.webrtcserver.webclient.events.ServerInfoEventBody;
 import de.marcschuler.webrtcserver.webclient.events.auth.AuthChallengeRequest;
 import de.marcschuler.webrtcserver.webclient.events.auth.AuthChallengeResponse;
 import de.marcschuler.webrtcserver.webclient.events.client.ClientChannelJoinEvent;
@@ -41,9 +38,8 @@ import java.util.Vector;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class WebClientConnectionService extends TextWebSocketHandler {
+public class WebSocketConnectionService extends TextWebSocketHandler {
 
-    private final ServerInfoService serverInfoService;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final AuthService authService;
 

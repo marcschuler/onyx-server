@@ -1,6 +1,7 @@
 package de.marcschuler.webrtcserver.data;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,7 @@ public class Channel {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name="channels")
+    @JoinColumn(name="section_id")
+    @NotNull
     private Section section;
 }

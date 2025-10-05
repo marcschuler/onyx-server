@@ -31,4 +31,6 @@ public class User {
     @Column(nullable = false)
     private Instant knownSince;
     private Instant lastSeen;
+
+    private boolean owner;
 }

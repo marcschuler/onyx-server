@@ -10,6 +10,7 @@ import lombok.ToString;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,15 +23,13 @@ public class Server {
     @Size(min = 3, max = 64)
     private String name;
 
-    @NotNull
-    @OneToMany(cascade = CascadeType.ALL)
-    @OrderColumn
-    private List<Section> sections;
-
-    @NotNull
-    @OneToOne(cascade = CascadeType.ALL)
-    @Deprecated
-    private Channel defaultChannel;
+    @OneToMany(
+            mappedBy = "server",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @OrderColumn(name = "section_order")
+    private List<Section> sections = new ArrayList<>();
 
     @JsonIgnore
     @ToString.Exclude

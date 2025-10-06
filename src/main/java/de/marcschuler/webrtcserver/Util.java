@@ -1,8 +1,12 @@
 package de.marcschuler.webrtcserver;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.List;
 
 public class Util {
+
+    public static final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * Moves an element to a new order

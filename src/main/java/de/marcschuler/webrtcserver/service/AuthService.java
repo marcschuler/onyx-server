@@ -1,6 +1,8 @@
 package de.marcschuler.webrtcserver.service;
 
 import de.marcschuler.webrtcserver.data.User;
+import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
+import de.marcschuler.webrtcserver.webclient.events.auth.JwtTokenMessage;
 import io.jsonwebtoken.Jwts;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.NotNull;
@@ -10,10 +12,13 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -28,6 +33,7 @@ public class AuthService {
     private final CryptoService cryptoService;
 
     private final ServerService serverService;
+    private final WebSocketConnectionService webSocketConnectionService;
 
     private final ScheduledExecutorService executorService;
 
@@ -37,14 +43,14 @@ public class AuthService {
     private int authExpiration;
 
     @Value("${iris.auth.jwt.expiration}")
-    private long jwtExpiration;
+    private Duration jwtExpiration;
+    @Value("${iris.auth.jwt.refresh}")
+    private Duration jwtRefresh;
 
     @PostConstruct
     void init() {
         if (authExpiration <= 0)
             throw new IllegalStateException("challenge expiration must be greater than 0");
-        if (jwtExpiration <= 0)
-            throw new IllegalStateException("jwt expiration must be greater than 0");
 
         //Remove old challenges
         executorService.scheduleAtFixedRate(() -> {
@@ -52,6 +58,19 @@ public class AuthService {
                 this.challenges.removeIf(challenge -> challenge.validUntil.isAfter(Instant.now()));
             }
         }, 1, 1, TimeUnit.MINUTES);
+    }
+
+    @Scheduled(fixedRateString = "${iris.auth.jwt.refresh")
+    public void refreshToken() {
+        webSocketConnectionService.clientsInteractable()
+                .forEach(client -> {
+                    var jwt = this.createJWT(client.getUser());
+                    try {
+                        client.sendMessage(new JwtTokenMessage(jwt));
+                    } catch (IOException e) {
+                        log.error("Could not send message to client", e);
+                    }
+                });
     }
 
     public AuthChallenge createChallenge() {
@@ -66,34 +85,37 @@ public class AuthService {
      * Checks that the challenge is a valid challenge from the server and
      * it is answered in time. A challenge may be checked multiple times
      * using this function
+     *
      * @param challenge the challenge to check
      * @return true if valid, false if invalid
      */
     public boolean isValidChallenge(@NotNull String challenge) {
         synchronized (challenges) {
-           return challenges.stream()
-                   .filter(c -> c.getChallenge().equals(challenge))
-                   .anyMatch(c -> c.getValidUntil().isAfter(Instant.now()));
+            return challenges.stream()
+                    .filter(c -> c.getChallenge().equals(challenge))
+                    .anyMatch(c -> c.getValidUntil().isAfter(Instant.now()));
         }
     }
 
     /**
      * Creates an jwt
+     *
      * @param user the user
      * @return the jwt as string
      */
-    public String createJWT(User user){
+    public String createJWT(User user) {
         return Jwts.builder()
                 .subject(user.getId())
                 .issuer("webrtc-server")
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + jwtExpiration * 1000))
+                .expiration(new Date(System.currentTimeMillis() + jwtExpiration.toMillis()))
                 .signWith(serverService.getServer().getKeys().getPrivate())
                 .compact();
     }
 
     /**
      * Validates the jwt
+     *
      * @param jwt the jwt
      * @return the user id
      */

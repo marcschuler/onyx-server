@@ -100,15 +100,15 @@ public class WebClientAuthHandler {
 
         var authSuccessEvent = new AuthSuccessEvent();
         authSuccessEvent.setJwt(authService.createJWT(user));
-        webSocketConnectionService.sendToClient(event.getClient(),authSuccessEvent);
+        event.getClient().sendMessage(authSuccessEvent);
 
         //Send ICE config
         var iceServerData = new IceServerData();
         iceServerData.setIceServers(serverMapper.mapToDTO(webRTConfig.getConfig().getIce()));
-        webSocketConnectionService.sendToClient(event.getClient(), iceServerData);
+        event.getClient().sendMessage(iceServerData);
 
         var serverTreeChangeEvent = webSocketService.createServerTreeChangeEvent(event.getClient());
-        webSocketConnectionService.sendToClient(event.getClient(), serverTreeChangeEvent);
+        event.getClient().sendMessage(serverTreeChangeEvent);
 
         for (WebClient client : webSocketConnectionService.clients()) {
             if (client != event.getClient() && client.getChannel() != null) {

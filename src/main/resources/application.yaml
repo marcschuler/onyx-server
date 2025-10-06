@@ -15,9 +15,10 @@ spring:
 iris:
   auth:
     challenge:
-      expiration: 60
+      expiration: 1m
     jwt:
-      expiration: 300
+      expiration: 5m
+      refresh: 4m30s
 
 webrtc:
   config:

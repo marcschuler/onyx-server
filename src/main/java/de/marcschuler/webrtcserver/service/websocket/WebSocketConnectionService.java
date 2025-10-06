@@ -128,6 +128,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
         client.getSession().close();
     }
 
+    @Deprecated
     public void sendToClient(WebClient client, EventBody eventBody) throws IOException {
         var data = objectMapper.writeValueAsBytes(eventBody);
         client.getSession().sendMessage(new TextMessage(data));
@@ -181,6 +182,12 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
 
     public List<WebClient> clients(){
         return this.sessions;
+    }
+
+    public List<WebClient> clientsInteractable(){
+        return this.sessions.stream()
+                .filter(c -> c.getState().isInteractionAllowed())
+                .toList();
     }
 
 }

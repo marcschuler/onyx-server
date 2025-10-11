@@ -12,12 +12,11 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -33,14 +32,15 @@ public class AuthService {
     private final CryptoService cryptoService;
 
     private final ServerService serverService;
-    private final WebSocketConnectionService webSocketConnectionService;
+    @Lazy
+    private WebSocketConnectionService webSocketConnectionService;
 
     private final ScheduledExecutorService executorService;
 
     private final List<AuthChallenge> challenges = new ArrayList<>();
 
     @Value("${iris.auth.challenge.expiration}")
-    private int authExpiration;
+    private Duration challengeExpiration;
 
     @Value("${iris.auth.jwt.expiration}")
     private Duration jwtExpiration;
@@ -49,9 +49,6 @@ public class AuthService {
 
     @PostConstruct
     void init() {
-        if (authExpiration <= 0)
-            throw new IllegalStateException("challenge expiration must be greater than 0");
-
         //Remove old challenges
         executorService.scheduleAtFixedRate(() -> {
             synchronized (challenges) {
@@ -74,7 +71,7 @@ public class AuthService {
     }
 
     public AuthChallenge createChallenge() {
-        var challenge = new AuthChallenge(cryptoService.generateChallenge(), Instant.now().plus(authExpiration, ChronoUnit.SECONDS));
+        var challenge = new AuthChallenge(cryptoService.generateChallenge(), Instant.now().plus(challengeExpiration.toMillis(), ChronoUnit.MILLIS));
         synchronized (challenges) {
             challenges.add(challenge);
         }

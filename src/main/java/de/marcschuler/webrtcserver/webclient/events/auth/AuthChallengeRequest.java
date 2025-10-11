@@ -1,7 +1,7 @@
 package de.marcschuler.webrtcserver.webclient.events.auth;
 
 import de.marcschuler.webrtcserver.service.AuthService;
-import de.marcschuler.webrtcserver.webclient.events.EventBody;
+import de.marcschuler.webrtcserver.webclient.events.MessageBody;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,7 +11,7 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
-public class AuthChallengeRequest extends EventBody {
+public class AuthChallengeRequest extends MessageBody {
 
     @NotNull
     private final AuthService.AuthChallenge challenge;

@@ -15,11 +15,11 @@ import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
 import de.marcschuler.webrtcserver.webclient.KickReason;
 import de.marcschuler.webrtcserver.webclient.WebClient;
 import de.marcschuler.webrtcserver.webclient.WebClientState;
-import de.marcschuler.webrtcserver.webclient.events.ClientEvent;
+import de.marcschuler.webrtcserver.webclient.events.ClientMessage;
 import de.marcschuler.webrtcserver.webclient.events.auth.AuthChallengeResponse;
-import de.marcschuler.webrtcserver.webclient.events.auth.AuthSuccessEvent;
-import de.marcschuler.webrtcserver.webclient.events.client.ClientChannelJoinEvent;
-import de.marcschuler.webrtcserver.webclient.events.peer.IceServerData;
+import de.marcschuler.webrtcserver.webclient.events.auth.AuthSuccessMessage;
+import de.marcschuler.webrtcserver.webclient.events.client.ClientChannelJoinMessage;
+import de.marcschuler.webrtcserver.webclient.events.peer.IceServerMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -51,7 +51,7 @@ public class WebClientAuthHandler {
     private final WebRTConfig webRTConfig;
 
     @EventListener
-    public void onLogin(ClientEvent<AuthChallengeResponse> event) throws IOException {
+    public void onLogin(ClientMessage<AuthChallengeResponse> event) throws IOException {
         log.info("Responding to auth challenge");
         var content = event.getBody().getChallenge();
         var username = event.getBody().getUsername();
@@ -98,12 +98,12 @@ public class WebClientAuthHandler {
         event.getClient().setState(WebClientState.LOGGED_IN);
         userService.save(user);
 
-        var authSuccessEvent = new AuthSuccessEvent();
+        var authSuccessEvent = new AuthSuccessMessage();
         authSuccessEvent.setJwt(authService.createJWT(user));
         event.getClient().sendMessage(authSuccessEvent);
 
         //Send ICE config
-        var iceServerData = new IceServerData();
+        var iceServerData = new IceServerMessage();
         iceServerData.setIceServers(serverMapper.mapToDTO(webRTConfig.getConfig().getIce()));
         event.getClient().sendMessage(iceServerData);
 
@@ -112,7 +112,7 @@ public class WebClientAuthHandler {
 
         for (WebClient client : webSocketConnectionService.clients()) {
             if (client != event.getClient() && client.getChannel() != null) {
-                webSocketConnectionService.sendToClient(event.getClient(), new ClientChannelJoinEvent(
+                webSocketConnectionService.sendToClient(event.getClient(), new ClientChannelJoinMessage(
                         serverMapper.mapToDTO(client.getUser()),
                         client.getChannel().getId()
                 ));

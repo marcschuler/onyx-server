@@ -1,13 +1,11 @@
 package de.marcschuler.webrtcserver.webclient.events.peer;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import de.marcschuler.webrtcserver.webclient.events.EventBody;
+import de.marcschuler.webrtcserver.webclient.events.MessageBody;
 import lombok.Data;
 
-import java.util.Map;
-
 @Data
-public class PeerOffer extends EventBody {
+public class PeerOffer extends MessageBody {
     private String clientTo;
 
     private JsonNode offer;

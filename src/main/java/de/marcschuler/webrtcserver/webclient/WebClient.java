@@ -1,11 +1,10 @@
 package de.marcschuler.webrtcserver.webclient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import de.marcschuler.webrtcserver.Util;
 import de.marcschuler.webrtcserver.data.Channel;
 import de.marcschuler.webrtcserver.data.User;
-import de.marcschuler.webrtcserver.webclient.events.EventBody;
+import de.marcschuler.webrtcserver.webclient.events.MessageBody;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -28,8 +27,8 @@ public class WebClient {
     @Nullable
     private Channel channel;
 
-    public void sendMessage(EventBody eventBody) throws IOException {
-        var data = Util.objectMapper.writeValueAsBytes(eventBody);
+    public void sendMessage(MessageBody messageBody) throws IOException {
+        var data = Util.objectMapper.writeValueAsBytes(messageBody);
         this.session.sendMessage(new TextMessage(data));
     }
 }

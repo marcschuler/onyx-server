@@ -6,7 +6,7 @@ import de.marcschuler.webrtcserver.service.ChannelService;
 import de.marcschuler.webrtcserver.service.SectionService;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
-import de.marcschuler.webrtcserver.webclient.events.ClientEvent;
+import de.marcschuler.webrtcserver.webclient.events.ClientMessage;
 import de.marcschuler.webrtcserver.webclient.events.config.ChannelCreateRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ public class WebClientServerConfigHandler {
     private final SectionService sectionService;
 
     @EventListener
-    public void onOffer(ClientEvent<ChannelCreateRequest> event) throws NotFoundException {
+    public void onOffer(ClientMessage<ChannelCreateRequest> event) throws NotFoundException {
         var section = sectionService.findById(event.getBody().getSection())
                 .orElseThrow(()-> new NotFoundException("Section " + event.getBody().getSection() + " does not exist"));
         var channel = new Channel();

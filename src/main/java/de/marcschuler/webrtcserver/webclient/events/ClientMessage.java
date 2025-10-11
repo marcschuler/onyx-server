@@ -8,7 +8,7 @@ import org.springframework.core.ResolvableTypeProvider;
 
 @RequiredArgsConstructor
 @Data
-public class ClientEvent <T extends EventBody> implements ResolvableTypeProvider {
+public class ClientMessage<T extends MessageBody> implements ResolvableTypeProvider {
     private final T body;
     private final WebClient client;
 

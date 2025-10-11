@@ -1,6 +1,6 @@
 package de.marcschuler.webrtcserver.webclient.events.client;
 
-import de.marcschuler.webrtcserver.webclient.events.EventBody;
+import de.marcschuler.webrtcserver.webclient.events.MessageBody;
 import lombok.Data;
 
 import java.util.UUID;
@@ -10,7 +10,7 @@ import java.util.UUID;
  * The server may not allow this
  */
 @Data
-public class ClientChannelChangeRequest extends EventBody {
+public class ClientChannelChangeRequest extends MessageBody {
 
     private UUID channelId;
 

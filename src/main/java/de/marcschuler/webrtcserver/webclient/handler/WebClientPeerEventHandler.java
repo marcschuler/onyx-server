@@ -1,7 +1,7 @@
 package de.marcschuler.webrtcserver.webclient.handler;
 
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
-import de.marcschuler.webrtcserver.webclient.events.ClientEvent;
+import de.marcschuler.webrtcserver.webclient.events.ClientMessage;
 import de.marcschuler.webrtcserver.webclient.events.peer.PeerAnswer;
 import de.marcschuler.webrtcserver.webclient.events.peer.PeerAnswerForward;
 import de.marcschuler.webrtcserver.webclient.events.peer.PeerOffer;
@@ -26,7 +26,7 @@ public class WebClientPeerEventHandler {
     private final WebSocketConnectionService webSocketConnectionService;
 
     @EventListener
-    public void onOffer(ClientEvent<PeerOffer> event) throws IOException {
+    public void onOffer(ClientMessage<PeerOffer> event) throws IOException {
         var clientFrom = event.getClient().getUser().getUsername();
         log.info("Forwarding peer offer from {} to {}", clientFrom, event.getBody().getClientTo());
         var clientTo = webSocketConnectionService.clientFromKeyId(event.getBody().getClientTo()).get();
@@ -42,7 +42,7 @@ public class WebClientPeerEventHandler {
     }
 
     @EventListener
-    public void onAnswer(ClientEvent<PeerAnswer> event) throws IOException {
+    public void onAnswer(ClientMessage<PeerAnswer> event) throws IOException {
         var clientFrom = event.getClient().getUser().getUsername();
         log.info("Forwarding peer answer from {} to {}", clientFrom, event.getBody().getClientTo());
         var clientTo = webSocketConnectionService.clientFromKeyId(event.getBody().getClientTo()).get();

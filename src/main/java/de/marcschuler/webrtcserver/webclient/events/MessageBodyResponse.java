@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-public class EventBodyResponse <T extends EventBodyRequest> extends EventBody {
+public class MessageBodyResponse<T extends MessageBodyRequest> extends MessageBody {
     @NotNull
     protected UUID respondsTo;
 }

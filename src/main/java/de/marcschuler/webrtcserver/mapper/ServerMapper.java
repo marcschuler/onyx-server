@@ -10,8 +10,8 @@ import de.marcschuler.webrtcserver.data.Server;
 import de.marcschuler.webrtcserver.data.User;
 import de.marcschuler.webrtcserver.dto.*;
 import de.marcschuler.webrtcserver.service.CryptoService;
-import de.marcschuler.webrtcserver.webclient.events.peer.IceServerData;
-import de.marcschuler.webrtcserver.webclient.events.server.ServerTreeChangeEvent;
+import de.marcschuler.webrtcserver.webclient.events.peer.IceServerMessage;
+import de.marcschuler.webrtcserver.webclient.events.server.ServerTreeChangeMessage;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public abstract class ServerMapper {
     /**
      * SERVER
      */
-    public abstract ServerTreeChangeEvent mapToChangeEvent(Server server);
+    public abstract ServerTreeChangeMessage mapToChangeEvent(Server server);
     public abstract ServerDTO mapToDTO(Server server);
     public abstract Server update(@MappingTarget Server server, ServerWritableDTO dto);
 
@@ -45,9 +45,9 @@ public abstract class ServerMapper {
 
     public abstract UserReference mapToDTO(User user);
 
-    public abstract IceServerData.IceServer mapToDTO(WebRTConfig.IceConfig iceConfig);
+    public abstract IceServerMessage.IceServer mapToDTO(WebRTConfig.IceConfig iceConfig);
 
-    public abstract List<IceServerData.IceServer> mapToDTO(List<WebRTConfig.IceConfig> iceConfig);
+    public abstract List<IceServerMessage.IceServer> mapToDTO(List<WebRTConfig.IceConfig> iceConfig);
 
     JWK mapKeyToJWK(PublicKey key) {
         return this.cryptoService.exportPublicKey(key);

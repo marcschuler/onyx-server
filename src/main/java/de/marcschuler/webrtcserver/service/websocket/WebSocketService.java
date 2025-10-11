@@ -3,7 +3,7 @@ package de.marcschuler.webrtcserver.service.websocket;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.ServerService;
 import de.marcschuler.webrtcserver.webclient.WebClient;
-import de.marcschuler.webrtcserver.webclient.events.server.ServerTreeChangeEvent;
+import de.marcschuler.webrtcserver.webclient.events.server.ServerTreeChangeMessage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ public class WebSocketService {
 
 
     @Transactional
-    public ServerTreeChangeEvent createServerTreeChangeEvent(WebClient webClient) {
+    public ServerTreeChangeMessage createServerTreeChangeEvent(WebClient webClient) {
         return serverMapper.mapToChangeEvent(serverService.getServer());
     }
 

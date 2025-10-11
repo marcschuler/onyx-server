@@ -9,7 +9,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class ServerInfoEventBody extends EventBody {
+public class ServerInfoMessageBody extends MessageBody {
     private Server server;
     private List<WebClient> clients;
 }

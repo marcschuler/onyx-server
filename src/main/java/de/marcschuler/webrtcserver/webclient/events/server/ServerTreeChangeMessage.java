@@ -1,7 +1,7 @@
 package de.marcschuler.webrtcserver.webclient.events.server;
 
 import de.marcschuler.webrtcserver.dto.SectionDTO;
-import de.marcschuler.webrtcserver.webclient.events.EventBody;
+import de.marcschuler.webrtcserver.webclient.events.MessageBody;
 import lombok.Data;
 
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.List;
  * So this could fire on join or when the client permissions are changed
  */
 @Data
-public class ServerTreeChangeEvent extends EventBody {
+public class ServerTreeChangeMessage extends MessageBody {
 
     private String name;
 

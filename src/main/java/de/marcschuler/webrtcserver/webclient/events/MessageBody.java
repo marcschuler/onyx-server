@@ -14,7 +14,7 @@ import lombok.*;
 })*/
 @Getter
 @Setter
-public abstract class EventBody {
+public abstract class MessageBody {
 
 
     /*@RequiredArgsConstructor

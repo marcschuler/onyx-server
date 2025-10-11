@@ -3,7 +3,7 @@ package de.marcschuler.webrtcserver.webclient.handler;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.ChannelService;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
-import de.marcschuler.webrtcserver.webclient.events.ClientEvent;
+import de.marcschuler.webrtcserver.webclient.events.ClientMessage;
 import de.marcschuler.webrtcserver.webclient.events.channel.ChannelDetailRequest;
 import de.marcschuler.webrtcserver.webclient.events.channel.ChannelDetailResponse;
 import de.marcschuler.webrtcserver.webclient.events.client.ClientChannelChangeRequest;
@@ -27,7 +27,7 @@ public class WebClientServerEventHandler {
 
     @EventListener
     @Transactional
-    public void onChannelChangeRequest(ClientEvent<ClientChannelChangeRequest> event) {
+    public void onChannelChangeRequest(ClientMessage<ClientChannelChangeRequest> event) {
         log.info("User {} wants to change channel to {}", event.getClient().getUser().getUsername(), event.getBody().getChannelId());
         var channel = channelService.get(event.getBody().getChannelId()).get();
         webSocketConnectionService.moveClient(event.getClient(), channel);
@@ -35,7 +35,7 @@ public class WebClientServerEventHandler {
 
     @EventListener
     @Transactional
-    public void onChannelDetailRequest(ClientEvent<ChannelDetailRequest> event) throws IOException {
+    public void onChannelDetailRequest(ClientMessage<ChannelDetailRequest> event) throws IOException {
         var channel = channelService.get(event.getBody().getChannelId()).get();
 
         var response = new ChannelDetailResponse(serverMapper.mapToDTO(channel));

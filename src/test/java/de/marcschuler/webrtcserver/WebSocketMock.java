@@ -2,73 +2,96 @@ package de.marcschuler.webrtcserver;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.marcschuler.webrtcserver.webclient.events.EventBody;
+import de.marcschuler.webrtcserver.webclient.events.MessageBody;
 import de.marcschuler.webrtcserver.webclient.events.auth.AuthChallengeResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
-import java.net.URI;
+import java.util.List;
 import java.util.concurrent.*;
 
 @RequiredArgsConstructor
+@Slf4j
 public class WebSocketMock {
 
     private final ObjectMapper objectMapper;
 
     private WebSocketSession session;
-    private String msg;
-    private final CountDownLatch latch = new CountDownLatch(1);
+    private final BlockingQueue<String> messageQueue = new LinkedBlockingQueue<>();
 
-    public WebSocketSession connect() throws InterruptedException, ExecutionException, TimeoutException {
+    public void connect() throws ExecutionException, InterruptedException, TimeoutException {
         StandardWebSocketClient client = new StandardWebSocketClient();
-        var se =  client.execute(new WebSocketHandler() {
+        CompletableFuture<WebSocketSession> responseFuture = new CompletableFuture<>();
+
+        WebSocketHandler handler = new TextWebSocketHandler() {
             @Override
             public void afterConnectionEstablished(WebSocketSession s) throws Exception {
-                System.out.println("Connected to server");
-                session = s;
+                log.info("connected to server");
+                responseFuture.complete(s);
             }
 
             @Override
-            public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
-                System.out.println("Received: " + message.getPayload());
-                while(msg!=null){
-                    Thread.sleep(10);
-                }
-                msg = (String) message.getPayload();
-                latch.countDown();
+            public void handleTextMessage(WebSocketSession session, TextMessage message) {
+                messageQueue.offer(message.getPayload());
             }
 
             @Override
-            public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
-                System.err.println("Transport error: " + exception.getMessage());
+            public void handleTransportError(WebSocketSession session, Throwable exception) {
+                log.error("Error: Connection closed",exception);
+                responseFuture.completeExceptionally(exception);
             }
-
-            @Override
-            public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
-                System.out.println("Connection closed: " + closeStatus);
-            }
-
-            @Override
-            public boolean supportsPartialMessages() {
-                return false;
-            }
-        }, "ws://localhost:8080/websocket");
-
-        return se.get(5, TimeUnit.SECONDS);
+        };
+        log.info("waiting for connection");
+        client.execute(handler, "ws://localhost:8080/websocket").get(2, TimeUnit.SECONDS);
+        this.session = responseFuture.get(5, TimeUnit.SECONDS);
     }
 
     public void sendMessage(String message) throws IOException {
         session.sendMessage(new TextMessage(message));
     }
 
-    public <T extends EventBody> T recv() throws InterruptedException, JsonProcessingException {
-        latch.await(5,TimeUnit.SECONDS);
-        var m = msg;
-        msg=null;
-        return (T) objectMapper.readValue(m, EventBody.class);
+    // Receive the next message
+    public <T extends MessageBody> T recv() throws InterruptedException, JsonProcessingException {
+        return recv(List.of());
     }
+
+    // Receive the next message, ignoring this ones
+    public <T extends MessageBody> T recv(List<Class<? extends MessageBody>> ignoredMessages) throws InterruptedException, JsonProcessingException {
+        while (true) {
+            if (!session.isOpen())
+                throw new IllegalStateException("Connection closed");
+            var m = messageQueue.poll(5, TimeUnit.SECONDS);
+            if (m==null)
+                throw new IllegalStateException("No message in queue - was connection closed?");
+            T t = (T) objectMapper.readValue(m, MessageBody.class);
+            if (ignoredMessages.contains(t.getClass())) {
+                log.info("ignoring message: {}", t.getClass());
+                continue;
+            }
+            return t;
+        }
+    }
+
+    public boolean isOpen(){
+        return session.isOpen();
+    }
+
+    // Receive the next message of a special type
+    public <T extends MessageBody> T recv(Class<? extends MessageBody> wantedMessage) throws InterruptedException, JsonProcessingException {
+        while (true) {
+            var m = messageQueue.poll(10, TimeUnit.SECONDS);
+            T t = (T) objectMapper.readValue(m, MessageBody.class);
+            if (t.getClass().equals(wantedMessage))
+                return t;
+            log.info("ignoring message {} that is not {}", t.getClass(), wantedMessage);
+        }
+
+    }
+
 
     public void close() throws IOException {
         session.close();

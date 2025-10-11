@@ -1,12 +1,12 @@
 package de.marcschuler.webrtcserver.webclient.events.config;
 
-import de.marcschuler.webrtcserver.webclient.events.EventBody;
+import de.marcschuler.webrtcserver.webclient.events.MessageBody;
 import lombok.Data;
 
 import java.util.UUID;
 
 @Data
-public class ChannelCreateRequest extends EventBody {
+public class ChannelCreateRequest extends MessageBody {
     private String name;
     private UUID section;;
 }

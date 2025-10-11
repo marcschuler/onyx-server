@@ -128,6 +128,10 @@ public class CryptoService {
      * @param <T>       the type of T.
      */
     public <T> T verifyContent(SignedContent<T> content, Class<T> clazz, PublicKey publicKey) throws InvalidKeyException, JsonProcessingException, SignatureException, NoSuchAlgorithmException {
+        if (content==null)
+            throw new SignatureException("SignedContent is null");
+        if (content.getContent()==null || content.getContentSignature()==null)
+            throw new SignatureException("Content and/or content signature is null");
         var signature = Signature.getInstance(CRYPTO_ALGORITHM);
         signature.initVerify(publicKey);
         signature.update(content.getContent().getBytes(StandardCharsets.UTF_8));

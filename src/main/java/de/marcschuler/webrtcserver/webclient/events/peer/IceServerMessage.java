@@ -1,12 +1,12 @@
 package de.marcschuler.webrtcserver.webclient.events.peer;
 
-import de.marcschuler.webrtcserver.webclient.events.EventBody;
+import de.marcschuler.webrtcserver.webclient.events.MessageBody;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class IceServerData extends EventBody {
+public class IceServerMessage extends MessageBody {
     private List<IceServer> iceServers;
 
     @Data

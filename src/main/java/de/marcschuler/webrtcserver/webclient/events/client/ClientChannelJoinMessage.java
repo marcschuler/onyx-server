@@ -1,7 +1,7 @@
 package de.marcschuler.webrtcserver.webclient.events.client;
 
 import de.marcschuler.webrtcserver.dto.UserReference;
-import de.marcschuler.webrtcserver.webclient.events.EventBody;
+import de.marcschuler.webrtcserver.webclient.events.MessageBody;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -17,7 +17,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ClientChannelJoinEvent extends EventBody {
+public class ClientChannelJoinMessage extends MessageBody {
     @NotNull
     private UserReference user;
     @Nullable

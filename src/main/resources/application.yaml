@@ -18,7 +18,7 @@ iris:
       expiration: 1m
     jwt:
       expiration: 5m
-      refresh: 4m30s
+      refresh: 4m
 
 webrtc:
   config:

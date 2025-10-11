@@ -8,12 +8,12 @@ import de.marcschuler.webrtcserver.service.AuthService;
 import de.marcschuler.webrtcserver.webclient.KickReason;
 import de.marcschuler.webrtcserver.webclient.WebClient;
 import de.marcschuler.webrtcserver.webclient.WebClientState;
-import de.marcschuler.webrtcserver.webclient.events.ClientEvent;
-import de.marcschuler.webrtcserver.webclient.events.EventBody;
+import de.marcschuler.webrtcserver.webclient.events.ClientMessage;
+import de.marcschuler.webrtcserver.webclient.events.MessageBody;
 import de.marcschuler.webrtcserver.webclient.events.auth.AuthChallengeRequest;
 import de.marcschuler.webrtcserver.webclient.events.auth.AuthChallengeResponse;
-import de.marcschuler.webrtcserver.webclient.events.client.ClientChannelJoinEvent;
-import de.marcschuler.webrtcserver.webclient.events.client.ClientChannelLeaveEvent;
+import de.marcschuler.webrtcserver.webclient.events.client.ClientChannelJoinMessage;
+import de.marcschuler.webrtcserver.webclient.events.client.ClientChannelLeaveMessage;
 import de.marcschuler.webrtcserver.webclient.events.connection.KickMessage;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.NotNull;
@@ -49,13 +49,13 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
 
     private final List<WebClient> sessions = new Vector<>();
 
-    private final List<Class<? extends EventBody>> allowedEventsWhenUnauthorized = List.of(AuthChallengeResponse.class);
+    private final List<Class<? extends MessageBody>> allowedEventsWhenUnauthorized = List.of(AuthChallengeResponse.class);
 
     @PostConstruct
     public void init() {
         var names = new ArrayList<String>();
         new Reflections("de.marcschuler.webrtcserver.webclient.events")
-                .getSubTypesOf(EventBody.class)
+                .getSubTypesOf(MessageBody.class)
                 .stream()
                 .filter(c -> !Modifier.isAbstract(c.getModifiers()))
                 .filter(c -> !Modifier.isInterface(c.getModifiers()))
@@ -78,7 +78,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
     @Override
     public synchronized void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         log.info("Received message {} from {}", new String(message.asBytes()), session);
-        var event = objectMapper.readValue(message.asBytes(), EventBody.class);
+        var event = objectMapper.readValue(message.asBytes(), MessageBody.class);
         var client = clientFromSession(session).get();
 
         if (!client.getState().isInteractionAllowed()) {
@@ -89,7 +89,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
         }
 
         log.info("Sending event {} to bus", event.getClass().getSimpleName());
-        applicationEventPublisher.publishEvent(new ClientEvent<>(event, client));
+        applicationEventPublisher.publishEvent(new ClientMessage<>(event, client));
     }
 
     public void moveClient(WebClient client, Channel channel) {
@@ -97,12 +97,12 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
         client.setChannel(channel);
 
         if (channel!=null){
-            sendToAllClients(new ClientChannelJoinEvent(
+            sendToAllClients(new ClientChannelJoinMessage(
                     serverMapper.mapToDTO(client.getUser()),
                     channel.getId()
             ));
         }else if (channelBefore != null){
-            sendToAllClients(new ClientChannelLeaveEvent(serverMapper.mapToDTO(client.getUser())));
+            sendToAllClients(new ClientChannelLeaveMessage(serverMapper.mapToDTO(client.getUser())));
         }else{
             log.warn("Ignored channel change request because moving from null to null");
         }
@@ -129,20 +129,20 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
     }
 
     @Deprecated
-    public void sendToClient(WebClient client, EventBody eventBody) throws IOException {
-        var data = objectMapper.writeValueAsBytes(eventBody);
+    public void sendToClient(WebClient client, MessageBody messageBody) throws IOException {
+        var data = objectMapper.writeValueAsBytes(messageBody);
         client.getSession().sendMessage(new TextMessage(data));
     }
 
-    public void sendToAllClients(EventBody eventBody) {
-        sendToClients(sessions, eventBody);
+    public void sendToAllClients(MessageBody messageBody) {
+        sendToClients(sessions, messageBody);
     }
 
-    public void sendToClients(List<WebClient> clients, EventBody eventBody) {
+    public void sendToClients(List<WebClient> clients, MessageBody messageBody) {
         var exceptions = false;
         for (var client : clients) {
             try {
-                sendToClient(client, eventBody);
+                sendToClient(client, messageBody);
             } catch (IOException e) {
                 e.printStackTrace();
                 exceptions = true;

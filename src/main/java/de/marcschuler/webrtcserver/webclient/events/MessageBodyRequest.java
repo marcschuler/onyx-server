@@ -5,6 +5,6 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-public class EventBodyRequest extends EventBody{
+public class MessageBodyRequest extends MessageBody {
     protected UUID requestId;
 }

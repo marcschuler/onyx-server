@@ -1,10 +1,9 @@
-import com.fasterxml.jackson.core.JsonProcessingException;
+package de.marcschuler.webrtcserver;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.marcschuler.webrtcserver.WebSocketMock;
 import de.marcschuler.webrtcserver.service.AuthService;
 import de.marcschuler.webrtcserver.service.CryptoService;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
-import de.marcschuler.webrtcserver.webclient.WebClientState;
 import de.marcschuler.webrtcserver.webclient.events.auth.AuthChallengeRequest;
 import de.marcschuler.webrtcserver.webclient.events.auth.AuthChallengeResponse;
 import de.marcschuler.webrtcserver.webclient.events.auth.AuthSuccessMessage;
@@ -20,10 +19,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Component
 @RequiredArgsConstructor
@@ -52,9 +47,7 @@ public class IntegrationHelper {
         authChallengeResponse.setUsername(username);
         authChallengeResponse.setPublicKey(cryptoService.exportPublicKeyToJSON(keys.getPublic()));
         mock.sendMessage(authChallengeResponse);
-
-        //Success
-        var authSuccessMessage = (AuthSuccessMessage) mock.recv();
+        mock.recv(AuthSuccessMessage.class);
         return mock;
     }
 }

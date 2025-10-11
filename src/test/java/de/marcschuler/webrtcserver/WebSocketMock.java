@@ -41,7 +41,7 @@ public class WebSocketMock {
 
             @Override
             public void handleTransportError(WebSocketSession session, Throwable exception) {
-                log.error("Error: Connection closed",exception);
+                log.error("Error: Connection closed", exception);
                 responseFuture.completeExceptionally(exception);
             }
         };
@@ -65,7 +65,7 @@ public class WebSocketMock {
             if (!session.isOpen())
                 throw new IllegalStateException("Connection closed");
             var m = messageQueue.poll(5, TimeUnit.SECONDS);
-            if (m==null)
+            if (m == null)
                 throw new IllegalStateException("No message in queue - was connection closed?");
             T t = (T) objectMapper.readValue(m, MessageBody.class);
             if (ignoredMessages.contains(t.getClass())) {
@@ -76,20 +76,26 @@ public class WebSocketMock {
         }
     }
 
-    public boolean isOpen(){
+    public boolean isOpen() {
         return session.isOpen();
     }
 
-    // Receive the next message of a special type
-    public <T extends MessageBody> T recv(Class<? extends MessageBody> wantedMessage) throws InterruptedException, JsonProcessingException {
-        while (true) {
-            var m = messageQueue.poll(10, TimeUnit.SECONDS);
+    public <T extends MessageBody> T recv(Class<T> wantedMessage) throws InterruptedException, JsonProcessingException {
+        return recv(wantedMessage,1);
+    }
+
+        // Receive the next message of a special type
+    public <T extends MessageBody> T recv(Class<T> wantedMessage, int maxTries) throws InterruptedException, JsonProcessingException {
+        var i = 0;
+        while (i < maxTries) {
+            var m = messageQueue.poll(5, TimeUnit.SECONDS);
             T t = (T) objectMapper.readValue(m, MessageBody.class);
             if (t.getClass().equals(wantedMessage))
                 return t;
             log.info("ignoring message {} that is not {}", t.getClass(), wantedMessage);
+            i++;
         }
-
+        throw new IllegalStateException("Could not find message");
     }
 
 

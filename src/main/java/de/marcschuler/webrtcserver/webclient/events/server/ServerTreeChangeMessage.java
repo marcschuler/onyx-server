@@ -2,6 +2,7 @@ package de.marcschuler.webrtcserver.webclient.events.server;
 
 import de.marcschuler.webrtcserver.dto.SectionDTO;
 import de.marcschuler.webrtcserver.webclient.events.MessageBody;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.List;
@@ -16,8 +17,10 @@ import java.util.List;
 @Data
 public class ServerTreeChangeMessage extends MessageBody {
 
+    @NotNull
     private String name;
 
+    @NotNull
     private List<SectionDTO> sections;
 
 }

@@ -78,7 +78,8 @@ public class WebClientAuthHandler {
 
         var keyId = cryptoService.generateKeyId(publicKey);
         if (webSocketConnectionService.clientFromKeyId(keyId).isPresent()) {
-            log.info("Client {} is already connected. Kicking new instance", event.getClient().getUser().getUsername());
+            var existingUsername =webSocketConnectionService.clientFromKeyId(keyId).get().getUser().getUsername();
+            log.info("Client {} is already connected as {}. Kicking new instance", event.getBody().getUsername(),existingUsername);
             webSocketConnectionService.kickClient(event.getClient(), KickReason.ALREADY_CONNECTED);
             return;
         }

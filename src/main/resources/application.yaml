@@ -11,6 +11,12 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     show-sql: true
 
+springdoc:
+  api-docs:
+    path: /openapi
+  model-converters:
+    polymorphic-converter:
+      enabled: true
 
 iris:
   auth:

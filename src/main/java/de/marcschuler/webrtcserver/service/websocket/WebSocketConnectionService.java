@@ -96,18 +96,17 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
         var channelBefore = client.getChannel();
         client.setChannel(channel);
 
-        if (channel!=null){
+        if (channel != null) {
             sendToAllClients(new ClientChannelJoinMessage(
                     serverMapper.mapToDTO(client.getUser()),
                     channel.getId()
             ));
-        }else if (channelBefore != null){
+        } else if (channelBefore != null) {
             sendToAllClients(new ClientChannelLeaveMessage(serverMapper.mapToDTO(client.getUser())));
-        }else{
+        } else {
             log.warn("Ignored channel change request because moving from null to null");
         }
     }
-
 
 
     /**
@@ -121,7 +120,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
         log.info("Kicking client {} for reason: {}", client, reason);
         try {
             sendToClient(client, new KickMessage(reason));
-        }catch (Exception e){ //we can ignore this
+        } catch (Exception e) { //we can ignore this
             log.warn("Kicking message failed", e);
         }
         sessions.remove(client);
@@ -155,9 +154,11 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
     @Override
     public synchronized void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         log.info("Session for ws:{} closed because {}", session.getId(), status);
-        var client = clientFromSession(session).get();
-        sessions.remove(client);
-        moveClient(client,null); //TODO may send another event type?
+        clientFromSession(session)
+                .ifPresent(client -> {
+                    sessions.remove(client);
+                    moveClient(client, null); //TODO may send another event type?
+                });
     }
 
 
@@ -167,10 +168,10 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
                 .findFirst();
     }
 
-    public Optional<WebClient> clientFromKeyId(@NotNull String id){
+    public Optional<WebClient> clientFromKeyId(@NotNull String id) {
         // User might be null if a client is connected for the first time but hasn't authenticated
         return this.sessions.stream()
-                .filter(s -> s.getUser()!=null &&  s.getUser().getId().equals(id))
+                .filter(s -> s.getUser() != null && s.getUser().getId().equals(id))
                 .findFirst();
     }
 
@@ -180,11 +181,11 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
                 .findFirst();
     }
 
-    public List<WebClient> clients(){
+    public List<WebClient> clients() {
         return this.sessions;
     }
 
-    public List<WebClient> clientsInteractable(){
+    public List<WebClient> clientsInteractable() {
         return this.sessions.stream()
                 .filter(c -> c.getState().isInteractionAllowed())
                 .toList();

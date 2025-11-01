@@ -28,7 +28,7 @@ public class Server {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    @OrderColumn(name = "section_order")
+   // @OrderColumn(name = "section_order")
     private List<Section> sections = new ArrayList<>();
 
     @JsonIgnore

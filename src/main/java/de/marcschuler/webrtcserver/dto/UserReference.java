@@ -7,8 +7,10 @@ import lombok.Data;
 @Data
 public class UserReference {
 
+    @NotNull
     private String id;
     @NotNull
     private JsonNode publicKey;
+    @NotNull
     private String username;
 }

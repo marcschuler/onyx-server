@@ -54,7 +54,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
     @PostConstruct
     public void init() {
         var names = new ArrayList<String>();
-        new Reflections("de.marcschuler.webrtcserver.webclient.events")
+        new Reflections("de.marcschuler.webrtcserver.webclient.messages")
                 .getSubTypesOf(MessageBody.class)
                 .stream()
                 .filter(c -> !Modifier.isAbstract(c.getModifiers()))

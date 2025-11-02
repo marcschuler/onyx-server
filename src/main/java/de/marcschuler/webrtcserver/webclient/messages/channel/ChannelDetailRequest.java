@@ -1,6 +1,6 @@
-package de.marcschuler.webrtcserver.webclient.events.channel;
+package de.marcschuler.webrtcserver.webclient.messages.channel;
 
-import de.marcschuler.webrtcserver.webclient.events.MessageBodyRequest;
+import de.marcschuler.webrtcserver.webclient.messages.MessageBodyRequest;
 import lombok.Data;
 
 import java.util.UUID;

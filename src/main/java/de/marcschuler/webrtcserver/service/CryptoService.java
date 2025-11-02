@@ -111,13 +111,13 @@ public class CryptoService {
     /**
      * Signs content with the given key
      */
-    public <T> SignedContent<T> signContent(T content, PrivateKey privateKey) throws SignatureException, NoSuchAlgorithmException, InvalidKeyException, JsonProcessingException {
+    public <T> SignedContent signContent(T content, PrivateKey privateKey) throws SignatureException, NoSuchAlgorithmException, InvalidKeyException, JsonProcessingException {
         var signature = Signature.getInstance(CRYPTO_ALGORITHM);
         signature.initSign(privateKey);
         signature.update(objectMapper.writeValueAsBytes(content));
         var signatureBase64 = Base64.getEncoder().encodeToString(signature.sign());
         var jsonString = objectMapper.writeValueAsString(content);
-        return new SignedContent<>(jsonString, signatureBase64);
+        return new SignedContent(jsonString, signatureBase64);
     }
 
     /**
@@ -127,7 +127,7 @@ public class CryptoService {
      * @param publicKey the public key to verify against
      * @param <T>       the type of T.
      */
-    public <T> T verifyContent(SignedContent<T> content, Class<T> clazz, PublicKey publicKey) throws InvalidKeyException, JsonProcessingException, SignatureException, NoSuchAlgorithmException {
+    public <T> T verifyContent(SignedContent content, Class<T> clazz, PublicKey publicKey) throws InvalidKeyException, JsonProcessingException, SignatureException, NoSuchAlgorithmException {
         if (content==null)
             throw new SignatureException("SignedContent is null");
         if (content.getContent()==null || content.getContentSignature()==null)
@@ -140,8 +140,8 @@ public class CryptoService {
         return objectMapper.readValue(content.getContent(), clazz);
     }
 
-    public <T> JsonNode verifyContent(SignedContent<T> content, PublicKey publicKey) throws InvalidKeyException, JsonProcessingException, SignatureException, NoSuchAlgorithmException {
-        return verifyContent((SignedContent<JsonNode>) content,JsonNode.class, publicKey);
+    public <T> JsonNode verifyContent(SignedContent content, PublicKey publicKey) throws InvalidKeyException, JsonProcessingException, SignatureException, NoSuchAlgorithmException {
+        return verifyContent(content,JsonNode.class, publicKey);
     }
 
 }

@@ -2,13 +2,11 @@ package de.marcschuler.webrtcserver.service;
 
 import de.marcschuler.webrtcserver.data.User;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
-import de.marcschuler.webrtcserver.webclient.events.auth.JwtTokenMessage;
+import de.marcschuler.webrtcserver.dto.AuthChallenge;
+import de.marcschuler.webrtcserver.webclient.messages.auth.JwtTokenMessage;
 import io.jsonwebtoken.Jwts;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,7 +50,7 @@ public class AuthService {
         //Remove old challenges
         executorService.scheduleAtFixedRate(() -> {
             synchronized (challenges) {
-                this.challenges.removeIf(challenge -> challenge.validUntil.isAfter(Instant.now()));
+                this.challenges.removeIf(challenge -> challenge.getValidUntil().isAfter(Instant.now()));
             }
         }, 1, 1, TimeUnit.MINUTES);
     }
@@ -125,13 +123,4 @@ public class AuthService {
     }
 
 
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class AuthChallenge {
-        @NotNull
-        private String challenge;
-        @NotNull
-        private Instant validUntil;
-    }
 }

@@ -1,4 +1,4 @@
-package de.marcschuler.webrtcserver.webclient.events;
+package de.marcschuler.webrtcserver.webclient.messages;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.*;

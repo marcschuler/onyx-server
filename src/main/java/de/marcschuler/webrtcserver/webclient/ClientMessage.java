@@ -1,6 +1,6 @@
-package de.marcschuler.webrtcserver.webclient.events;
+package de.marcschuler.webrtcserver.webclient;
 
-import de.marcschuler.webrtcserver.webclient.WebClient;
+import de.marcschuler.webrtcserver.webclient.messages.MessageBody;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ResolvableType;

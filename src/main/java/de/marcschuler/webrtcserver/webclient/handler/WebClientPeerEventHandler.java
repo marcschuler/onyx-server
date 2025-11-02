@@ -1,11 +1,11 @@
 package de.marcschuler.webrtcserver.webclient.handler;
 
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
-import de.marcschuler.webrtcserver.webclient.events.ClientMessage;
-import de.marcschuler.webrtcserver.webclient.events.peer.PeerAnswer;
-import de.marcschuler.webrtcserver.webclient.events.peer.PeerAnswerForward;
-import de.marcschuler.webrtcserver.webclient.events.peer.PeerOffer;
-import de.marcschuler.webrtcserver.webclient.events.peer.PeerOfferForward;
+import de.marcschuler.webrtcserver.webclient.ClientMessage;
+import de.marcschuler.webrtcserver.webclient.messages.peer.PeerAnswer;
+import de.marcschuler.webrtcserver.webclient.messages.peer.PeerAnswerForward;
+import de.marcschuler.webrtcserver.webclient.messages.peer.PeerOffer;
+import de.marcschuler.webrtcserver.webclient.messages.peer.PeerOfferForward;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;

@@ -3,7 +3,7 @@ package de.marcschuler.webrtcserver.service.websocket;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.ServerService;
 import de.marcschuler.webrtcserver.webclient.WebClient;
-import de.marcschuler.webrtcserver.webclient.events.server.ServerTreeChangeMessage;
+import de.marcschuler.webrtcserver.webclient.messages.server.ServerTreeChangeMessage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

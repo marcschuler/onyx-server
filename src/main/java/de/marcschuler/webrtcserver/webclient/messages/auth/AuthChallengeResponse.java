@@ -1,9 +1,8 @@
-package de.marcschuler.webrtcserver.webclient.events.auth;
+package de.marcschuler.webrtcserver.webclient.messages.auth;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import de.marcschuler.webrtcserver.dto.SignedContent;
-import de.marcschuler.webrtcserver.service.AuthService;
-import de.marcschuler.webrtcserver.webclient.events.MessageBody;
+import de.marcschuler.webrtcserver.webclient.messages.MessageBody;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -16,7 +15,7 @@ public class AuthChallengeResponse extends MessageBody {
     @NotNull
     private JsonNode publicKey;
     @NotNull
-    private SignedContent<AuthService.AuthChallenge> challenge;
+    private SignedContent challenge;
     @NotNull
     private String username;
 

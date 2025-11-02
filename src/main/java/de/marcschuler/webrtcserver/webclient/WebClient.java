@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.marcschuler.webrtcserver.Util;
 import de.marcschuler.webrtcserver.data.Channel;
 import de.marcschuler.webrtcserver.data.User;
-import de.marcschuler.webrtcserver.webclient.events.MessageBody;
+import de.marcschuler.webrtcserver.webclient.messages.MessageBody;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

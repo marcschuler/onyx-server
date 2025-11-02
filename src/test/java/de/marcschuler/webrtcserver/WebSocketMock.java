@@ -2,8 +2,8 @@ package de.marcschuler.webrtcserver;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.marcschuler.webrtcserver.webclient.events.MessageBody;
-import de.marcschuler.webrtcserver.webclient.events.auth.AuthChallengeResponse;
+import de.marcschuler.webrtcserver.webclient.messages.MessageBody;
+import de.marcschuler.webrtcserver.webclient.messages.auth.AuthChallengeResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.*;

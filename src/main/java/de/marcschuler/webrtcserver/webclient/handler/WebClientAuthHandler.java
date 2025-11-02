@@ -15,11 +15,12 @@ import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
 import de.marcschuler.webrtcserver.webclient.KickReason;
 import de.marcschuler.webrtcserver.webclient.WebClient;
 import de.marcschuler.webrtcserver.webclient.WebClientState;
-import de.marcschuler.webrtcserver.webclient.events.ClientMessage;
-import de.marcschuler.webrtcserver.webclient.events.auth.AuthChallengeResponse;
-import de.marcschuler.webrtcserver.webclient.events.auth.AuthSuccessMessage;
-import de.marcschuler.webrtcserver.webclient.events.client.ClientChannelJoinMessage;
-import de.marcschuler.webrtcserver.webclient.events.peer.IceServerMessage;
+import de.marcschuler.webrtcserver.webclient.ClientMessage;
+import de.marcschuler.webrtcserver.dto.AuthChallenge;
+import de.marcschuler.webrtcserver.webclient.messages.auth.AuthChallengeResponse;
+import de.marcschuler.webrtcserver.webclient.messages.auth.AuthSuccessMessage;
+import de.marcschuler.webrtcserver.webclient.messages.client.ClientChannelJoinMessage;
+import de.marcschuler.webrtcserver.webclient.messages.peer.IceServerMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -64,9 +65,9 @@ public class WebClientAuthHandler {
         } catch (ParseException e) {
             throw new RuntimeException("Could not parse JWK", e);
         }
-        AuthService.AuthChallenge challenge;
+        AuthChallenge challenge;
         try {
-            challenge = cryptoService.verifyContent(content, AuthService.AuthChallenge.class, publicKey);
+            challenge = cryptoService.verifyContent(content, AuthChallenge.class, publicKey);
         } catch (InvalidKeyException | JsonProcessingException | SignatureException | NoSuchAlgorithmException e) {
             log.warn("Client signature could not be verified {}", event.getClient());
             throw new RuntimeException("Could not verify signature", e);

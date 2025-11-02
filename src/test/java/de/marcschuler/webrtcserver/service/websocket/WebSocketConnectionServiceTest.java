@@ -6,9 +6,9 @@ import de.marcschuler.webrtcserver.dto.SignedContent;
 import de.marcschuler.webrtcserver.service.AuthService;
 import de.marcschuler.webrtcserver.service.CryptoService;
 import de.marcschuler.webrtcserver.webclient.WebClientState;
-import de.marcschuler.webrtcserver.webclient.events.auth.AuthChallengeRequest;
-import de.marcschuler.webrtcserver.webclient.events.auth.AuthChallengeResponse;
-import de.marcschuler.webrtcserver.webclient.events.auth.AuthSuccessMessage;
+import de.marcschuler.webrtcserver.webclient.messages.auth.AuthChallengeRequest;
+import de.marcschuler.webrtcserver.webclient.messages.auth.AuthChallengeResponse;
+import de.marcschuler.webrtcserver.webclient.messages.auth.AuthSuccessMessage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -107,7 +107,7 @@ class WebSocketConnectionServiceTest {
 
         //Authenticate
         var authChallengeResponse = new AuthChallengeResponse();
-        authChallengeResponse.setChallenge(new SignedContent<>(null,null));
+        authChallengeResponse.setChallenge(new SignedContent(null,null));
         authChallengeResponse.setUsername("marc");
         authChallengeResponse.setPublicKey(cryptoService.exportPublicKeyToJSON(key.getPublic()));
         webSocketMock.sendMessage(authChallengeResponse);

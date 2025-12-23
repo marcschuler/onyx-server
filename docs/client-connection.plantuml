@@ -1,0 +1,30 @@
+@startuml
+title Starting a Connection
+participant Client
+participant Server
+autonumber
+
+Server -> Client: AuthChallengeRequest
+note right
+the Server sends a challenge
+to the Client
+end note
+
+Client -> Server: AuthChallengeResponse
+note left
+the Client signs the challenge,
+thus proving its public key
+end note
+
+Server -> Client: AuthSuccessMessage
+note right
+Client now is logged in.
+A JWT for REST access is sent
+end note
+
+Server -> Client: ServerTreeMessage
+note right
+the server sends a list of all
+channels and containing clients
+end note
+@enduml

@@ -32,12 +32,20 @@ public class CryptoService {
 
     private final SecureRandom secureRandom = new SecureRandom();
 
+    /**
+     * Generated a secure random, 128 byte strong Base64 string
+     * @return
+     */
     public String generateChallenge() {
         var bytes = new byte[128];
         secureRandom.nextBytes(bytes);
         return Base64.getEncoder().encodeToString(bytes);
     }
 
+    /**
+     * Generates a secure default KeyPair
+     * @return
+     */
     @SneakyThrows
     public KeyPair generateKeyPair() {
         log.info("Generating keypair");
@@ -45,6 +53,11 @@ public class CryptoService {
         return kpg.generateKeyPair();
     }
 
+    /**
+     * Generates the unique ID from a key
+     * @param publicKey
+     * @return
+     */
     @SneakyThrows
     public String generateKeyId(PublicKey publicKey) {
         MessageDigest digest = MessageDigest.getInstance(HASHING_ALGORITHM);
@@ -52,12 +65,23 @@ public class CryptoService {
         return Base64.getEncoder().encodeToString(encodedhash);
     }
 
+    /**
+     * Converts a public key to an JWK
+     * @param publicKey
+     * @return
+     */
     public JWK exportPublicKey(PublicKey publicKey) {
         return new OctetKeyPair.Builder((OctetKeyPair) publicKey)
                 .keyID(generateKeyId(publicKey))
                 .build();
     }
 
+    /**
+     * Exports a public key as a JWK (Json Web Key)
+     * @param publicKey
+     * @return
+     * @throws JsonProcessingException
+     */
     public JsonNode exportPublicKeyToJSON(PublicKey publicKey) throws JsonProcessingException {
         var keyBytes = publicKey.getEncoded();
         // Extract raw 32-byte key (skip first 12 bytes of X.509 header)
@@ -73,6 +97,13 @@ public class CryptoService {
         return objectMapper.readTree(jwk.toJSONString());
     }
 
+    /**
+     * Imports a public key from an jwk
+     * @param jwk
+     * @return
+     * @throws InvalidKeySpecException
+     * @throws JOSEException
+     */
     public PublicKey parsePublicKey(JWK jwk) throws InvalidKeySpecException, JOSEException {
         if (jwk instanceof OctetKeyPair okp && okp.getCurve().equals(Curve.Ed25519)) {
             // okp.toPublicKey(); - somehow jose can not convert to ed25519 (old java requirements???)

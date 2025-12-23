@@ -1,8 +1,7 @@
 package de.marcschuler.webrtcserver.controller.v0;
 
-import de.marcschuler.webrtcserver.dto.SectionDTO;
-import de.marcschuler.webrtcserver.dto.ServerDTO;
-import de.marcschuler.webrtcserver.dto.ServerWritableDTO;
+import de.marcschuler.webrtcserver.dto.data.ServerDTO;
+import de.marcschuler.webrtcserver.dto.data.ServerWritableDTO;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.ServerService;
 import lombok.RequiredArgsConstructor;

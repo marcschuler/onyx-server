@@ -1,6 +1,6 @@
 package de.marcschuler.webrtcserver.webclient.messages.server;
 
-import de.marcschuler.webrtcserver.dto.SectionDTO;
+import de.marcschuler.webrtcserver.dto.data.SectionDTO;
 import de.marcschuler.webrtcserver.webclient.messages.MessageBody;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

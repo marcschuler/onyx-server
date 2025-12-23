@@ -1,4 +1,4 @@
-package de.marcschuler.webrtcserver.dto;
+package de.marcschuler.webrtcserver.dto.data;
 
 import lombok.Data;
 
@@ -8,6 +8,6 @@ import java.util.UUID;
 @Data
 public class SectionDTO extends SectionWriteDTO {
     private UUID id;
-    private List<ChannelReference> channels;
+    private List<ChannelDTO> channels;
 
 }

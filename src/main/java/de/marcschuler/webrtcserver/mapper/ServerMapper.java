@@ -9,6 +9,7 @@ import de.marcschuler.webrtcserver.data.Section;
 import de.marcschuler.webrtcserver.data.Server;
 import de.marcschuler.webrtcserver.data.User;
 import de.marcschuler.webrtcserver.dto.*;
+import de.marcschuler.webrtcserver.dto.data.*;
 import de.marcschuler.webrtcserver.service.CryptoService;
 import de.marcschuler.webrtcserver.webclient.messages.server.ServerTreeChangeMessage;
 import org.mapstruct.Mapper;
@@ -39,10 +40,10 @@ public abstract class ServerMapper {
     public abstract Section update(@MappingTarget Section section, SectionWriteDTO dto);
     public abstract SectionDTO mapToDTO(Section section);
 
-    public abstract ChannelReference mapToDTO(Channel channel);
-    public abstract Channel mapFromDTO(ChannelReference channel);
+    public abstract ChannelDTO mapToDTO(Channel channel);
+    public abstract Channel mapFromDTO(ChannelDTO channel);
 
-    public abstract UserReference mapToDTO(User user);
+    public abstract PublicUserDTO mapToDTO(User user);
 
     public abstract IceServer mapToDTO(WebRTConfig.IceConfig iceConfig);
 

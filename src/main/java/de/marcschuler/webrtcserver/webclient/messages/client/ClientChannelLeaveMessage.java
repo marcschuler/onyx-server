@@ -1,6 +1,6 @@
 package de.marcschuler.webrtcserver.webclient.messages.client;
 
-import de.marcschuler.webrtcserver.dto.UserReference;
+import de.marcschuler.webrtcserver.dto.data.PublicUserDTO;
 import de.marcschuler.webrtcserver.webclient.messages.MessageBody;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -15,5 +15,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ClientChannelLeaveMessage extends MessageBody {
     @NotNull
-    private UserReference user;
+    private PublicUserDTO user;
 }

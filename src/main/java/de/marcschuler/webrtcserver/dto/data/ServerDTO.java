@@ -1,4 +1,4 @@
-package de.marcschuler.webrtcserver.dto;
+package de.marcschuler.webrtcserver.dto.data;
 
 import lombok.Data;
 

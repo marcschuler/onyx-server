@@ -1,11 +1,11 @@
-package de.marcschuler.webrtcserver.dto;
+package de.marcschuler.webrtcserver.dto.data;
 
 import lombok.Data;
 
 import java.util.UUID;
 
 @Data
-public class ChannelReference {
+public class ChannelDTO {
     private UUID id;
     private String name;
 }

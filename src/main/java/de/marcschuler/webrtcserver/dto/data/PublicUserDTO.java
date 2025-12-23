@@ -1,11 +1,11 @@
-package de.marcschuler.webrtcserver.dto;
+package de.marcschuler.webrtcserver.dto.data;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class UserReference {
+public class PublicUserDTO {
 
     @NotNull
     private String id;

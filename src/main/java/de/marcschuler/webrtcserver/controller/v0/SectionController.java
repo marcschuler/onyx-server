@@ -1,7 +1,7 @@
 package de.marcschuler.webrtcserver.controller.v0;
 
-import de.marcschuler.webrtcserver.dto.SectionDTO;
-import de.marcschuler.webrtcserver.dto.SectionWriteDTO;
+import de.marcschuler.webrtcserver.dto.data.SectionDTO;
+import de.marcschuler.webrtcserver.dto.data.SectionWriteDTO;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.SectionService;
 import de.marcschuler.webrtcserver.service.ServerService;

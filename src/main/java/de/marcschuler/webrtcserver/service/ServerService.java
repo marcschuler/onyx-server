@@ -3,7 +3,7 @@ package de.marcschuler.webrtcserver.service;
 import de.marcschuler.webrtcserver.data.Channel;
 import de.marcschuler.webrtcserver.data.Section;
 import de.marcschuler.webrtcserver.data.Server;
-import de.marcschuler.webrtcserver.dto.ServerDTO;
+import de.marcschuler.webrtcserver.dto.data.ServerDTO;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.repository.ChannelRepository;
 import de.marcschuler.webrtcserver.repository.SectionRepository;
@@ -11,7 +11,6 @@ import de.marcschuler.webrtcserver.repository.ServerRepository;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 

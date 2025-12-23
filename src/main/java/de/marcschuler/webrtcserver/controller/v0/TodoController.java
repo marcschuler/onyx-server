@@ -3,7 +3,7 @@ package de.marcschuler.webrtcserver.controller.v0;
 import de.marcschuler.webrtcserver.dto.AuthChallenge;
 import de.marcschuler.webrtcserver.dto.IceServer;
 import de.marcschuler.webrtcserver.dto.SignedContent;
-import de.marcschuler.webrtcserver.dto.UserReference;
+import de.marcschuler.webrtcserver.dto.data.PublicUserDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +20,7 @@ public class TodoController {
     }
 
     @GetMapping("userReference")
-    public UserReference userReference(){
+    public PublicUserDTO userReference(){
         return null;
     }
 

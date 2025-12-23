@@ -1,6 +1,6 @@
 package de.marcschuler.webrtcserver.webclient.messages.client;
 
-import de.marcschuler.webrtcserver.dto.UserReference;
+import de.marcschuler.webrtcserver.dto.data.PublicUserDTO;
 import de.marcschuler.webrtcserver.webclient.messages.MessageBody;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
@@ -19,7 +19,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ClientChannelJoinMessage extends MessageBody {
     @NotNull
-    private UserReference user;
+    private PublicUserDTO user;
     @Nullable
     private UUID channelId;
 }

@@ -1,6 +1,6 @@
 package de.marcschuler.webrtcserver.controller.v0;
 
-import de.marcschuler.webrtcserver.dto.ChannelReference;
+import de.marcschuler.webrtcserver.dto.data.ChannelDTO;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.ChannelService;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +19,8 @@ public class ChannelController {
     private final ServerMapper serverMapper;
 
     @PostMapping
-    public ChannelReference create(@RequestBody ChannelReference channelReference) {
-        var channel = channelService.create(serverMapper.mapFromDTO(channelReference));
+    public ChannelDTO create(@RequestBody ChannelDTO channelDTO) {
+        var channel = channelService.create(serverMapper.mapFromDTO(channelDTO));
         return serverMapper.mapToDTO(channel);
     }
 }

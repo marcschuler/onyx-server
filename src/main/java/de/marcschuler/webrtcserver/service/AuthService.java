@@ -44,6 +44,8 @@ public class AuthService {
     private Duration jwtExpiration;
     @Value("${iris.auth.jwt.refresh}")
     private Duration jwtRefresh;
+    @Value("${spring.application.name}")
+    private String applicationName;
 
     @PostConstruct
     void init() {
@@ -59,7 +61,7 @@ public class AuthService {
     public void refreshToken() {
         webSocketConnectionService.clientsInteractable()
                 .forEach(client -> {
-                    var jwt = this.createJWT(client.getUser());
+                    @SuppressWarnings("DataFlowIssue") var jwt = createJWT(client.getUser());
                     try {
                         client.sendMessage(new JwtTokenMessage(jwt));
                     } catch (IOException e) {
@@ -101,10 +103,10 @@ public class AuthService {
     public String createJWT(User user) {
         return Jwts.builder()
                 .subject(user.getId())
-                .issuer("webrtc-server")
+                .issuer(applicationName) //TODO
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + jwtExpiration.toMillis()))
-                .signWith(serverService.getServer().getKeys().getPrivate())
+                .signWith(serverService.defaultServer().getKeys().getPrivate())
                 .compact();
     }
 
@@ -112,11 +114,11 @@ public class AuthService {
      * Validates the jwt
      *
      * @param jwt the jwt
-     * @return the user id
+     * @return the user id (subject)
      */
     public String verifyJWT(String jwt) {
         var claims = Jwts.parser()
-                .verifyWith(serverService.getServer().getKeys().getPublic())
+                .verifyWith(serverService.defaultServer().getKeys().getPublic())
                 .build()
                 .parseSignedClaims(jwt);
         return claims.getBody().getSubject();

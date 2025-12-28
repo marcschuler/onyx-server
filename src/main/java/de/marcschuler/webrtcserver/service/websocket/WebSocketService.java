@@ -22,7 +22,7 @@ public class WebSocketService {
 
     @Transactional
     public ServerTreeChangeMessage createServerTreeChangeEvent(WebClient webClient) {
-        return serverMapper.mapToChangeEvent(serverService.getServer());
+        return serverMapper.mapToChangeEvent(serverService.defaultServer());
     }
 
     @Transactional

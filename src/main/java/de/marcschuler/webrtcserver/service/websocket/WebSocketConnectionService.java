@@ -3,6 +3,7 @@ package de.marcschuler.webrtcserver.service.websocket;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import de.marcschuler.webrtcserver.data.Channel;
+import de.marcschuler.webrtcserver.error.webclient.NoClientException;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.AuthService;
 import de.marcschuler.webrtcserver.webclient.KickReason;
@@ -62,6 +63,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
                 .forEach(c -> {
                     names.add(c.getSimpleName());
                     objectMapper.registerSubtypes(new NamedType(c, c.getSimpleName()));
+                    log.debug("Registered message: {}", c.getSimpleName());
                 });
         log.info("Initialised events {}", names);
     }
@@ -79,7 +81,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
     public synchronized void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         log.info("Received message {} from {}", new String(message.asBytes()), session);
         var event = objectMapper.readValue(message.asBytes(), MessageBody.class);
-        var client = clientFromSession(session).get();
+        var client = clientFromSession(session).orElseThrow(() -> new NoClientException("Client for session " + session.getId() + " not found"));
 
         if (!client.getState().isInteractionAllowed()) {
             if (!allowedEventsWhenUnauthorized.contains(event.getClass())) {
@@ -143,7 +145,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
             try {
                 sendToClient(client, messageBody);
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Could not send to a single client", e);
                 exceptions = true;
             }
         }
@@ -185,6 +187,10 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
         return this.sessions;
     }
 
+    /**
+     * All clients that are interactable. Basically logged in and have a user field.
+     * @return
+     */
     public List<WebClient> clientsInteractable() {
         return this.sessions.stream()
                 .filter(c -> c.getState().isInteractionAllowed())

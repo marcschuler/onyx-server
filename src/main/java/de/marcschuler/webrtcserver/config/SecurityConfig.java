@@ -6,11 +6,16 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -19,7 +24,20 @@ import java.util.List;
 
 @Configuration
 @EnableMethodSecurity
+@EnableWebSecurity
 public class SecurityConfig {
+
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .authorizeHttpRequests(auth -> auth
+                        //.requestMatchers("/openapi/**").permitAll()
+                        .anyRequest().permitAll() //TODO
+                )
+                .csrf(AbstractHttpConfigurer::disable);
+
+        return http.build();
+    }
 
     @Component
     @RequiredArgsConstructor
@@ -38,6 +56,7 @@ public class SecurityConfig {
             if (token != null && token.startsWith("Bearer ")) {
                 token = token.substring(7);
             } else {
+                filterChain.doFilter(request, response);
                 return;
             }
             var subject = authService.verifyJWT(token);

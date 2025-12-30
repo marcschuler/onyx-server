@@ -22,7 +22,7 @@ public class FirstTimeStartupRunner implements CommandLineRunner {
             log.info("This seems to be the first start. Hello :)");
             log.info("Generating a default server");
             var server = serverService.generateDefault();
-            log.info("Server with id '{}' and public key '{}' generated", server.getId(), server.getKeys().getPublic().getEncoded());
+            log.info("Server with id '{}' and public key '{}' generated", server.getId(), server.getKeys().getPublic().toString());
         }
     }
 }

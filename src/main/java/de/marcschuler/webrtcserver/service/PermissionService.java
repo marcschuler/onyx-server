@@ -12,15 +12,12 @@ import java.util.List;
 @Slf4j
 public class PermissionService {
 
-    private S
-
     public List<String> permissionsForUser(User user){
-
+        return List.of(); //TODO
     }
 
-    public void buildPermissionString(String type)
 
     public boolean hasPermission(User user, String permission){
-
+        return false; //TODO
     }
 }

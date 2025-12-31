@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class PublicUserDTO {
+public class UserSimpleDTO {
 
     @NotNull
     private String id;

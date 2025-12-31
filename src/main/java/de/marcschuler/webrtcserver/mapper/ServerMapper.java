@@ -52,7 +52,7 @@ public abstract class ServerMapper {
 
     public abstract Channel mapFromDTO(ChannelDTO channel);
 
-    public abstract PublicUserDTO mapToDTO(User user);
+    public abstract UserSimpleDTO mapToDTO(User user);
 
     public abstract IceServer mapToDTO(WebRTConfig.IceConfig iceConfig);
 

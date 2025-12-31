@@ -1,8 +1,7 @@
-# Securoty
-## Keys
-Clients must have an ed25519 key pair per identity.
-A Client may have multiple identities
+# Security
+## Identity
+Every Client should have at least one identity.
+An Identity is a ED25519 key pair containing a public key and a private key.
 
-
-## Signing
-A SignedContent
+The public key is used to sign in to a server and sign messages.
+The server may save the associated public key or it's ID to reidentify the client.

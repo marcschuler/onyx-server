@@ -32,8 +32,7 @@ public class SectionController {
     @PutMapping("{sectionId}")
     public SectionDTO edit(@RequestBody SectionWriteDTO sectionDto,@PathVariable UUID sectionId) {
         var section = sectionService.findById(sectionId).orElseThrow();
-        serverMapper.update(section,sectionDto);
-        sectionService.save(section);
+        sectionService.update(section, sectionDto);
         return serverMapper.mapToDTO(section);
     }
 

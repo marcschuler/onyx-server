@@ -3,6 +3,6 @@ package de.marcschuler.webrtcserver.dto.data;
 import lombok.Data;
 
 @Data
-public class ServerWritableDTO {
+public class ChannelWriteDTO {
     private String name;
 }

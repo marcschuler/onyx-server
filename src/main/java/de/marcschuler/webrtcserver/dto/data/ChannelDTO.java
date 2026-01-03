@@ -7,4 +7,6 @@ import java.util.UUID;
 @Data
 public class ChannelDTO extends ChannelWriteDTO {
     private UUID id;
+
+    private UUID chatId;
 }

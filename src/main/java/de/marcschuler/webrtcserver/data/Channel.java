@@ -18,6 +18,9 @@ public class Channel {
     @Column(nullable = false)
     private String name;
 
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL, optional = false)
+    private Chat chat;
+
     @ManyToOne
     @JoinColumn(name="section_id")
     @NotNull

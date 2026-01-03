@@ -4,10 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.nimbusds.jose.jwk.JWK;
 import de.marcschuler.webrtcserver.config.WebRTConfig;
-import de.marcschuler.webrtcserver.data.Channel;
-import de.marcschuler.webrtcserver.data.Section;
-import de.marcschuler.webrtcserver.data.Server;
-import de.marcschuler.webrtcserver.data.User;
+import de.marcschuler.webrtcserver.data.*;
 import de.marcschuler.webrtcserver.dto.*;
 import de.marcschuler.webrtcserver.dto.data.*;
 import de.marcschuler.webrtcserver.service.CryptoService;
@@ -57,6 +54,15 @@ public abstract class ServerMapper {
     public abstract IceServer mapToDTO(WebRTConfig.IceConfig iceConfig);
 
     public abstract List<IceServer> mapToDTO(List<WebRTConfig.IceConfig> iceConfig);
+
+    /**
+     * Chat
+     */
+    public abstract MessageDTO mapToDTO(Message message);
+
+    /**
+     * OTHER
+     */
 
     JWK mapPublicKeyToJWK(KeyPair keyPair) {
         return this.cryptoService.exportPublicKey(keyPair.getPublic());

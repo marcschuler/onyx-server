@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/v0/server/{serverId}/sectio")
+@RequestMapping("/v0/server/{serverId}/channel")
 @RequiredArgsConstructor
 public class ChannelController {
 

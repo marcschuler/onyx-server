@@ -1,5 +1,6 @@
 package de.marcschuler.webrtcserver.data;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
@@ -15,6 +16,10 @@ public class Chat {
     @Id
     private UUID id;
 
-    @OneToMany
+    @OneToMany(
+            mappedBy = "chat",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     private List<Message> messages;
 }

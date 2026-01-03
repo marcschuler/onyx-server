@@ -45,7 +45,7 @@ public class ServerService {
 
         var server = new Server();
         server.setId(UUID.randomUUID());
-        server.setName("Iris Server");
+        server.setName("WebRTC Server");
         server.setKeys(keys);
 
 

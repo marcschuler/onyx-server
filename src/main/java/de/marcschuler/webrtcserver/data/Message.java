@@ -1,5 +1,6 @@
 package de.marcschuler.webrtcserver.data;
 
+import de.marcschuler.webrtcserver.data.message.MessageContent;
 import de.marcschuler.webrtcserver.dto.SignedContent;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -8,6 +9,7 @@ import lombok.Data;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -22,8 +24,8 @@ public class Message {
     @Column(nullable = false)
     private Instant timestamp;
 
-    @Column(length = 65535)
-    private String markdown;
+    @OneToMany
+    private List<MessageContent> content;
 
     @ManyToOne
     @JoinColumn(name="chat_id")

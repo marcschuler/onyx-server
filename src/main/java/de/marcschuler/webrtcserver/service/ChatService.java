@@ -3,6 +3,7 @@ package de.marcschuler.webrtcserver.service;
 import de.marcschuler.webrtcserver.data.Chat;
 import de.marcschuler.webrtcserver.data.Message;
 import de.marcschuler.webrtcserver.data.User;
+import de.marcschuler.webrtcserver.data.message.MarkdownMessageContent;
 import de.marcschuler.webrtcserver.repository.ChatRepository;
 import de.marcschuler.webrtcserver.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,11 +35,14 @@ public class ChatService {
     }
 
     public Message createMessage(Chat chat, User user, String markdown) {
+        var content = new MarkdownMessageContent();
+        content.setText(markdown);
+
         var message = new Message();
         message.setChat(chat);
         message.setId(UUID.randomUUID());
         message.setUser(user);
-        message.setMarkdown(markdown);
+        message.setContent(List.of(content));
         message.setTimestamp(Instant.now());
         messageRepository.save(message);
         //TODO Notify the clients

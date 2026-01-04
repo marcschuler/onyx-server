@@ -20,6 +20,7 @@ public class Server {
     private UUID id;
     @Size(min = 3, max = 64)
     private String name;
+    @Column(length = 2048)
 
     @OneToMany(
             mappedBy = "server",

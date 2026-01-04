@@ -19,7 +19,7 @@ public class ChatController {
 
     private final ServerMapper serverMapper;
 
-    @GetMapping("{id}")
+    @GetMapping("{id}/message")
     public List<MessageDTO> messages(@PathVariable UUID id) {
         var chat = chatService.chatById(id).orElseThrow();
         return chatService.messagesInChat(chat)

@@ -1,10 +1,12 @@
 package de.marcschuler.webrtcserver.service;
 
 import de.marcschuler.webrtcserver.data.Channel;
+import de.marcschuler.webrtcserver.data.Chat;
 import de.marcschuler.webrtcserver.data.Section;
 import de.marcschuler.webrtcserver.data.Server;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.repository.ChannelRepository;
+import de.marcschuler.webrtcserver.repository.ChatRepository;
 import de.marcschuler.webrtcserver.repository.SectionRepository;
 import de.marcschuler.webrtcserver.repository.ServerRepository;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
@@ -29,6 +31,8 @@ public class ServerService {
     private final ServerRepository serverRepository;
     private final ChannelRepository channelRepository;
     private final SectionRepository sectionRepository;
+    private final ChatRepository chatRepository;
+
     private final ServerMapper serverMapper;
 
     public Server defaultServer() {
@@ -54,15 +58,25 @@ public class ServerService {
         var section3 = new Section(UUID.randomUUID(), "Chat", List.of(), server);
 
 
-        var channel1 = new Channel(UUID.randomUUID(), "Lobby", section1);
-        var channel2 = new Channel(UUID.randomUUID(), "Talking I", section2);
-        var channel3 = new Channel(UUID.randomUUID(), "Talking II", section2);
-        var channel4 = new Channel(UUID.randomUUID(), "Chatting", section3);
-        var channel5 = new Channel(UUID.randomUUID(), "Other", section3);
-        var channel6 = new Channel(UUID.randomUUID(), "Team", section3);
+        var chat1 = new Chat(UUID.randomUUID(), List.of());
+        var chat2 = new Chat(UUID.randomUUID(), List.of());
+        var chat3 = new Chat(UUID.randomUUID(), List.of());
+        var chat4 = new Chat(UUID.randomUUID(), List.of());
+        var chat5 = new Chat(UUID.randomUUID(), List.of());
+        var chat6 = new Chat(UUID.randomUUID(), List.of());
+
+
+        var channel1 = new Channel(UUID.randomUUID(), "Lobby", chat1, section1);
+        var channel2 = new Channel(UUID.randomUUID(), "Talking I", chat2, section2);
+        var channel3 = new Channel(UUID.randomUUID(), "Talking II", chat3, section2);
+        var channel4 = new Channel(UUID.randomUUID(), "Chatting", chat4, section3);
+        var channel5 = new Channel(UUID.randomUUID(), "Other", chat5, section3);
+        var channel6 = new Channel(UUID.randomUUID(), "Team", chat6, section3);
 
         serverRepository.save(server);
         sectionRepository.saveAll(List.of(section1, section2, section3));
+        chatRepository.saveAll(List.of(chat1, chat2, chat3, chat4, chat5, chat6));
+        channelRepository.save(channel1);
         channelRepository.saveAll(List.of(channel1, channel2, channel3, channel4, channel5, channel6));
 
 

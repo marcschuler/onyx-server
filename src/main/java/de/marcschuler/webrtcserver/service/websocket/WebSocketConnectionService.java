@@ -79,7 +79,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
 
     @Override
     public synchronized void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        log.info("Received message {} from {}", new String(message.asBytes()), session);
+        log.debug("Received message {} from {}", new String(message.asBytes()), session);
         var event = objectMapper.readValue(message.asBytes(), MessageBody.class);
         var client = clientFromSession(session).orElseThrow(() -> new NoClientException("Client for session " + session.getId() + " not found"));
 
@@ -90,7 +90,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
             }
         }
 
-        log.info("Sending event {} to bus", event.getClass().getSimpleName());
+        log.debug("Sending event {} to bus", event.getClass().getSimpleName());
         applicationEventPublisher.publishEvent(new ClientMessage<>(event, client));
     }
 
@@ -119,6 +119,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
      * @throws IOException if there is an error kicking the client.
      */
     public void kickClient(WebClient client, KickReason reason) throws IOException {
+        client.setState(WebClientState.INVALID);
         log.info("Kicking client {} for reason: {}", client, reason);
         try {
             sendToClient(client, new KickMessage(reason));

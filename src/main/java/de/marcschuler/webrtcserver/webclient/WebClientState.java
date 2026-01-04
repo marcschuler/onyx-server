@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public enum WebClientState {
     NOT_AUTHORIZED(false),
-    LOGGED_IN(true);
+    LOGGED_IN(true), INVALID(false);
 
     private final boolean interactionAllowed;
 

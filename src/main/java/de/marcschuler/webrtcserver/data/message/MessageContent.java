@@ -9,7 +9,7 @@ import java.util.UUID;
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @DiscriminatorColumn(name = "type")
 @Data
-public sealed abstract class MessageContent permits MarkdownMessageContent  {
+public abstract class MessageContent  {
 
     @Id
     @GeneratedValue

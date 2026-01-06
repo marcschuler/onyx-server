@@ -24,7 +24,7 @@ public class Message {
     @Column(nullable = false)
     private Instant timestamp;
 
-    @OneToMany
+    @OneToMany(cascade =  CascadeType.ALL,orphanRemoval = true)
     private List<MessageContent> content;
 
     @ManyToOne

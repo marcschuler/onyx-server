@@ -1,6 +1,7 @@
 package de.marcschuler.webrtcserver.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import de.marcschuler.webrtcserver.data.message.MarkdownMessageContent;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -20,7 +21,8 @@ public class Server {
     private UUID id;
     @Size(min = 3, max = 64)
     private String name;
-    @Column(length = 2048)
+    @OneToOne(cascade = CascadeType.ALL)
+    private MarkdownMessageContent description;
 
     @OneToMany(
             mappedBy = "server",

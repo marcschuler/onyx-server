@@ -5,20 +5,23 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.nimbusds.jose.jwk.JWK;
 import de.marcschuler.webrtcserver.config.WebRTConfig;
 import de.marcschuler.webrtcserver.data.*;
+import de.marcschuler.webrtcserver.data.message.MessageContent;
 import de.marcschuler.webrtcserver.dto.*;
 import de.marcschuler.webrtcserver.dto.data.*;
+import de.marcschuler.webrtcserver.dto.data.message.MessageContentDTO;
 import de.marcschuler.webrtcserver.service.CryptoService;
 import de.marcschuler.webrtcserver.webclient.messages.server.ServerTreeChangeMessage;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Mappings;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.security.KeyPair;
 import java.security.PublicKey;
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = MessageMapper.class)
 public abstract class ServerMapper {
 
     @Autowired
@@ -27,6 +30,7 @@ public abstract class ServerMapper {
     /**
      * SERVER
      */
+    @Mapping(target = "server", source = "server")
     public abstract ServerTreeChangeMessage mapToChangeEvent(Server server);
 
     @Mapping(target = "publicKey", source = "keys")
@@ -45,6 +49,7 @@ public abstract class ServerMapper {
 
     public abstract SectionDTO mapToDTO(Section section);
 
+    @Mapping(target = "chatId", source = "chat.id")
     public abstract ChannelDTO mapToDTO(Channel channel);
 
     public abstract Channel mapFromDTO(ChannelDTO channel);
@@ -54,11 +59,6 @@ public abstract class ServerMapper {
     public abstract IceServer mapToDTO(WebRTConfig.IceConfig iceConfig);
 
     public abstract List<IceServer> mapToDTO(List<WebRTConfig.IceConfig> iceConfig);
-
-    /**
-     * Chat
-     */
-    public abstract MessageDTO mapToDTO(Message message);
 
     /**
      * OTHER

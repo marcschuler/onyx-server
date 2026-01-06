@@ -18,11 +18,17 @@ public class ServerController {
 
     private final ServerMapper serverMapper;
 
-    @PutMapping("{sectionId}")
+    @PutMapping("{serverId}")
     public ServerDTO edit(@RequestBody ServerWritableDTO serverDto, @PathVariable UUID serverId) {
         var server = serverService.get(serverId).orElseThrow();
         serverMapper.update(server,serverDto);
         serverService.save(server);
         return serverMapper.mapToDTO(server);
     }
+
+    @GetMapping("{id}")
+    public ServerDTO info(@PathVariable UUID id) {
+        return serverMapper.mapToDTO(serverService.get(id).orElseThrow());
+    }
+
 }

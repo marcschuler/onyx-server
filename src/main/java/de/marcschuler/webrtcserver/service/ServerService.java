@@ -4,6 +4,7 @@ import de.marcschuler.webrtcserver.data.Channel;
 import de.marcschuler.webrtcserver.data.Chat;
 import de.marcschuler.webrtcserver.data.Section;
 import de.marcschuler.webrtcserver.data.Server;
+import de.marcschuler.webrtcserver.data.message.MarkdownMessageContent;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.repository.ChannelRepository;
 import de.marcschuler.webrtcserver.repository.ChatRepository;
@@ -51,6 +52,7 @@ public class ServerService {
         server.setId(UUID.randomUUID());
         server.setName("WebRTC Server");
         server.setKeys(keys);
+        server.setDescription(new MarkdownMessageContent("This is the default server description."));
 
 
         var section1 = new Section(UUID.randomUUID(), "Lobby", List.of(), server);

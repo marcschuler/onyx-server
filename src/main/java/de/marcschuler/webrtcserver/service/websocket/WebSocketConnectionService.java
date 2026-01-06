@@ -133,6 +133,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
     @Deprecated
     public void sendToClient(WebClient client, MessageBody messageBody) throws IOException {
         var data = objectMapper.writeValueAsBytes(messageBody);
+        log.debug("Sending to client {}: {}", client, data);
         client.getSession().sendMessage(new TextMessage(data));
     }
 

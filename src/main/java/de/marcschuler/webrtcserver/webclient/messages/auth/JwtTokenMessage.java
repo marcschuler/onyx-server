@@ -9,5 +9,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class JwtTokenMessage extends MessageBody {
     @NotNull
-    private String token;
+    private String jwt;
 }

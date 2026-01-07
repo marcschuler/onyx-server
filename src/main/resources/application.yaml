@@ -9,7 +9,11 @@ spring:
     password: webrtc
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
-    show-sql: true
+    show-sql: false
+
+logging:
+  level:
+    de.marcschuler.webrtcserver: DEBUG
 
 springdoc:
   api-docs:

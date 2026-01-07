@@ -31,4 +31,12 @@ public class WebClient {
         var data = Util.objectMapper.writeValueAsBytes(messageBody);
         this.session.sendMessage(new TextMessage(data));
     }
+
+    @Override
+    public String toString() {
+        return "WebClient{" +
+                ", user=" + user +
+                ", state=" + state +
+                '}';
+    }
 }

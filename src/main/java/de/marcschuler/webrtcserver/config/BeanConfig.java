@@ -5,7 +5,10 @@ import de.marcschuler.webrtcserver.webclient.messages.MessageBody;
 import io.swagger.v3.core.converter.AnnotatedType;
 import io.swagger.v3.core.converter.ModelConverters;
 import io.swagger.v3.core.converter.ResolvedSchema;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
@@ -47,8 +50,17 @@ public class BeanConfig {
                     .type("object")
                     .additionalProperties(true)
                     .description("Valid JSON data without a given schema (internally: JsonNode)");
-            openApi.schema("JsonNode", anySchema);
 
+
+            openApi.addSecurityItem(new SecurityRequirement()
+                            .addList("jwt-auth"))
+                    .components(new Components()
+                            .addSecuritySchemes("jwt-auth", new SecurityScheme()
+                                    .name("jwt-auth")
+                                    .type(SecurityScheme.Type.HTTP)
+                                    .scheme("bearer")
+                                    .bearerFormat("JWT")));
+            openApi.schema("JsonNode", anySchema);
             var messageTypes = new ArrayList<String>();
 
             new Reflections("de.marcschuler.webrtcserver.webclient.messages")
@@ -61,7 +73,7 @@ public class BeanConfig {
 
                         var baseSchemas = new ArrayList<Schema<?>>();
                         Class<?> cla = c.getSuperclass();
-                        if (cla != null && cla!=Object.class) { // Object.class leads to null schema
+                        if (cla != null && cla != Object.class) { // Object.class leads to null schema
                             var baseSchema = polymorphySchemas.computeIfAbsent(cla, aClass -> {
                                 var resolvedBaseSchema = ModelConverters.getInstance()
                                         .resolveAsResolvedSchema(new AnnotatedType(aClass));
@@ -91,9 +103,11 @@ public class BeanConfig {
             enumSchema.setType("string");
             enumSchema.setDescription("A list of all messages");
             enumSchema.setEnum(messageTypes);
-            openApi.schema("MessageTypes",enumSchema);
+            openApi.schema("MessageTypes", enumSchema);
 
-        };
+        }
+
+                ;
     }
 
 }

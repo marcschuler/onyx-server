@@ -42,8 +42,6 @@ public class AuthService {
 
     @Value("${iris.auth.jwt.expiration}")
     private Duration jwtExpiration;
-    @Value("${iris.auth.jwt.refresh}")
-    private Duration jwtRefresh;
     @Value("${spring.application.name}")
     private String applicationName;
 
@@ -59,6 +57,7 @@ public class AuthService {
 
     @Scheduled(fixedRateString = "${iris.auth.jwt.refresh")
     public void refreshToken() {
+        log.debug("Reissuing JWT for all clients with a lifetime of {}", jwtExpiration);
         webSocketConnectionService.clientsInteractable()
                 .forEach(client -> {
                     @SuppressWarnings("DataFlowIssue") var jwt = createJWT(client.getUser());

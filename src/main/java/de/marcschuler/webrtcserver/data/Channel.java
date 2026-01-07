@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.UUID;
 
@@ -24,5 +25,6 @@ public class Channel {
     @ManyToOne
     @JoinColumn(name="section_id")
     @NotNull
+    @ToString.Exclude
     private Section section;
 }

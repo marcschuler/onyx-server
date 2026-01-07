@@ -12,6 +12,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
+//TODO User should be able to sign their message (content + timestamp)
 @Entity
 @Data
 public class Message {

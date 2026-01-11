@@ -44,7 +44,6 @@ public class BeanConfig {
     @Bean
     public OpenApiCustomizer schemaCustomizer() {
         var polymorphySchemas = new HashMap<Class<?>, ResolvedSchema>();
-
         return openApi -> {
             Schema<?> anySchema = new Schema<>()
                     .type("object")
@@ -104,10 +103,7 @@ public class BeanConfig {
             enumSchema.setDescription("A list of all messages");
             enumSchema.setEnum(messageTypes);
             openApi.schema("MessageTypes", enumSchema);
-
-        }
-
-                ;
+        };
     }
 
 }

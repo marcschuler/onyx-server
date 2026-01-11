@@ -24,7 +24,7 @@ public class Section {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    //TODO @OrderColumn(name = "channel_order")
+    @OrderColumn(name = "channel_order")
     private List<Channel> channels = new ArrayList<>();
 
     @ManyToOne

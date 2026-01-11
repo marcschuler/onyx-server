@@ -7,16 +7,14 @@ import java.util.UUID;
 
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-@DiscriminatorColumn(name = "type")
+@DiscriminatorColumn(
+        name = "type",
+        discriminatorType = DiscriminatorType.STRING
+)
 @Data
-public abstract class MessageContent  {
+public abstract class MessageContent {
 
     @Id
     @GeneratedValue
-    private UUID id;
-
-    @Enumerated(EnumType.STRING)
-    @Column(insertable = false, updatable = false)
-    private MessageContentType type;
-
+    protected UUID id;
 }

@@ -5,16 +5,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.nimbusds.jose.jwk.JWK;
 import de.marcschuler.webrtcserver.config.WebRTConfig;
 import de.marcschuler.webrtcserver.data.*;
-import de.marcschuler.webrtcserver.data.message.MessageContent;
 import de.marcschuler.webrtcserver.dto.*;
 import de.marcschuler.webrtcserver.dto.data.*;
-import de.marcschuler.webrtcserver.dto.data.message.MessageContentDTO;
 import de.marcschuler.webrtcserver.service.CryptoService;
 import de.marcschuler.webrtcserver.webclient.messages.server.ServerTreeChangeMessage;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.Mappings;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.security.KeyPair;
@@ -36,7 +33,7 @@ public abstract class ServerMapper {
     @Mapping(target = "publicKey", source = "keys")
     public abstract ServerDTO mapToDTO(Server server);
 
-    public abstract Server update(@MappingTarget Server server, ServerWritableDTO dto);
+    public abstract Server update(@MappingTarget Server server, ServerWriteDTO dto);
 
     /**
      * SECTIONS

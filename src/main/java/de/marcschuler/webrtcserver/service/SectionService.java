@@ -55,4 +55,8 @@ public class SectionService {
         serverMapper.update(section,sectionDto);
         saveChanges(section);
     }
+
+    public Optional<Section> get(UUID id){
+        return sectionRepository.findById(id);
+    }
 }

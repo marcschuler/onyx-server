@@ -3,6 +3,7 @@ package de.marcschuler.webrtcserver.controller.v0;
 import de.marcschuler.webrtcserver.dto.AuthChallenge;
 import de.marcschuler.webrtcserver.dto.IceServer;
 import de.marcschuler.webrtcserver.dto.SignedContent;
+import de.marcschuler.webrtcserver.dto.data.ServerWriteDTO;
 import de.marcschuler.webrtcserver.dto.data.UserSimpleDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +31,15 @@ public class TodoController {
     }
     @GetMapping("signedContent")
     public SignedContent signedContent(){
+        return null;
+    }
+
+    @GetMapping("usersimpledto")
+    public UserSimpleDTO userSimpleDTO(){
+        return null;
+    }
+    @GetMapping("serverwritabledto")
+    public ServerWriteDTO serverWritableDTO(){
         return null;
     }
 }

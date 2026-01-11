@@ -9,7 +9,10 @@ spring:
     password: webrtc
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
-    show-sql: false
+    show-sql: true
+  mvc:
+    problemdetails:
+      enabled: true
 
 logging:
   level:
@@ -29,6 +32,8 @@ iris:
     jwt:
       expiration: 5m
       refresh: 4m
+  storage:
+    path: ./data/files
 
 webrtc:
   config:

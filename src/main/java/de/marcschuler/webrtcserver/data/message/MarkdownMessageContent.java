@@ -10,9 +10,10 @@ import lombok.NoArgsConstructor;
 @Entity
 @DiscriminatorValue("MARKDOWN")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public final class MarkdownMessageContent extends MessageContent {
+
     @Column(length = 65535)
     private String text;
 }

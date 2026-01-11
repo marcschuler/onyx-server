@@ -1,14 +1,17 @@
 package de.marcschuler.webrtcserver.service;
 
 import de.marcschuler.webrtcserver.data.User;
+import de.marcschuler.webrtcserver.error.webclient.ProblemDetailException;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
 import de.marcschuler.webrtcserver.dto.AuthChallenge;
 import de.marcschuler.webrtcserver.webclient.messages.auth.JwtTokenMessage;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -30,6 +33,7 @@ public class AuthService {
     private final CryptoService cryptoService;
 
     private final ServerService serverService;
+    @Autowired
     @Lazy
     private WebSocketConnectionService webSocketConnectionService;
 
@@ -55,7 +59,7 @@ public class AuthService {
         }, 1, 1, TimeUnit.MINUTES);
     }
 
-    @Scheduled(fixedRateString = "${iris.auth.jwt.refresh")
+    @Scheduled(fixedRateString = "${iris.auth.jwt.refresh}", initialDelayString = "1m")
     public void refreshToken() {
         log.debug("Reissuing JWT for all clients with a lifetime of {}", jwtExpiration);
         webSocketConnectionService.clientsInteractable()
@@ -122,6 +126,5 @@ public class AuthService {
                 .parseSignedClaims(jwt);
         return claims.getBody().getSubject();
     }
-
 
 }

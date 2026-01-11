@@ -1,7 +1,9 @@
 package de.marcschuler.webrtcserver.service;
 
+import de.marcschuler.webrtcserver.Util;
 import de.marcschuler.webrtcserver.data.Channel;
 import de.marcschuler.webrtcserver.repository.ChannelRepository;
+import de.marcschuler.webrtcserver.repository.SectionRepository;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ public class ChannelService {
 
     private final WebSocketService webSocketService;
 
+    private final SectionRepository sectionRepository;
     private final ChannelRepository channelRepository;
 
     @Transactional
@@ -29,5 +32,12 @@ public class ChannelService {
 
     public Optional<Channel> get(UUID channelId) {
         return channelRepository.findById(channelId);
+    }
+
+    public void reorder(Channel channel, int newOrder) {
+        var section = channel.getSection();
+        Util.reorder(section.getChannels(), channel, newOrder);
+        sectionRepository.save(section);
+        webSocketService.updateServerTree();
     }
 }

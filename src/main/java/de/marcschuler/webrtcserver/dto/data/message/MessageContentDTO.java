@@ -9,13 +9,12 @@ import lombok.Data;
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.PROPERTY,
-        property = "type"
+        property = "type",
+        visible = true
 )
 @JsonSubTypes({
         @JsonSubTypes.Type(value = MarkdownMessageContentDTO.class, name = "MARKDOWN"),
 })
 @Data
 public abstract class MessageContentDTO {
-    @NotNull
-    private MessageContentType type;
 }

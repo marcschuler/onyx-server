@@ -9,6 +9,19 @@ public class Util {
     public static final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
+     * See the other reorder function
+     *
+     * @param list     the list
+     * @param element  the element in the list
+     * @param newOrder the new order
+     * @param <T>      any element
+     */
+    public static <T> void reorder(List<T> list, T element, int newOrder) {
+        var index = list.indexOf(element);
+        reorder(list, index, newOrder);
+    }
+
+    /**
      * Moves an element to a new order
      *
      * @param list         the list

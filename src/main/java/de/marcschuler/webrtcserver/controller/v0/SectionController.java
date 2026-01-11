@@ -1,5 +1,6 @@
 package de.marcschuler.webrtcserver.controller.v0;
 
+import de.marcschuler.webrtcserver.data.Section;
 import de.marcschuler.webrtcserver.dto.data.SectionDTO;
 import de.marcschuler.webrtcserver.dto.data.SectionWriteDTO;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
@@ -8,6 +9,7 @@ import de.marcschuler.webrtcserver.service.ServerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -46,4 +48,6 @@ public class SectionController {
     public void delete(@PathVariable UUID sectionId, @PathVariable UUID serverId) {
         sectionService.delete(sectionId);
     }
+
+
 }

@@ -1,6 +1,5 @@
 package de.marcschuler.webrtcserver.controller.v0;
 
-import de.marcschuler.webrtcserver.data.Section;
 import de.marcschuler.webrtcserver.dto.data.SectionDTO;
 import de.marcschuler.webrtcserver.dto.data.SectionWriteDTO;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
@@ -10,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -26,7 +24,7 @@ public class SectionController implements OrderableController {
     @PostMapping
     public SectionDTO create(@RequestBody SectionWriteDTO sectionDto) {
         var server = serverService.defaultServer();
-        return serverMapper.mapToDTO(sectionService.create(server,sectionDto));
+        return serverMapper.mapToDTO(sectionService.create(server, sectionDto));
     }
 
     @PutMapping("{sectionId}")
@@ -44,7 +42,8 @@ public class SectionController implements OrderableController {
 
     @DeleteMapping("{sectionId}")
     public void delete(@PathVariable UUID sectionId) {
-        sectionService.delete(sectionId);
+        var section = sectionService.get(sectionId).orElseThrow();
+        sectionService.delete(section);
     }
 
 

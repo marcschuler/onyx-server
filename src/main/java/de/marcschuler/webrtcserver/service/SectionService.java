@@ -39,9 +39,10 @@ public class SectionService {
         return section;
     }
 
-    public void delete(UUID sectionId) {
-        log.info("Deleting section {}", sectionId);
-        this.sectionRepository.deleteById(sectionId);
+    public void delete(Section section) {
+        log.info("Deleting section {}", section.getId());
+        section.getServer().getSections().removeIf(s -> s == section);
+        serverRepository.save(section.getServer());
         webSocketService.updateServerTree();
     }
 
@@ -59,11 +60,11 @@ public class SectionService {
 
     public void update(Section section, SectionWriteDTO sectionDto) {
         log.info("Updating section {}", section.getName());
-        serverMapper.update(section,sectionDto);
+        serverMapper.update(section, sectionDto);
         saveChanges(section);
     }
 
-    public Optional<Section> get(UUID id){
+    public Optional<Section> get(UUID id) {
         return sectionRepository.findById(id);
     }
 }

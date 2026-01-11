@@ -1,6 +1,6 @@
 package de.marcschuler.webrtcserver.webclient.messages.auth;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import de.marcschuler.webrtcserver.dto.SignedContent;
 import de.marcschuler.webrtcserver.webclient.messages.MessageBody;
 import jakarta.validation.constraints.NotNull;

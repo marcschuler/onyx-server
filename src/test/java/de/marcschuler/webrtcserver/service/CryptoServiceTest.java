@@ -1,7 +1,6 @@
 package de.marcschuler.webrtcserver.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
+import tools.jackson.core.JacksonException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -36,7 +36,7 @@ class CryptoServiceTest {
     }
 
     @Test
-    void testValidation() throws SignatureException, NoSuchAlgorithmException, InvalidKeyException, JsonProcessingException {
+    void testValidation() throws SignatureException, NoSuchAlgorithmException, InvalidKeyException, JacksonException {
         var pair = cryptoService.generateKeyPair();
         var content = cryptoService.signContent("Test String", pair.getPrivate());
         log.info(objectMapper.writeValueAsString(content));
@@ -53,7 +53,7 @@ class CryptoServiceTest {
     }
 
     @Test
-    void testJWKExportImport() throws JsonProcessingException, ParseException, InvalidKeySpecException, JOSEException, SignatureException, NoSuchAlgorithmException, InvalidKeyException {
+    void testJWKExportImport() throws JacksonException, ParseException, InvalidKeySpecException, JOSEException, SignatureException, NoSuchAlgorithmException, InvalidKeyException {
         var keyPair = cryptoService.generateKeyPair();
         var publicJWK = cryptoService.exportPublicKeyToJSON(keyPair.getPublic()).toString();
         var importedKey = cryptoService.parsePublicKey(JWK.parse(publicJWK));

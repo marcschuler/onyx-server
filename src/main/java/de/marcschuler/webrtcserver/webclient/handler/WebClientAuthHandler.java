@@ -1,6 +1,5 @@
 package de.marcschuler.webrtcserver.webclient.handler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
 import de.marcschuler.webrtcserver.config.WebRTConfig;
@@ -25,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -68,7 +68,7 @@ public class WebClientAuthHandler {
         AuthChallenge challenge;
         try {
             challenge = cryptoService.verifyContent(content, AuthChallenge.class, publicKey);
-        } catch (InvalidKeyException | JsonProcessingException | SignatureException | NoSuchAlgorithmException e) {
+        } catch (InvalidKeyException | JacksonException | SignatureException | NoSuchAlgorithmException e) {
             log.warn("Client signature could not be verified {}", event.getClient());
             throw new RuntimeException("Could not verify signature", e);
         }

@@ -12,15 +12,16 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springdoc.core.utils.SpringDocUtils;
+import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import tools.jackson.databind.jsontype.NamedType;
+import tools.jackson.databind.module.SimpleModule;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -42,67 +43,103 @@ public class BeanConfig {
     }
 
     @Bean
+    public JsonMapperBuilderCustomizer registerAnimalSubtypes() {
+        return builder -> {
+            var module = new SimpleModule("webclient-messages");
+
+            var names = new ArrayList<String>();
+            new Reflections("de.marcschuler.webrtcserver.webclient.messages")
+                    .getSubTypesOf(MessageBody.class)
+                    .stream()
+                    .filter(c -> !Modifier.isAbstract(c.getModifiers()))
+                    .filter(c -> !Modifier.isInterface(c.getModifiers()))
+                    .forEach(c -> {
+                        names.add(c.getSimpleName());
+                        module.registerSubtypes(new NamedType(c, c.getSimpleName()));
+                    });
+            log.info("Initialised events for jackson {}", names);
+
+            builder.addModule(module);
+        };
+    }
+
+
+    @Bean
     public OpenApiCustomizer schemaCustomizer() {
-        var polymorphySchemas = new HashMap<Class<?>, ResolvedSchema>();
         return openApi -> {
+            var polymorphySchemas = new HashMap<Class<?>, ResolvedSchema>();
+            var messageTypes = new ArrayList<String>();
+
+            // ---------- 1. JsonNode "any" schema ----------
             Schema<?> anySchema = new Schema<>()
                     .type("object")
                     .additionalProperties(true)
                     .description("Valid JSON data without a given schema (internally: JsonNode)");
+            openApi.getComponents().addSchemas("JsonNode", anySchema);
 
+            // ---------- 2. JWT Security ----------
+            openApi.addSecurityItem(new SecurityRequirement().addList("jwt-auth"));
+            openApi.getComponents().addSecuritySchemes("jwt-auth",
+                    new SecurityScheme()
+                            .name("jwt-auth")
+                            .type(SecurityScheme.Type.HTTP)
+                            .scheme("bearer")
+                            .bearerFormat("JWT")
+            );
 
-            openApi.addSecurityItem(new SecurityRequirement()
-                            .addList("jwt-auth"))
-                    .components(new Components()
-                            .addSecuritySchemes("jwt-auth", new SecurityScheme()
-                                    .name("jwt-auth")
-                                    .type(SecurityScheme.Type.HTTP)
-                                    .scheme("bearer")
-                                    .bearerFormat("JWT")));
-            openApi.schema("JsonNode", anySchema);
-            var messageTypes = new ArrayList<String>();
-
+            // ---------- 3. Polymorphic MessageBody subclasses ----------
             new Reflections("de.marcschuler.webrtcserver.webclient.messages")
                     .getSubTypesOf(MessageBody.class)
                     .stream()
-                    .filter(c -> !Modifier.isAbstract(c.getModifiers())) // ignore abstract classes
-                    .map(c -> {
+                    .filter(c -> !Modifier.isAbstract(c.getModifiers()))
+                    .forEach(c -> {
                         ResolvedSchema resolvedSchema = ModelConverters.getInstance()
                                 .resolveAsResolvedSchema(new AnnotatedType(c));
 
-                        var baseSchemas = new ArrayList<Schema<?>>();
-                        Class<?> cla = c.getSuperclass();
-                        if (cla != null && cla != Object.class) { // Object.class leads to null schema
-                            var baseSchema = polymorphySchemas.computeIfAbsent(cla, aClass -> {
-                                var resolvedBaseSchema = ModelConverters.getInstance()
-                                        .resolveAsResolvedSchema(new AnnotatedType(aClass));
-                                openApi.schema(resolvedBaseSchema.schema.getName(), resolvedBaseSchema.schema);
-                                return resolvedBaseSchema;
-                            });
-                            baseSchemas.add(new Schema<>().$ref("#/components/schemas/" + baseSchema.schema.getName()));
-                            cla = cla.getSuperclass();
-                        }
-                        if (!baseSchemas.isEmpty())
-                            resolvedSchema.schema.allOf(baseSchemas);
+                        // ---------- Handle inheritance ----------
+                        Class<?> superclass = c.getSuperclass();
+                        List<Schema<?>> allOfSchemas = new ArrayList<>();
 
+                        while (superclass != null && superclass != Object.class) {
+                            var baseSchema = polymorphySchemas.computeIfAbsent(superclass, cls -> {
+                                var resolvedBase = ModelConverters.getInstance()
+                                        .resolveAsResolvedSchema(new AnnotatedType(cls));
+                                // Only add if not already present
+                                if (!openApi.getComponents().getSchemas().containsKey(resolvedBase.schema.getName())) {
+                                    openApi.getComponents().addSchemas(resolvedBase.schema.getName(), resolvedBase.schema);
+                                }
+                                return resolvedBase;
+                            });
+
+                            allOfSchemas.add(new Schema<>().$ref("#/components/schemas/" + baseSchema.schema.getName()));
+                            superclass = superclass.getSuperclass();
+                        }
+
+                        if (!allOfSchemas.isEmpty()) {
+                            resolvedSchema.schema.allOf(allOfSchemas);
+                        }
+
+                        // ---------- Add discriminator-like "type" property ----------
                         var typeSchema = new io.swagger.v3.oas.models.media.StringSchema()
                                 ._enum(List.of(c.getSimpleName()))
                                 .readOnly(true);
                         resolvedSchema.schema.addProperty("type", typeSchema);
                         resolvedSchema.schema.addRequiredItem("type");
+
                         messageTypes.add(c.getSimpleName());
-                        return resolvedSchema;
-                    })
-                    .forEach(schema -> {
-                        log.info("Adding schema{}", schema.schema.getName());
-                        openApi.schema(schema.schema.getName(), schema.schema);
+
+                        // ---------- Add schema without overwriting existing controller types ----------
+                        if (!openApi.getComponents().getSchemas().containsKey(resolvedSchema.schema.getName())) {
+                            openApi.getComponents().addSchemas(resolvedSchema.schema.getName(), resolvedSchema.schema);
+                        }
                     });
 
+            // ---------- 4. Enum of all MessageBody types ----------
             Schema<String> enumSchema = new Schema<>();
             enumSchema.setType("string");
-            enumSchema.setDescription("A list of all messages");
+            enumSchema.setDescription("A list of all message types");
             enumSchema.setEnum(messageTypes);
-            openApi.schema("MessageTypes", enumSchema);
+            openApi.getComponents().addSchemas("MessageTypes", enumSchema);
         };
     }
 

@@ -1,5 +1,6 @@
 package de.marcschuler.webrtcserver.data;
 
+import de.marcschuler.webrtcserver.dto.data.ChannelCreateDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Channel {
     @Id
+    @GeneratedValue
     private UUID id;
     @Column(nullable = false)
     private String name;
@@ -23,8 +25,8 @@ public class Channel {
     private Chat chat;
 
     @ManyToOne
-    @JoinColumn(name="section_id")
-    @NotNull
     @ToString.Exclude
+    @JoinColumn(name = "section_id", insertable = false, updatable = false)
     private Section section;
+
 }

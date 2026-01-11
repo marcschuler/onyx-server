@@ -1,6 +1,6 @@
 package de.marcschuler.webrtcserver;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 

@@ -7,15 +7,16 @@ import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.SectionService;
 import de.marcschuler.webrtcserver.service.ServerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/v0/server/{serverId}/section")
+@RequestMapping(value = "/v0/section", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
-public class SectionController {
+public class SectionController implements OrderableController {
 
     private final ServerService serverService;
     private final SectionService sectionService;
@@ -23,29 +24,26 @@ public class SectionController {
     private final ServerMapper serverMapper;
 
     @PostMapping
-    public SectionDTO create(@RequestBody SectionWriteDTO sectionDto, @PathVariable UUID serverId) {
-        var server = serverService.get(serverId).orElseThrow();
-        var section = serverMapper.mapFromDTO(sectionDto);
-        section.setServer(server);
-        section = sectionService.create(section);
-        return serverMapper.mapToDTO(section);
+    public SectionDTO create(@RequestBody SectionWriteDTO sectionDto) {
+        var server = serverService.defaultServer();
+        return serverMapper.mapToDTO(sectionService.create(server,sectionDto));
     }
 
     @PutMapping("{sectionId}")
-    public SectionDTO edit(@RequestBody SectionWriteDTO sectionDto,@PathVariable UUID sectionId) {
+    public SectionDTO edit(@RequestBody SectionWriteDTO sectionDto, @PathVariable UUID sectionId) {
         var section = sectionService.findById(sectionId).orElseThrow();
         sectionService.update(section, sectionDto);
         return serverMapper.mapToDTO(section);
     }
 
-    @PutMapping("{sectionId}/reorder/{newOrder}")
-    public void reorder(@PathVariable UUID sectionId, @PathVariable int newOrder) {
-        var section = sectionService.findById(sectionId).orElseThrow();
-        sectionService.reorder(section, newOrder);
+    @Override
+    public void order(UUID id, int newOrder) {
+        var channel = sectionService.get(id).orElseThrow();
+        sectionService.order(channel, newOrder);
     }
 
     @DeleteMapping("{sectionId}")
-    public void delete(@PathVariable UUID sectionId, @PathVariable UUID serverId) {
+    public void delete(@PathVariable UUID sectionId) {
         sectionService.delete(sectionId);
     }
 

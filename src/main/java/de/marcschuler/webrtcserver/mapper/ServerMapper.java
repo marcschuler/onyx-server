@@ -1,7 +1,6 @@
 package de.marcschuler.webrtcserver.mapper;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.nimbusds.jose.jwk.JWK;
 import de.marcschuler.webrtcserver.config.WebRTConfig;
 import de.marcschuler.webrtcserver.data.*;
@@ -13,6 +12,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.core.JacksonException;
 
 import java.security.KeyPair;
 import java.security.PublicKey;
@@ -50,6 +50,8 @@ public abstract class ServerMapper {
     public abstract ChannelDTO mapToDTO(Channel channel);
 
     public abstract Channel mapFromDTO(ChannelDTO channel);
+    public abstract Channel mapFromDTO(ChannelWriteDTO channel);
+    public abstract Channel update(@MappingTarget Channel channel, ChannelWriteDTO channelDTO);
 
     public abstract UserSimpleDTO mapToDTO(User user);
 
@@ -65,7 +67,7 @@ public abstract class ServerMapper {
         return this.cryptoService.exportPublicKey(keyPair.getPublic());
     }
 
-    JsonNode mapPublicKeyToJWKJson(KeyPair keyPair) throws JsonProcessingException {
+    JsonNode mapPublicKeyToJWKJson(KeyPair keyPair) throws JacksonException {
         return this.cryptoService.exportPublicKeyToJSON(keyPair.getPublic());
     }
 
@@ -73,7 +75,8 @@ public abstract class ServerMapper {
         return this.cryptoService.exportPublicKey(key);
     }
 
-    JsonNode mapKeyToJSON(PublicKey key) throws JsonProcessingException {
+    JsonNode mapKeyToJSON(PublicKey key) throws JacksonException {
         return this.cryptoService.exportPublicKeyToJSON(key);
     }
+
 }

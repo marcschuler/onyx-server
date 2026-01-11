@@ -1,7 +1,7 @@
 package de.marcschuler.webrtcserver.service.websocket;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.jsontype.NamedType;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.jsontype.NamedType;
 import de.marcschuler.webrtcserver.data.Channel;
 import de.marcschuler.webrtcserver.error.webclient.NoClientException;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
@@ -52,21 +52,6 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
 
     private final List<Class<? extends MessageBody>> allowedEventsWhenUnauthorized = List.of(AuthChallengeResponse.class);
 
-    @PostConstruct
-    public void init() {
-        var names = new ArrayList<String>();
-        new Reflections("de.marcschuler.webrtcserver.webclient.messages")
-                .getSubTypesOf(MessageBody.class)
-                .stream()
-                .filter(c -> !Modifier.isAbstract(c.getModifiers()))
-                .filter(c -> !Modifier.isInterface(c.getModifiers()))
-                .forEach(c -> {
-                    names.add(c.getSimpleName());
-                    objectMapper.registerSubtypes(new NamedType(c, c.getSimpleName()));
-                    log.debug("Registered message: {}", c.getSimpleName());
-                });
-        log.info("Initialised events {}", names);
-    }
 
     @Override
     public synchronized void afterConnectionEstablished(WebSocketSession session) throws IOException {

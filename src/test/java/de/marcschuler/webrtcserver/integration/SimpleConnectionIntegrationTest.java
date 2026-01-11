@@ -1,6 +1,5 @@
 package de.marcschuler.webrtcserver.integration;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import de.marcschuler.webrtcserver.IntegrationHelper;
 import de.marcschuler.webrtcserver.WebSocketMock;
 import de.marcschuler.webrtcserver.webclient.messages.peer.IceServerMessage;
@@ -8,11 +7,10 @@ import de.marcschuler.webrtcserver.webclient.messages.server.ServerTreeChangeMes
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import tools.jackson.core.JacksonException;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -24,7 +22,6 @@ import java.util.concurrent.TimeoutException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ActiveProfiles("test")
 public class SimpleConnectionIntegrationTest {
@@ -53,7 +50,7 @@ public class SimpleConnectionIntegrationTest {
     }
 
     @Test
-    void testChannelJoin() throws InterruptedException, JsonProcessingException {
+    void testChannelJoin() throws InterruptedException, JacksonException {
         client.recv(IceServerMessage.class);
         var tree = client.recv(ServerTreeChangeMessage.class);
     }

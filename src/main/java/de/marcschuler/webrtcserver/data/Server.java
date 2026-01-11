@@ -18,6 +18,7 @@ import java.util.UUID;
 public class Server {
     @Id
     @NotNull
+    @GeneratedValue
     private UUID id;
     @Size(min = 3, max = 64)
     private String name;
@@ -25,11 +26,11 @@ public class Server {
     private MarkdownMessageContent description;
 
     @OneToMany(
-            mappedBy = "server",
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-   // @OrderColumn(name = "section_order")
+    @JoinColumn(name="server_id")
+    @OrderColumn(name = "channel_order")
     private List<Section> sections = new ArrayList<>();
 
     @JsonIgnore

@@ -1,8 +1,7 @@
 package de.marcschuler.webrtcserver.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.JWK;
@@ -13,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import tools.jackson.core.JacksonException;
 
 import java.nio.charset.StandardCharsets;
 import java.security.*;
@@ -80,9 +80,9 @@ public class CryptoService {
      * Exports a public key as a JWK (Json Web Key)
      * @param publicKey
      * @return
-     * @throws JsonProcessingException
+     * @throws JacksonException
      */
-    public JsonNode exportPublicKeyToJSON(PublicKey publicKey) throws JsonProcessingException {
+    public JsonNode exportPublicKeyToJSON(PublicKey publicKey) throws JacksonException {
         var keyBytes = publicKey.getEncoded();
         // Extract raw 32-byte key (skip first 12 bytes of X.509 header)
         // X.509 Ed25519 public keys have 12-byte prefix, adjust if needed
@@ -142,7 +142,7 @@ public class CryptoService {
     /**
      * Signs content with the given key
      */
-    public <T> SignedContent signContent(T content, PrivateKey privateKey) throws SignatureException, NoSuchAlgorithmException, InvalidKeyException, JsonProcessingException {
+    public <T> SignedContent signContent(T content, PrivateKey privateKey) throws SignatureException, NoSuchAlgorithmException, InvalidKeyException, JacksonException {
         var signature = Signature.getInstance(CRYPTO_ALGORITHM);
         signature.initSign(privateKey);
         signature.update(objectMapper.writeValueAsBytes(content));
@@ -158,7 +158,7 @@ public class CryptoService {
      * @param publicKey the public key to verify against
      * @param <T>       the type of T.
      */
-    public <T> T verifyContent(SignedContent content, Class<T> clazz, PublicKey publicKey) throws InvalidKeyException, JsonProcessingException, SignatureException, NoSuchAlgorithmException {
+    public <T> T verifyContent(SignedContent content, Class<T> clazz, PublicKey publicKey) throws InvalidKeyException, JacksonException, SignatureException, NoSuchAlgorithmException {
         if (content==null)
             throw new SignatureException("SignedContent is null");
         if (content.getContent()==null || content.getContentSignature()==null)
@@ -171,7 +171,7 @@ public class CryptoService {
         return objectMapper.readValue(content.getContent(), clazz);
     }
 
-    public <T> JsonNode verifyContent(SignedContent content, PublicKey publicKey) throws InvalidKeyException, JsonProcessingException, SignatureException, NoSuchAlgorithmException {
+    public <T> JsonNode verifyContent(SignedContent content, PublicKey publicKey) throws InvalidKeyException, JacksonException, SignatureException, NoSuchAlgorithmException {
         return verifyContent(content,JsonNode.class, publicKey);
     }
 

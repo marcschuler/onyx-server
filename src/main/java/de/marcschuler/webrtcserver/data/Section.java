@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,19 +17,20 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Section {
     @Id
+    @GeneratedValue
     private UUID id;
     private String name;
 
     @OneToMany(
-            mappedBy = "section",
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
+    @JoinColumn(name="section_id")
     @OrderColumn(name = "channel_order")
     private List<Channel> channels = new ArrayList<>();
 
     @ManyToOne
-    @JoinColumn(name="server_id")
-    @NotNull
+    @ToString.Exclude
+    @JoinColumn(name = "server_id", insertable = false, updatable = false)
     private Server server;
 }

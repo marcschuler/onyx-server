@@ -1,7 +1,6 @@
 package de.marcschuler.webrtcserver;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import de.marcschuler.webrtcserver.webclient.messages.MessageBody;
 import de.marcschuler.webrtcserver.webclient.messages.auth.AuthChallengeResponse;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import tools.jackson.core.JacksonException;
 
 import java.io.IOException;
 import java.util.List;
@@ -55,12 +55,12 @@ public class WebSocketMock {
     }
 
     // Receive the next message
-    public <T extends MessageBody> T recv() throws InterruptedException, JsonProcessingException {
+    public <T extends MessageBody> T recv() throws InterruptedException, JacksonException {
         return recv(List.of());
     }
 
     // Receive the next message, ignoring this ones
-    public <T extends MessageBody> T recv(List<Class<? extends MessageBody>> ignoredMessages) throws InterruptedException, JsonProcessingException {
+    public <T extends MessageBody> T recv(List<Class<? extends MessageBody>> ignoredMessages) throws InterruptedException, JacksonException {
         while (true) {
             if (!session.isOpen())
                 throw new IllegalStateException("Connection closed");
@@ -80,12 +80,12 @@ public class WebSocketMock {
         return session.isOpen();
     }
 
-    public <T extends MessageBody> T recv(Class<T> wantedMessage) throws InterruptedException, JsonProcessingException {
+    public <T extends MessageBody> T recv(Class<T> wantedMessage) throws InterruptedException, JacksonException {
         return recv(wantedMessage,1);
     }
 
         // Receive the next message of a special type
-    public <T extends MessageBody> T recv(Class<T> wantedMessage, int maxTries) throws InterruptedException, JsonProcessingException {
+    public <T extends MessageBody> T recv(Class<T> wantedMessage, int maxTries) throws InterruptedException, JacksonException {
         var i = 0;
         while (i < maxTries) {
             var m = messageQueue.poll(5, TimeUnit.SECONDS);

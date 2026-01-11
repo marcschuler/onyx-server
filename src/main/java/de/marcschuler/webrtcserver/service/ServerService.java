@@ -11,6 +11,7 @@ import de.marcschuler.webrtcserver.repository.ChatRepository;
 import de.marcschuler.webrtcserver.repository.SectionRepository;
 import de.marcschuler.webrtcserver.repository.ServerRepository;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,44 +48,70 @@ public class ServerService {
     }
 
 
+    @Transactional
     public Server generateDefault() {
         var keys = cryptoService.generateKeyPair();
 
+        // ---------- 1. Create server ----------
         var server = new Server();
-        server.setId(UUID.randomUUID());
         server.setName("WebRTC Server");
-        server.setKeys(keys);
+        server.setKeys(keys); // assuming keys is already defined
         server.setDescription(new MarkdownMessageContent("This is the default server description."));
 
+        // ---------- 2. Create sections ----------
+        var section1 = new Section();
+        section1.setName("Lobby");
+        section1.setServer(server);
 
-        var section1 = new Section(UUID.randomUUID(), "Lobby", List.of(), server);
-        var section2 = new Section(UUID.randomUUID(), "Talk", List.of(), server);
-        var section3 = new Section(UUID.randomUUID(), "Chat", List.of(), server);
+        var section2 = new Section();
+        section2.setName("Talk");
+        section2.setServer(server);
 
+        var section3 = new Section();
+        section3.setName("Chat");
+        section3.setServer(server);
 
-        var chat1 = new Chat(UUID.randomUUID(), List.of());
-        var chat2 = new Chat(UUID.randomUUID(), List.of());
-        var chat3 = new Chat(UUID.randomUUID(), List.of());
-        var chat4 = new Chat(UUID.randomUUID(), List.of());
-        var chat5 = new Chat(UUID.randomUUID(), List.of());
-        var chat6 = new Chat(UUID.randomUUID(), List.of());
+        server.setSections(List.of(section1, section2, section3));
 
+        // ---------- 3. Create channels and chats ----------
+        var channel1 = new Channel();
+        channel1.setName("Lobby");
+        var chat1 = new Chat();
+        channel1.setChat(chat1);
 
-        var channel1 = new Channel(UUID.randomUUID(), "Lobby", chat1, section1);
-        var channel2 = new Channel(UUID.randomUUID(), "Talking I", chat2, section2);
-        var channel3 = new Channel(UUID.randomUUID(), "Talking II", chat3, section2);
-        var channel4 = new Channel(UUID.randomUUID(), "Chatting", chat4, section3);
-        var channel5 = new Channel(UUID.randomUUID(), "Other", chat5, section3);
-        var channel6 = new Channel(UUID.randomUUID(), "Team", chat6, section3);
+        var channel2 = new Channel();
+        channel2.setName("Talking I");
+        var chat2 = new Chat();
+        channel2.setChat(chat2);
 
-        serverRepository.save(server);
-        sectionRepository.saveAll(List.of(section1, section2, section3));
-        chatRepository.saveAll(List.of(chat1, chat2, chat3, chat4, chat5, chat6));
-        channelRepository.save(channel1);
-        channelRepository.saveAll(List.of(channel1, channel2, channel3, channel4, channel5, channel6));
+        var channel3 = new Channel();
+        channel3.setName("Talking II");
+        var chat3 = new Chat();
+        channel3.setChat(chat3);
 
+        var channel4 = new Channel();
+        channel4.setName("Chatting");
+        var chat4 = new Chat();
+        channel4.setChat(chat4);
 
-        return serverRepository.findById(server.getId()).orElseThrow();
+        var channel5 = new Channel();
+        channel5.setName("Other");
+        var chat5 = new Chat();
+        channel5.setChat(chat5);
+
+        var channel6 = new Channel();
+        channel6.setName("Team");
+        var chat6 = new Chat();
+        channel6.setChat(chat6);
+
+        // ---------- 4. Assign channels to sections ----------
+        section1.setChannels(List.of(channel1));
+        section2.setChannels(List.of(channel2, channel3));
+        section3.setChannels(List.of(channel4, channel5, channel6));
+
+        // ---------- 5. Persist server (cascade saves sections, channels, and chats) ----------
+        return serverRepository.save(server);
+
     }
 
     public Optional<Server> get(UUID serverId) {

@@ -13,4 +13,5 @@ public class UserSimpleDTO {
     private JsonNode publicKey;
     @NotNull
     private String username;
+    private FileDTO avatar;
 }

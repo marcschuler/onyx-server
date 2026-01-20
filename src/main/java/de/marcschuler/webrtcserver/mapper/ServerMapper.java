@@ -54,6 +54,7 @@ public abstract class ServerMapper {
     public abstract Channel update(@MappingTarget Channel channel, ChannelWriteDTO channelDTO);
 
     public abstract UserSimpleDTO mapToDTO(User user);
+    public abstract UserExtendedDTO mapToDTOExtended(User user);
 
     public abstract IceServer mapToDTO(WebRTConfig.IceConfig iceConfig);
 
@@ -62,6 +63,7 @@ public abstract class ServerMapper {
     /**
      * OTHER
      */
+    public abstract FileDTO mapToDTO(File file);
 
     JWK mapPublicKeyToJWK(KeyPair keyPair) {
         return this.cryptoService.exportPublicKey(keyPair.getPublic());

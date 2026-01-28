@@ -62,7 +62,9 @@ public class ChannelService {
     }
 
     public void delete(Channel channel) {
-        channelRepository.delete(channel);
+        var section  = channel.getSection();
+        section.getChannels().removeIf(c -> c.equals(channel));
+        sectionRepository.save(section);
         webSocketService.updateServerTree();
     }
 

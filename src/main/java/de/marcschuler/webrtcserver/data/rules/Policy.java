@@ -1,14 +1,16 @@
 package de.marcschuler.webrtcserver.data.rules;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.Data;
 
 import java.util.UUID;
 
+@Entity
 @Data
-public class Policy implements Comparable<Policy> {
+public sealed abstract class Policy implements Comparable<Policy> permits SimplePolicy, SpeLPolicy {
     @Id
     @GeneratedValue
     private UUID id;
@@ -18,8 +20,6 @@ public class Policy implements Comparable<Policy> {
 
     private String name;
     private String description;
-
-    private String spel;
 
 
     @Override

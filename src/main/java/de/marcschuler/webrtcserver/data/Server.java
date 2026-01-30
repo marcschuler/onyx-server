@@ -29,12 +29,16 @@ public class Server {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    @JoinColumn(name="server_id")
+    @JoinColumn(name = "server_id")
     @OrderColumn(name = "channel_order")
     private List<Section> sections = new ArrayList<>();
 
+    @OneToMany(cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private List<Group> groups = new ArrayList<>();
+
     @JsonIgnore
     @ToString.Exclude
-    @Column(length=1024)
+    @Column(length = 1024)
     private KeyPair keys;
 }

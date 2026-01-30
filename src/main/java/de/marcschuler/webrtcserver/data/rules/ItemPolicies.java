@@ -1,19 +1,20 @@
 package de.marcschuler.webrtcserver.data.rules;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
 import lombok.Data;
 
 import java.util.Set;
 import java.util.UUID;
 
+@Entity
 @Data
-public class RuleSet {
+public class ItemPolicies {
+
     @Id
     @GeneratedValue
     private UUID id;
 
-    @ManyToMany
-    private Set<Rule> rules;
+    private Set<Policy> policies;
 }

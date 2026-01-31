@@ -19,14 +19,10 @@ public class File {
     private String filename;
     private String contentType;
 
-    private HashType hashType;
-    private String hash;
-    private String previewHash;
+    private Hash hash;
 
     @CreatedDate
     private Instant created;
 
-    public enum HashType{
-        SHA_256
-    }
+
 }

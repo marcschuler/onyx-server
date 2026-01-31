@@ -1,4 +1,4 @@
-package de.marcschuler.webrtcserver.data.rules;
+package de.marcschuler.webrtcserver.data.policy;
 
 import jakarta.persistence.Entity;
 import lombok.Data;

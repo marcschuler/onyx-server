@@ -1,4 +1,4 @@
-package de.marcschuler.webrtcserver.data.rules;
+package de.marcschuler.webrtcserver.data.policy;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

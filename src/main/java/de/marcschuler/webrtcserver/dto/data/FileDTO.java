@@ -1,6 +1,5 @@
 package de.marcschuler.webrtcserver.dto.data;
 
-import de.marcschuler.webrtcserver.data.File;
 import lombok.Data;
 
 import java.time.Instant;
@@ -13,7 +12,7 @@ public class FileDTO {
     private String filename;
     private String contentType;
 
-    private File.HashType hashType;
+    private HashDTO hash;
     private Instant created;
 
 }

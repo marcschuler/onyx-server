@@ -1,10 +1,9 @@
-package de.marcschuler.webrtcserver.data.rules;
+package de.marcschuler.webrtcserver.data.policy;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import lombok.Data;
 
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 

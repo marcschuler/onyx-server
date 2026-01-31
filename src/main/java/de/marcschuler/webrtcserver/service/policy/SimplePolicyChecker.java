@@ -2,12 +2,18 @@ package de.marcschuler.webrtcserver.service.policy;
 
 import de.marcschuler.webrtcserver.data.Group;
 import de.marcschuler.webrtcserver.data.User;
-import de.marcschuler.webrtcserver.data.rules.SimplePolicy;
+import de.marcschuler.webrtcserver.data.policy.SimplePolicy;
 import de.marcschuler.webrtcserver.error.webclient.PolicyCheckException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Service
+@RequiredArgsConstructor
+@Slf4j
 public class SimplePolicyChecker implements PolicyChecker<SimplePolicy> {
 
     @Override

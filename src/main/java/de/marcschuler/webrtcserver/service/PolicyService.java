@@ -1,17 +1,12 @@
 package de.marcschuler.webrtcserver.service;
 
-import de.marcschuler.webrtcserver.data.rules.Policy;
-import de.marcschuler.webrtcserver.data.rules.SimplePolicy;
+import de.marcschuler.webrtcserver.data.policy.Policy;
+import de.marcschuler.webrtcserver.data.policy.SimplePolicy;
 import de.marcschuler.webrtcserver.error.webclient.PolicyCheckException;
 import de.marcschuler.webrtcserver.service.policy.SimplePolicyChecker;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.expression.EvaluationContext;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.ast.FunctionReference;
-import org.springframework.expression.spel.standard.SpelExpression;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.SimpleEvaluationContext;
 import org.springframework.stereotype.Service;
 

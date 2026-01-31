@@ -1,6 +1,7 @@
 package de.marcschuler.webrtcserver.service;
 
 import de.marcschuler.webrtcserver.data.File;
+import de.marcschuler.webrtcserver.data.Hash;
 import de.marcschuler.webrtcserver.repository.FileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,15 +33,14 @@ public class StorageService {
         var f = new File();
         f.setFilename(file.getOriginalFilename());
         f.setContentType(file.getContentType());
-        f.setHashType(File.HashType.SHA_256);
-        f.setHash(hash);
+        f.setHash(new Hash(Hash.HashType.SHA_256, hash));
         fileRepository.save(f);
         return f;
     }
 
     public InputStream getFileContent(File file) throws IOException {
         //TODO check if it is an sha256 and no path injection?
-        var path = filePath(file.getHash());
+        var path = filePath(file.getHash().getHash());
         return Files.newInputStream(path);
     }
 

@@ -1,6 +1,6 @@
 package de.marcschuler.webrtcserver.service.policy;
 
-import de.marcschuler.webrtcserver.data.rules.Policy;
+import de.marcschuler.webrtcserver.data.policy.Policy;
 import de.marcschuler.webrtcserver.error.webclient.PolicyCheckException;
 
 import java.util.Map;

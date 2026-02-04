@@ -1,16 +1,18 @@
 package de.marcschuler.webrtcserver.data.policy;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.UUID;
 
 @Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@DiscriminatorColumn(
+        name = "type",
+        discriminatorType = DiscriminatorType.STRING
+)
 @Data
-public sealed abstract class Policy implements Comparable<Policy> permits SimplePolicy, SpeLPolicy {
+public abstract class Policy implements Comparable<Policy> {
     @Id
     @GeneratedValue
     private UUID id;

@@ -18,7 +18,4 @@ public abstract class MessageMapper {
 
     @SubclassMapping(source = MarkdownMessageContent.class, target = MarkdownMessageContentDTO.class)
     public abstract MessageContentDTO mapToDTO(MessageContent entity);
-
-   // @SubclassMapping(source = MarkdownMessageContentDTO.class, target = MarkdownMessageContent.class)
-   // public abstract MessageContent mapFromDTO(MessageContentDTO dto);
 }

@@ -5,7 +5,7 @@ import lombok.Data;
 
 import java.util.UUID;
 
-@Entity
+@Entity(name = "SERVER_GROUP")
 @Data
 public class Group {
     @Id

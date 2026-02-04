@@ -15,4 +15,6 @@ public class UserExtendedDTO extends UserSimpleDTO{
     private Instant knownSince;
     private Instant lastSeen;
 
+
+
 }

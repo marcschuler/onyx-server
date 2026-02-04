@@ -1,5 +1,7 @@
 package de.marcschuler.webrtcserver.mapper;
 
+import de.marcschuler.webrtcserver.data.policy.Policy;
+import de.marcschuler.webrtcserver.dto.data.policy.PolicyDTO;
 import tools.jackson.databind.JsonNode;
 import com.nimbusds.jose.jwk.JWK;
 import de.marcschuler.webrtcserver.config.WebRTConfig;
@@ -55,6 +57,11 @@ public abstract class ServerMapper {
 
     public abstract UserSimpleDTO mapToDTO(User user);
     public abstract UserExtendedDTO mapToDTOExtended(User user);
+
+
+    public abstract Group mapFromDTO(GroupWriteDTO policyWriteDTO);
+    public abstract GroupDTO mapToDTO(Group group);
+    public abstract Group update(@MappingTarget Group group, GroupWriteDTO groupWriteDTO);
 
     public abstract IceServer mapToDTO(WebRTConfig.IceConfig iceConfig);
 

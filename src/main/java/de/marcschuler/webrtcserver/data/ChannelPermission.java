@@ -10,7 +10,8 @@ public enum ChannelPermission {
     EDIT,
     EDIT_TITLE(EDIT),
     EDIT_DESCRIPTION(EDIT),
-    EDIT_AVATAR(EDIT);
+    EDIT_AVATAR(EDIT),
+    DELETE;
 
 
     private ChannelPermission parent;

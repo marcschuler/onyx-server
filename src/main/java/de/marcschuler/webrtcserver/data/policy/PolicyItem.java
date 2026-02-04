@@ -11,8 +11,7 @@ import java.util.UUID;
 
 @Entity
 @Data
-public class ItemPolicies {
-
+public class PolicyItem {
     @Id
     @GeneratedValue
     private UUID id;

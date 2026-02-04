@@ -1,13 +1,13 @@
 package de.marcschuler.webrtcserver.data;
 
-import de.marcschuler.webrtcserver.dto.data.ChannelCreateDTO;
+import de.marcschuler.webrtcserver.data.policy.PolicyItem;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.Map;
 import java.util.UUID;
 
 @Entity
@@ -28,5 +28,8 @@ public class Channel {
     @ToString.Exclude
     @JoinColumn(name = "section_id", insertable = false, updatable = false)
     private Section section;
+
+    @ManyToMany
+    private Map<ChannelPermission, PolicyItem> policies;
 
 }

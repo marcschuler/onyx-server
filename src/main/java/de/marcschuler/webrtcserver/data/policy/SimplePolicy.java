@@ -1,15 +1,17 @@
 package de.marcschuler.webrtcserver.data.policy;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.Data;
 
 import java.util.Set;
 import java.util.UUID;
 
+@DiscriminatorValue("SIMPLE")
 @Entity
 @Data
-public final class SimplePolicy extends Policy {
+public class SimplePolicy extends Policy {
     @Column(nullable = false)
     private SimplePolicyOperand operand;
     @Column(nullable = false)

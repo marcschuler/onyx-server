@@ -10,7 +10,6 @@ class SimplePolicyCheckerTest {
 
     @Test
     void testIn(){
-        policyChecker.check()
     }
 
 }

@@ -1,15 +1,9 @@
 package de.marcschuler.webrtcserver.service;
 
-import de.marcschuler.webrtcserver.data.Channel;
-import de.marcschuler.webrtcserver.data.Chat;
-import de.marcschuler.webrtcserver.data.Section;
-import de.marcschuler.webrtcserver.data.Server;
+import de.marcschuler.webrtcserver.data.*;
 import de.marcschuler.webrtcserver.data.message.MarkdownMessageContent;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
-import de.marcschuler.webrtcserver.repository.ChannelRepository;
-import de.marcschuler.webrtcserver.repository.ChatRepository;
-import de.marcschuler.webrtcserver.repository.SectionRepository;
-import de.marcschuler.webrtcserver.repository.ServerRepository;
+import de.marcschuler.webrtcserver.repository.*;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -33,9 +27,7 @@ public class ServerService {
     private WebSocketService webSocketService;
 
     private final ServerRepository serverRepository;
-    private final ChannelRepository channelRepository;
-    private final SectionRepository sectionRepository;
-    private final ChatRepository chatRepository;
+    private final GroupRepository groupRepository;
 
     private final ServerMapper serverMapper;
 
@@ -57,6 +49,20 @@ public class ServerService {
         server.setName("WebRTC Server");
         server.setKeys(keys); // assuming keys is already defined
         server.setDescription(new MarkdownMessageContent("This is the default server description."));
+
+        // ---------- 1.1 Create Groups ----------
+        var group1 = new Group();
+        group1.setName("Admin");
+        group1.setDescription("A Administrator is allowed to to anything");
+
+        var group2 = new Group();
+        group2.setName("Mod");
+        group1.setDescription("A Moderator is allowed to moderate users");
+
+        var group3 = new Group();
+        group3.setName("User");
+
+        server.setGroups(groupRepository.saveAll(List.of(group1, group2)));
 
         // ---------- 2. Create sections ----------
         var section1 = new Section();

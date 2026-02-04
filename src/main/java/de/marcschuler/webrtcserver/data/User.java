@@ -8,6 +8,7 @@ import lombok.Data;
 
 import java.security.PublicKey;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -24,7 +25,7 @@ public class User {
     private File avatar;
 
     @ManyToMany
-    private Set<Group> groups;
+    private Set<Group> groups = new HashSet<>();
 
     @NotNull
     @Column(nullable = false, unique = true, length = 1024)

@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Entity(name = "user_table")//TODO terrible fix
+@Entity(name = "server_users")
 @Data
 public class User {
     @Id
@@ -24,7 +24,7 @@ public class User {
     @OneToOne
     private File avatar;
 
-    @ManyToMany
+    @ManyToMany(fetch =  FetchType.EAGER)
     private Set<Group> groups = new HashSet<>();
 
     @NotNull

@@ -1,5 +1,8 @@
 package de.marcschuler.webrtcserver.service.websocket;
 
+import de.marcschuler.webrtcserver.data.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.jsontype.NamedType;
 import de.marcschuler.webrtcserver.data.Channel;
@@ -31,10 +34,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -43,6 +43,10 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
 
     private final ApplicationEventPublisher applicationEventPublisher;
     private final AuthService authService;
+
+    @Autowired
+    @Lazy
+    private WebSocketService webSocketService;
 
     private final ObjectMapper objectMapper;
 
@@ -93,6 +97,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
         } else {
             log.warn("Ignored channel change request because moving from null to null");
         }
+        webSocketService.updateServerTree();
     }
 
 
@@ -115,7 +120,6 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
         client.getSession().close();
     }
 
-    @Deprecated
     public void sendToClient(WebClient client, MessageBody messageBody) throws IOException {
         var data = objectMapper.writeValueAsBytes(messageBody);
         log.debug("Sending to client {}: {}", client, data);
@@ -170,6 +174,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
                 .findFirst();
     }
 
+    @Deprecated
     public List<WebClient> clients() {
         return this.sessions;
     }
@@ -184,4 +189,10 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
                 .toList();
     }
 
+    public List<User> users() {
+        return clientsInteractable().stream()
+                .map(WebClient::getUser)
+                .filter(Objects::nonNull)
+                .toList();
+    }
 }

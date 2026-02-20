@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:webrtc
+
+onyx:
+  storage:
+    path: ./data

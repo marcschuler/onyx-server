@@ -2,6 +2,9 @@ package de.marcschuler.webrtcserver.mapper;
 
 import de.marcschuler.webrtcserver.data.policy.Policy;
 import de.marcschuler.webrtcserver.dto.data.policy.PolicyDTO;
+import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
+import de.marcschuler.webrtcserver.webclient.WebClient;
+import org.mapstruct.*;
 import tools.jackson.databind.JsonNode;
 import com.nimbusds.jose.jwk.JWK;
 import de.marcschuler.webrtcserver.config.WebRTConfig;
@@ -10,9 +13,6 @@ import de.marcschuler.webrtcserver.dto.*;
 import de.marcschuler.webrtcserver.dto.data.*;
 import de.marcschuler.webrtcserver.service.CryptoService;
 import de.marcschuler.webrtcserver.webclient.messages.server.ServerTreeChangeMessage;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 import org.springframework.beans.factory.annotation.Autowired;
 import tools.jackson.core.JacksonException;
 
@@ -29,8 +29,20 @@ public abstract class ServerMapper {
     /**
      * SERVER
      */
+    /**
+     *
+     * @param server the server
+     * @return the tree WITHOUT populated user lists. See {@link WebSocketService#createServerTreeChangeEvent(WebClient)} ()} for a fully populated list
+     */
     @Mapping(target = "server", source = "server")
+    @Named("mapToChangeEvent")
     public abstract ServerTreeChangeMessage mapToChangeEvent(Server server);
+
+    @Mapping(target = "chatId", source = "chat.id")
+    public abstract ChannelExtendedDTO mapToDTOExtended(Channel channel);
+
+    public abstract SectionExtendedDTO mapToDTOExtended(Section section);
+
 
     @Mapping(target = "publicKey", source = "keys")
     public abstract ServerDTO mapToDTO(Server server);
@@ -52,15 +64,22 @@ public abstract class ServerMapper {
     public abstract ChannelDTO mapToDTO(Channel channel);
 
     public abstract Channel mapFromDTO(ChannelDTO channel);
+
     public abstract Channel mapFromDTO(ChannelWriteDTO channel);
+
     public abstract Channel update(@MappingTarget Channel channel, ChannelWriteDTO channelDTO);
 
     public abstract UserSimpleDTO mapToDTO(User user);
+
+    public abstract List<UserSimpleDTO> mapToDTOList(List<User> user);
+
     public abstract UserExtendedDTO mapToDTOExtended(User user);
 
 
     public abstract Group mapFromDTO(GroupWriteDTO policyWriteDTO);
+
     public abstract GroupDTO mapToDTO(Group group);
+
     public abstract Group update(@MappingTarget Group group, GroupWriteDTO groupWriteDTO);
 
     public abstract IceServer mapToDTO(WebRTConfig.IceConfig iceConfig);

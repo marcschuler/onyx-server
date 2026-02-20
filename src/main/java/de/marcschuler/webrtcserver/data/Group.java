@@ -3,6 +3,7 @@ package de.marcschuler.webrtcserver.data;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.Map;
 import java.util.UUID;
 
 @Entity(name = "SERVER_GROUP")
@@ -19,4 +20,6 @@ public class Group {
 
     @ManyToOne
     private Group parent;
+    @ElementCollection
+    private Map<Permission.PermissionType,Integer> permissions;
 }

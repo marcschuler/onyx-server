@@ -1,5 +1,6 @@
 package de.marcschuler.webrtcserver.webclient.handler;
 
+import de.marcschuler.webrtcserver.data.Channel;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.ChannelService;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
@@ -29,7 +30,9 @@ public class WebClientServerEventHandler {
     @Transactional
     public void onChannelChangeRequest(ClientMessage<ClientChannelChangeRequest> event) {
         log.info("User {} wants to change channel to {}", event.getClient().getUser().getUsername(), event.getBody().getChannelId());
-        var channel = channelService.get(event.getBody().getChannelId()).get();
+        Channel channel = null;
+        if (event.getBody().getChannelId() != null)
+            channel = channelService.get(event.getBody().getChannelId()).orElseThrow();
         webSocketConnectionService.moveClient(event.getClient(), channel);
     }
 

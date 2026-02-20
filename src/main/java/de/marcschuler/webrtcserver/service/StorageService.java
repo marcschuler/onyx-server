@@ -22,7 +22,7 @@ public class StorageService {
 
     private final FileRepository fileRepository;
 
-    @Value("${iris.storage.path}")
+    @Value("${onyx.storage.files}")
     private Path basePath;
 
     public File uploadFile(MultipartFile file) throws IOException {

@@ -2,6 +2,7 @@ package de.marcschuler.webrtcserver.service.websocket;
 
 import de.marcschuler.webrtcserver.data.Channel;
 import de.marcschuler.webrtcserver.data.Chat;
+import de.marcschuler.webrtcserver.data.User;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.ServerService;
 import de.marcschuler.webrtcserver.webclient.WebClient;
@@ -9,9 +10,13 @@ import de.marcschuler.webrtcserver.webclient.messages.server.ServerTreeChangeMes
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.mapstruct.AfterMapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -24,8 +29,18 @@ public class WebSocketService {
     private final ServerMapper serverMapper;
 
     public List<WebClient> getClientsInChannel(Channel channel) {
-        return webSocketConnectionService.clients()
-                .stream().filter(client -> channel.equals(client.getChannel()))
+        return getClientsInChannel(channel.getId());
+    }
+
+    public List<WebClient> getClientsInChannel(UUID id) {
+        return webSocketConnectionService.clientsInteractable()
+                .stream().filter(client -> client.getChannel()!=null && client.getChannel().getId().equals(id))
+                .toList();
+    }
+
+    public List<WebClient> getClientsInNoChannel(){
+        return webSocketConnectionService.clientsInteractable()
+                .stream().filter(client -> client.getChannel()==null)
                 .toList();
     }
 
@@ -38,12 +53,25 @@ public class WebSocketService {
 
     @Transactional
     public ServerTreeChangeMessage createServerTreeChangeEvent(WebClient webClient) {
-        return serverMapper.mapToChangeEvent(serverService.defaultServer());
+        var users = webSocketConnectionService.users();
+        var message = serverMapper.mapToChangeEvent(serverService.defaultServer());
+            message.getSections().stream()
+                    .flatMap(s -> s.getChannels().stream())
+                    .forEach(c ->{
+                        var u = getClientsInChannel(c.getId())
+                                .stream().map(wc -> wc.getUser()).toList();
+                        c.setUsers(serverMapper.mapToDTOList(u));
+                    });
+
+            message.setUsers(serverMapper.mapToDTOList(users));
+            message.setUsersNotInChannel(serverMapper.mapToDTOList(getClientsInNoChannel().stream().map(WebClient::getUser).toList()));
+            return message;
+
     }
 
     @Transactional
     public void updateServerTree() {
-        for (WebClient client : webSocketConnectionService.clients()) {
+        for (var client : webSocketConnectionService.clients()) {
             try {
                 webSocketConnectionService.sendToClient(client, createServerTreeChangeEvent(client));
             } catch (Exception e) {

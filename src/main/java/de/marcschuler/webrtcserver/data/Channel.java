@@ -30,6 +30,6 @@ public class Channel {
     private Section section;
 
     @ManyToMany
-    private Map<ChannelPermission, PolicyItem> policies;
+    private Map<Permission.PermissionType, PolicyItem> policies;
 
 }

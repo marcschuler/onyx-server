@@ -3,7 +3,7 @@ spring:
     name: webrtc-server
 
   datasource:
-    url: jdbc:h2:mem:webrtc
+    url: jdbc:h2:file:${onyx.storage.path}/database
     driver-class-name: org.h2.Driver
     username: webrtc
     password: webrtc
@@ -25,7 +25,7 @@ springdoc:
     polymorphic-converter:
       enabled: true
 
-iris:
+onyx:
   auth:
     challenge:
       expiration: 1m
@@ -33,7 +33,8 @@ iris:
       expiration: 5m
       refresh: 4m
   storage:
-    path: ./data/files
+    path: /data
+    files: ${onyx.storage.path}/files
 
 webrtc:
   config:

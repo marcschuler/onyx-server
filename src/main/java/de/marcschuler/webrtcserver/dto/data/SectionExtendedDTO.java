@@ -1,15 +1,17 @@
 package de.marcschuler.webrtcserver.dto.data;
 
-import de.marcschuler.webrtcserver.data.Permission;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
 
 @Data
-public class GroupDTO extends GroupWriteDTO {
+public class SectionExtendedDTO {
+    @NotNull
+    private String name;
     @NotNull
     private UUID id;
-
+    @NotNull
+    private List<ChannelExtendedDTO> channels;
 }

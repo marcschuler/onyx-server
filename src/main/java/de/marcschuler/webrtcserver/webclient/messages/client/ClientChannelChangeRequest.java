@@ -2,6 +2,7 @@ package de.marcschuler.webrtcserver.webclient.messages.client;
 
 import de.marcschuler.webrtcserver.webclient.messages.MessageBody;
 import lombok.Data;
+import org.jspecify.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -12,6 +13,7 @@ import java.util.UUID;
 @Data
 public class ClientChannelChangeRequest extends MessageBody {
 
+    @Nullable
     private UUID channelId;
 
 }

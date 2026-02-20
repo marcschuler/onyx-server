@@ -33,6 +33,7 @@ public class GroupService {
 
     public void edit(Group group, GroupWriteDTO groupWriteDTO) {
         serverMapper.update(group, groupWriteDTO);
+        groupRepository.save(group);
     }
 
     public void delete(Group group) {

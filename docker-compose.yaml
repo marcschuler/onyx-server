@@ -1,14 +1,7 @@
 services:
-  coturn:
-    image: coturn/coturn
-    container_name: coturn
-    restart: unless-stopped
-    command: >
-      --min-port=49160
-      --max-port=49200
+  webrtc-server:
+    build: .
     ports:
-      - "3478:3478"
-      - "3478:3478/udp"
-      - "5349:5349"
-      - "5349:5349/udp"
-      - "49160-49200:49160-49200/udp"
+      - 8080:8080
+    volumes:
+      - ./docker-data:/data

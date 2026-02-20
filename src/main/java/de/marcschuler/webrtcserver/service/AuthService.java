@@ -41,10 +41,10 @@ public class AuthService {
 
     private final List<AuthChallenge> challenges = new ArrayList<>();
 
-    @Value("${iris.auth.challenge.expiration}")
+    @Value("${onyx.auth.challenge.expiration}")
     private Duration challengeExpiration;
 
-    @Value("${iris.auth.jwt.expiration}")
+    @Value("${onyx.auth.jwt.expiration}")
     private Duration jwtExpiration;
     @Value("${spring.application.name}")
     private String applicationName;
@@ -59,7 +59,7 @@ public class AuthService {
         }, 1, 1, TimeUnit.MINUTES);
     }
 
-    @Scheduled(fixedRateString = "${iris.auth.jwt.refresh}", initialDelayString = "1m")
+    @Scheduled(fixedRateString = "${onyx.auth.jwt.refresh}", initialDelayString = "1m")
     public void refreshToken() {
         log.debug("Reissuing JWT for all clients with a lifetime of {}", jwtExpiration);
         webSocketConnectionService.clientsInteractable()

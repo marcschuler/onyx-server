@@ -46,7 +46,7 @@ public class ServerService {
 
         // ---------- 1. Create server ----------
         var server = new Server();
-        server.setName("WebRTC Server");
+        server.setName("Onyx Server");
         server.setKeys(keys); // assuming keys is already defined
         server.setDescription(new MarkdownMessageContent("This is the default server description."));
 
@@ -61,6 +61,7 @@ public class ServerService {
 
         var group3 = new Group();
         group3.setName("User");
+        group3.setDescription("Default group for known users");
 
         server.setGroups(groupRepository.saveAll(List.of(group1, group2)));
 

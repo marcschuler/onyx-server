@@ -58,7 +58,7 @@ public class ChatService {
 
         log.info("New message in chat {}", chat.getId());
 
-        var clients = this.webSocketService.getClientsInChat(chat);
+        var clients = this.webSocketConnectionService.clientsInteractable();
         this.webSocketConnectionService.sendToClients(clients,
                 new IncomeMessageEvent(chat.getId(), messageMapper.mapToDTO(message)));
         return message;

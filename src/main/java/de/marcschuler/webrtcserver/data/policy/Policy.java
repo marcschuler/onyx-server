@@ -18,7 +18,7 @@ public abstract class Policy implements Comparable<Policy> {
     private UUID id;
 
     @Column(unique = true)
-    private int order;
+    private int priority;
 
     private String name;
     private String description;
@@ -26,6 +26,6 @@ public abstract class Policy implements Comparable<Policy> {
 
     @Override
     public int compareTo(Policy o) {
-        return Integer.compare(this.order, o.order);
+        return Integer.compare(this.priority, o.priority);
     }
 }

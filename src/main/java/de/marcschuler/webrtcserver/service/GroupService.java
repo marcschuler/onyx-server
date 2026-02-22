@@ -1,6 +1,7 @@
 package de.marcschuler.webrtcserver.service;
 
 import de.marcschuler.webrtcserver.data.Group;
+import de.marcschuler.webrtcserver.data.Permission;
 import de.marcschuler.webrtcserver.dto.data.GroupDTO;
 import de.marcschuler.webrtcserver.dto.data.GroupWriteDTO;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
@@ -24,7 +25,22 @@ public class GroupService {
 
     public Group create(GroupWriteDTO policyWriteDTO) {
         var group = serverMapper.mapFromDTO(policyWriteDTO);
+        buildGroupPermissions(group);
         return groupRepository.save(group);
+    }
+
+    public void buildGroupPermissions(Group group) {
+        var permissions = group.getPermissions();
+        permissions.forEach((permissionType, integer) -> {
+            if (!permissionType.isChannel())
+                permissions.remove(permissionType);
+            if (integer == null)
+                permissions.remove(permissionType);
+        });
+
+        if (permissions.isEmpty()) {
+            permissions.put(Permission.PermissionType.CHANNEL, 0);
+        }
     }
 
     public Optional<Group> get(UUID id) {

@@ -2,6 +2,7 @@ package de.marcschuler.webrtcserver.service;
 
 import de.marcschuler.webrtcserver.data.*;
 import de.marcschuler.webrtcserver.data.message.MarkdownMessageContent;
+import de.marcschuler.webrtcserver.dto.data.GroupWriteDTO;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.repository.*;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,6 +27,8 @@ public class ServerService {
     @Autowired
     @Lazy
     private WebSocketService webSocketService;
+
+    private final GroupService groupService;
 
     private final ServerRepository serverRepository;
     private final GroupRepository groupRepository;
@@ -44,28 +48,18 @@ public class ServerService {
     public Server generateDefault() {
         var keys = cryptoService.generateKeyPair();
 
-        // ---------- 1. Create server ----------
         var server = new Server();
         server.setName("Onyx Server");
         server.setKeys(keys); // assuming keys is already defined
         server.setDescription(new MarkdownMessageContent("This is the default server description."));
 
-        // ---------- 1.1 Create Groups ----------
-        var group1 = new Group();
-        group1.setName("Admin");
-        group1.setDescription("A Administrator is allowed to to anything");
 
-        var group2 = new Group();
-        group2.setName("Mod");
-        group1.setDescription("A Moderator is allowed to moderate users");
+        var group1 = groupService.create(new GroupWriteDTO("Admin","A Administrator is allowed to to anything",null,null, Map.of()));
+        var group2 = groupService.create(new GroupWriteDTO("Mod","A Moderator is allowed to moderate users",null,null, Map.of()));
+        var group3 = groupService.create(new GroupWriteDTO("User","Default group for known users",null,null, Map.of()));
 
-        var group3 = new Group();
-        group3.setName("User");
-        group3.setDescription("Default group for known users");
+        server.setGroups(List.of(group1, group2,group3));
 
-        server.setGroups(groupRepository.saveAll(List.of(group1, group2)));
-
-        // ---------- 2. Create sections ----------
         var section1 = new Section();
         section1.setName("Lobby");
         section1.setServer(server);
@@ -80,7 +74,6 @@ public class ServerService {
 
         server.setSections(List.of(section1, section2, section3));
 
-        // ---------- 3. Create channels and chats ----------
         var channel1 = new Channel();
         channel1.setName("Lobby");
         var chat1 = new Chat();
@@ -111,12 +104,10 @@ public class ServerService {
         var chat6 = new Chat();
         channel6.setChat(chat6);
 
-        // ---------- 4. Assign channels to sections ----------
         section1.setChannels(List.of(channel1));
         section2.setChannels(List.of(channel2, channel3));
         section3.setChannels(List.of(channel4, channel5, channel6));
 
-        // ---------- 5. Persist server (cascade saves sections, channels, and chats) ----------
         return serverRepository.save(server);
 
     }

@@ -70,14 +70,12 @@ public class BeanConfig {
             var polymorphySchemas = new HashMap<Class<?>, ResolvedSchema>();
             var messageTypes = new ArrayList<String>();
 
-            // ---------- 1. JsonNode "any" schema ----------
             Schema<?> anySchema = new Schema<>()
                     .type("object")
                     .additionalProperties(true)
                     .description("Valid JSON data without a given schema (internally: JsonNode)");
             openApi.getComponents().addSchemas("JsonNode", anySchema);
 
-            // ---------- 2. JWT Security ----------
             openApi.addSecurityItem(new SecurityRequirement().addList("jwt-auth"));
             openApi.getComponents().addSecuritySchemes("jwt-auth",
                     new SecurityScheme()
@@ -87,7 +85,6 @@ public class BeanConfig {
                             .bearerFormat("JWT")
             );
 
-            // ---------- 3. Polymorphic MessageBody subclasses ----------
             new Reflections("de.marcschuler.webrtcserver.webclient.messages")
                     .getSubTypesOf(MessageBody.class)
                     .stream()
@@ -96,7 +93,6 @@ public class BeanConfig {
                         ResolvedSchema resolvedSchema = ModelConverters.getInstance()
                                 .resolveAsResolvedSchema(new AnnotatedType(c));
 
-                        // ---------- Handle inheritance ----------
                         Class<?> superclass = c.getSuperclass();
                         List<Schema<?>> allOfSchemas = new ArrayList<>();
 
@@ -119,7 +115,6 @@ public class BeanConfig {
                             resolvedSchema.schema.allOf(allOfSchemas);
                         }
 
-                        // ---------- Add discriminator-like "type" property ----------
                         var typeSchema = new io.swagger.v3.oas.models.media.StringSchema()
                                 ._enum(List.of(c.getSimpleName()))
                                 .readOnly(true);
@@ -128,13 +123,11 @@ public class BeanConfig {
 
                         messageTypes.add(c.getSimpleName());
 
-                        // ---------- Add schema without overwriting existing controller types ----------
                         if (!openApi.getComponents().getSchemas().containsKey(resolvedSchema.schema.getName())) {
                             openApi.getComponents().addSchemas(resolvedSchema.schema.getName(), resolvedSchema.schema);
                         }
                     });
 
-            // ---------- 4. Enum of all MessageBody types ----------
             Schema<String> enumSchema = new Schema<>();
             enumSchema.setType("string");
             enumSchema.setDescription("A list of all message types");

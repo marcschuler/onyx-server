@@ -21,6 +21,7 @@ public class Group {
     @ManyToOne
     private Group parent;
     @ElementCollection
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Map<Permission.PermissionType,Integer> permissions;
+    private Map<Permission.PermissionType,Integer> accessPowers;
 }

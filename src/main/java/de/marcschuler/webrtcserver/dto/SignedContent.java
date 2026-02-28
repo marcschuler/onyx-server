@@ -10,7 +10,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SignedContent {
     @NotNull
-    private String content;
-    @NotNull
-    private String contentSignature;
+    private String jws;
 }

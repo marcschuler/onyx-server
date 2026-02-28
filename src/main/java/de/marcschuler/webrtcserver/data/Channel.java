@@ -1,5 +1,6 @@
 package de.marcschuler.webrtcserver.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.marcschuler.webrtcserver.data.policy.PolicyItem;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,10 +27,14 @@ public class Channel {
 
     @ManyToOne
     @ToString.Exclude
+    @JsonIgnore
     @JoinColumn(name = "section_id", insertable = false, updatable = false)
     private Section section;
 
+    @Enumerated(EnumType.STRING)
     @ManyToMany
+    @JsonIgnore
+    @ToString.Exclude
     private Map<Permission.PermissionType, PolicyItem> policies;
 
 }

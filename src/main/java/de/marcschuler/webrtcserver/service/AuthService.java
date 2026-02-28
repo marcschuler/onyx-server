@@ -1,5 +1,13 @@
 package de.marcschuler.webrtcserver.service;
 
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JOSEObjectType;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.crypto.Ed25519Signer;
+import com.nimbusds.jose.crypto.Ed25519Verifier;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 import de.marcschuler.webrtcserver.data.User;
 import de.marcschuler.webrtcserver.error.webclient.ProblemDetailException;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
@@ -18,6 +26,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -64,10 +73,10 @@ public class AuthService {
         log.debug("Reissuing JWT for all clients with a lifetime of {}", jwtExpiration);
         webSocketConnectionService.clientsInteractable()
                 .forEach(client -> {
-                    @SuppressWarnings("DataFlowIssue") var jwt = createJWT(client.getUser());
                     try {
+                        @SuppressWarnings("DataFlowIssue") var jwt = createJWT(client.getUser());
                         client.sendMessage(new JwtTokenMessage(jwt));
-                    } catch (IOException e) {
+                    } catch (IOException | JOSEException e) {
                         log.error("Could not send message to client", e);
                     }
                 });
@@ -103,14 +112,21 @@ public class AuthService {
      * @param user the user
      * @return the jwt as string
      */
-    public String createJWT(User user) {
-        return Jwts.builder()
+    public String createJWT(User user) throws JOSEException {
+        var header = new JWSHeader.Builder(JWSAlgorithm.EdDSA)
+                .keyID(user.getId())
+                .type(JOSEObjectType.JWT)
+                .build();
+        var claims = new JWTClaimsSet.Builder()
                 .subject(user.getId())
-                .issuer(applicationName) //TODO
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + jwtExpiration.toMillis()))
-                .signWith(serverService.defaultServer().getKeys().getPrivate())
-                .compact();
+                .issuer(applicationName)
+                .issueTime(new Date())
+                .expirationTime(new Date(System.currentTimeMillis() + jwtExpiration.toMillis()))
+                .build();
+
+        var signedJWT = new SignedJWT(header, claims);
+        signedJWT.sign(new Ed25519Signer(serverService.defaultServer().getKeys()));
+        return signedJWT.serialize();
     }
 
     /**
@@ -119,12 +135,15 @@ public class AuthService {
      * @param jwt the jwt
      * @return the user id (subject)
      */
-    public String verifyJWT(String jwt) {
-        var claims = Jwts.parser()
-                .verifyWith(serverService.defaultServer().getKeys().getPublic())
-                .build()
-                .parseSignedClaims(jwt);
-        return claims.getBody().getSubject();
+    public String verifyJWT(String jwt) throws JOSEException, ParseException {
+        var parsed = SignedJWT.parse(jwt);
+        var valid = parsed.verify(new Ed25519Verifier(serverService.defaultServer().getKeys().toPublicJWK()));
+        if (!valid){
+            log.error("No verifiable JWT: {}", jwt);
+            throw new SecurityException("Could not verify JWT");
+        }
+
+        return parsed.getJWTClaimsSet().getSubject();
     }
 
 }

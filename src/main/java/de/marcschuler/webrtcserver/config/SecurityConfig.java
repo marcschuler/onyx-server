@@ -1,5 +1,6 @@
 package de.marcschuler.webrtcserver.config;
 
+import com.nimbusds.jose.JOSEException;
 import de.marcschuler.webrtcserver.service.AuthService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 
 @Configuration
@@ -59,7 +61,12 @@ public class SecurityConfig {
                 filterChain.doFilter(request, response);
                 return;
             }
-            var subject = authService.verifyJWT(token);
+            String subject;
+            try {
+                subject = authService.verifyJWT(token);
+            } catch (JOSEException | ParseException e) {
+                throw new RuntimeException(e);
+            }
             //TODO get permissions
 
             Authentication auth =

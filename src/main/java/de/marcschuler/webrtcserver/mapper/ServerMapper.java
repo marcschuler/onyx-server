@@ -1,5 +1,6 @@
 package de.marcschuler.webrtcserver.mapper;
 
+import com.nimbusds.jose.jwk.OctetKeyPair;
 import de.marcschuler.webrtcserver.data.policy.Policy;
 import de.marcschuler.webrtcserver.dto.data.policy.PolicyDTO;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
@@ -18,7 +19,9 @@ import tools.jackson.core.JacksonException;
 
 import java.security.KeyPair;
 import java.security.PublicKey;
+import java.security.interfaces.EdECPublicKey;
 import java.util.List;
+import java.util.Map;
 
 @Mapper(componentModel = "spring", uses = MessageMapper.class)
 public abstract class ServerMapper {
@@ -91,20 +94,7 @@ public abstract class ServerMapper {
      */
     public abstract FileDTO mapToDTO(File file);
 
-    JWK mapPublicKeyToJWK(KeyPair keyPair) {
-        return this.cryptoService.exportPublicKey(keyPair.getPublic());
+    Map<String,Object> mapKeyToJWKString(OctetKeyPair keyPair){
+        return keyPair.toJSONObject();
     }
-
-    JsonNode mapPublicKeyToJWKJson(KeyPair keyPair) throws JacksonException {
-        return this.cryptoService.exportPublicKeyToJSON(keyPair.getPublic());
-    }
-
-    JWK mapKeyToJWK(PublicKey key) {
-        return this.cryptoService.exportPublicKey(key);
-    }
-
-    JsonNode mapKeyToJSON(PublicKey key) throws JacksonException {
-        return this.cryptoService.exportPublicKeyToJSON(key);
-    }
-
 }

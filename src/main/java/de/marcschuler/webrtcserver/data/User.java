@@ -1,5 +1,6 @@
 package de.marcschuler.webrtcserver.data;
 
+import com.nimbusds.jose.jwk.OctetKeyPair;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -29,9 +30,9 @@ public class User {
 
     @NotNull
     @Column(nullable = false, unique = true, length = 1024)
-    private PublicKey publicKey;
+    private OctetKeyPair publicKey;
 
-    @NotNull
+    @NotNull @Enumerated(EnumType.STRING)
     private ClientState state;
 
     @Column(nullable = false)

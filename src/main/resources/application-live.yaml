@@ -1,6 +1,8 @@
 spring:
-  datasource:
-    url: jdbc:h2:mem:webrtc
+  #datasource:
+    #url: jdbc:h2:mem:webrtc
+  jpa:
+    show-sql: true
 
 onyx:
   storage:

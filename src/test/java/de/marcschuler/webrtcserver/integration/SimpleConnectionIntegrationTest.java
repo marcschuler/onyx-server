@@ -1,6 +1,8 @@
 package de.marcschuler.webrtcserver.integration;
 
+import com.nimbusds.jose.JOSEException;
 import de.marcschuler.webrtcserver.IntegrationHelper;
+import de.marcschuler.webrtcserver.OnyxTest;
 import de.marcschuler.webrtcserver.WebSocketMock;
 import de.marcschuler.webrtcserver.webclient.messages.peer.IceServerMessage;
 import de.marcschuler.webrtcserver.webclient.messages.server.ServerTreeChangeMessage;
@@ -23,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@ActiveProfiles("test")
+@OnyxTest
 public class SimpleConnectionIntegrationTest {
 
     @Autowired
@@ -32,7 +34,7 @@ public class SimpleConnectionIntegrationTest {
     private WebSocketMock client;
 
     @BeforeEach
-    void setup() throws IOException, SignatureException, NoSuchAlgorithmException, ExecutionException, InvalidKeyException, InterruptedException, TimeoutException {
+    void setup() throws IOException, SignatureException, NoSuchAlgorithmException, ExecutionException, InvalidKeyException, InterruptedException, TimeoutException, JOSEException {
         client = integrationHelper.quickConnect();
     }
 
@@ -42,11 +44,11 @@ public class SimpleConnectionIntegrationTest {
     }
 
     @Test
-    void testServerTree() throws IOException, InterruptedException {
+    void testServerTree() throws InterruptedException {
         client.recv(IceServerMessage.class);
         var tree = client.recv(ServerTreeChangeMessage.class);
         assertNotNull(tree,"tree exists");
-        assertEquals(3,tree.getSections(),"three sections");
+        assertEquals(3,tree.getSections().size(),"three sections");
     }
 
     @Test

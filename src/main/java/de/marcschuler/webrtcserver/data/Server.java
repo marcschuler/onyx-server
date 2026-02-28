@@ -1,6 +1,7 @@
 package de.marcschuler.webrtcserver.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.nimbusds.jose.jwk.OctetKeyPair;
 import de.marcschuler.webrtcserver.data.message.MarkdownMessageContent;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -23,22 +24,24 @@ public class Server {
     @Size(min = 3, max = 64)
     private String name;
     @OneToOne(cascade = CascadeType.ALL)
-    private MarkdownMessageContent description;
+    private MarkdownMessageContent description; //TODO List<MessageContent>?
 
     @OneToMany(
             cascade = CascadeType.ALL,
-            orphanRemoval = true
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
     )
     @JoinColumn(name = "server_id")
     @OrderColumn(name = "channel_order")
     private List<Section> sections = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL,
-            orphanRemoval = true)
+            orphanRemoval = true,fetch = FetchType.EAGER)
     private List<Group> groups = new ArrayList<>();
 
     @JsonIgnore
     @ToString.Exclude
-    @Column(length = 1024)
-    private KeyPair keys;
+    @Column(length = 4096)
+    @Lob
+    private OctetKeyPair keys;
 }

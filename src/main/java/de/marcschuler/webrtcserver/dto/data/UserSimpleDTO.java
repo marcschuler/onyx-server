@@ -4,6 +4,7 @@ import tools.jackson.databind.JsonNode;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.util.Map;
 import java.util.Set;
 
 @Data
@@ -12,7 +13,7 @@ public class UserSimpleDTO {
     @NotNull
     private String id;
     @NotNull
-    private JsonNode publicKey;
+    private Map<String,Object> publicKey;
     @NotNull
     private String username;
     private FileDTO avatar;

@@ -14,7 +14,7 @@ import java.util.UUID;
         visible = true
 )
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = SimplePolicyDTO.class, name = "SIMPLE"),
+        @JsonSubTypes.Type(value = RolePolicyDTO.class, name = "SIMPLE"),
 })
 @Data
 public class PolicyDTO extends PolicyWriteDTO {

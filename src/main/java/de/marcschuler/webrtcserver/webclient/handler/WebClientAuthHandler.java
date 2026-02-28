@@ -2,6 +2,7 @@ package de.marcschuler.webrtcserver.webclient.handler;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.OctetKeyPair;
 import de.marcschuler.webrtcserver.config.WebRTConfig;
 import de.marcschuler.webrtcserver.data.ClientState;
 import de.marcschuler.webrtcserver.data.User;
@@ -52,14 +53,14 @@ public class WebClientAuthHandler {
     private final WebRTConfig webRTConfig;
 
     @EventListener
-    public void onLogin(ClientMessage<AuthChallengeResponse> event) throws IOException {
+    public void onLogin(ClientMessage<AuthChallengeResponse> event) throws IOException, JOSEException {
         log.info("Responding to auth challenge");
         var content = event.getBody().getChallenge();
         var username = event.getBody().getUsername();
-        PublicKey publicKey;
+        OctetKeyPair publicKey;
         try {
-            publicKey = cryptoService.parsePublicKey(JWK.parse(event.getBody().getPublicKey().toString()));
-        } catch (InvalidKeySpecException | JOSEException e) {
+            publicKey = cryptoService.importPublicKey(event.getBody().getPublicKey());
+        } catch (JOSEException e) {
             log.warn("Invalid public key from client {}", event.getClient());
             throw new RuntimeException("Could not parse public key", e);
         } catch (ParseException e) {
@@ -68,7 +69,7 @@ public class WebClientAuthHandler {
         AuthChallenge challenge;
         try {
             challenge = cryptoService.verifyContent(content, AuthChallenge.class, publicKey);
-        } catch (InvalidKeyException | JacksonException | SignatureException | NoSuchAlgorithmException e) {
+        } catch (InvalidKeyException | JacksonException | SignatureException | NoSuchAlgorithmException | ParseException e) {
             log.warn("Client signature could not be verified {}", event.getClient());
             throw new RuntimeException("Could not verify signature", e);
         }

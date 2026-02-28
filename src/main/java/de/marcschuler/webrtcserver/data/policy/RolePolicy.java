@@ -11,7 +11,7 @@ import java.util.UUID;
 @DiscriminatorValue("SIMPLE")
 @Entity
 @Data
-public class SimplePolicy extends Policy {
+public class RolePolicy extends Policy {
     @Column(nullable = false)
     private SimplePolicyOperand operand;
     @Column(nullable = false)

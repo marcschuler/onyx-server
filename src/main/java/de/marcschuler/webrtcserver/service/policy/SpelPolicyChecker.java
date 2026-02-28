@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 import java.util.Optional;
 
-//TODO check - it's experimenal right now
+//TODO implement - it's experimenal right now
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -20,7 +20,7 @@ public class SpelPolicyChecker implements PolicyChecker<SpeLPolicy> {
     private final ExpressionParser parser = new SpelExpressionParser();
 
     @Override
-    public Optional<Boolean> check(SpeLPolicy policy, Map<String, Object> context) throws PolicyCheckException {
+    public Optional<Boolean> check(SpeLPolicy policy, PolicyCheckerContext context) throws PolicyCheckException {
         var exp = parser.parseExpression(policy.getSpel());
         var result = exp.getValue(context, Boolean.class);
         return Optional.ofNullable(result);

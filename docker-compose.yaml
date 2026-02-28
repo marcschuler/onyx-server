@@ -1,5 +1,5 @@
 services:
-  webrtc-server:
+  onyx-server:
     build: .
     ports:
       - 8080:8080

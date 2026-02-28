@@ -1,5 +1,7 @@
 package de.marcschuler.webrtcserver;
 
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.jwk.OctetKeyPair;
 import tools.jackson.databind.ObjectMapper;
 import de.marcschuler.webrtcserver.service.AuthService;
 import de.marcschuler.webrtcserver.service.CryptoService;
@@ -29,23 +31,23 @@ public class IntegrationHelper {
     private final CryptoService cryptoService;
     private final ObjectMapper objectMapper;
 
-    public WebSocketMock quickConnect() throws IOException, SignatureException, NoSuchAlgorithmException, ExecutionException, InvalidKeyException, InterruptedException, TimeoutException {
+    public WebSocketMock quickConnect() throws IOException, SignatureException, NoSuchAlgorithmException, ExecutionException, InvalidKeyException, InterruptedException, TimeoutException, JOSEException {
         return quickConnect(RandomStringUtils.randomAlphanumeric(8));
     }
 
-    public WebSocketMock quickConnect(String username) throws IOException, SignatureException, NoSuchAlgorithmException, ExecutionException, InvalidKeyException, InterruptedException, TimeoutException {
+    public WebSocketMock quickConnect(String username) throws IOException, SignatureException, NoSuchAlgorithmException, ExecutionException, InvalidKeyException, InterruptedException, TimeoutException, JOSEException {
         return quickConnect(cryptoService.generateKeyPair(),username);
     }
 
-    public WebSocketMock quickConnect(KeyPair keys, String username) throws ExecutionException, InterruptedException, TimeoutException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException {
+    public WebSocketMock quickConnect(OctetKeyPair keyPair, String username) throws ExecutionException, InterruptedException, TimeoutException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException, JOSEException {
         var mock = new WebSocketMock(objectMapper);
         mock.connect();
 
         var authChallengeRequest = (AuthChallengeRequest) mock.recv();
         var authChallengeResponse = new AuthChallengeResponse();
-        authChallengeResponse.setChallenge(cryptoService.signContent(authChallengeRequest.getChallenge(), keys.getPrivate()));
+        authChallengeResponse.setChallenge(cryptoService.signContent(authChallengeRequest.getChallenge(),keyPair));
         authChallengeResponse.setUsername(username);
-        authChallengeResponse.setPublicKey(cryptoService.exportPublicKeyToJSON(keys.getPublic()));
+        authChallengeResponse.setPublicKey(keyPair.toPublicJWK().toJSONObject());
         mock.sendMessage(authChallengeResponse);
         mock.recv(AuthSuccessMessage.class);
         return mock;

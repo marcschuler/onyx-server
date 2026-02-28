@@ -1,8 +1,13 @@
-datasource:
-  url: jdbc:h2:mem:webrtc
-  driver-class-name: org.h2.Driver
-  username: webrtc
-  password: webrtc
-jpa:
-  database-platform: org.hibernate.dialect.H2Dialect
-  show-sql: true
+spring:
+  datasource:
+    url: jdbc:h2:mem:webrtc
+  jpa:
+    show-sql: true
+
+logging:
+  level:
+    de.marcschuler: TRACE
+
+onyx:
+  init:
+    startup-wizzard: false

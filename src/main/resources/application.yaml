@@ -28,6 +28,8 @@ springdoc:
       enabled: true
 
 onyx:
+  init:
+    startup-wizzard: true
   auth:
     challenge:
       expiration: 1m

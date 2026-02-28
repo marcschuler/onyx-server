@@ -36,7 +36,10 @@ public class ServerService {
     private final ServerMapper serverMapper;
 
     public Server defaultServer() {
-        return serverRepository.findAll().get(0); //one should exist at any time
+        var servers =  serverRepository.findAll();
+        if (servers.size()!=1)
+            log.error("More than one server active!");
+        return servers.get(0);//one should exist at any time
     }
 
     public List<Server> all() {
@@ -52,6 +55,8 @@ public class ServerService {
         server.setName("Onyx Server");
         server.setKeys(keys); // assuming keys is already defined
         server.setDescription(new MarkdownMessageContent("This is the default server description."));
+
+        //TODO create default AccessPowerPolicies for the channels
 
 
         var group1 = groupService.create(new GroupWriteDTO("Admin","A Administrator is allowed to to anything",null,null, Map.of()));

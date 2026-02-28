@@ -6,5 +6,5 @@ import lombok.Data;
 @Data
 public class ChannelWriteDTO {
     @NotNull
-    private String name;
+    protected String name;
 }

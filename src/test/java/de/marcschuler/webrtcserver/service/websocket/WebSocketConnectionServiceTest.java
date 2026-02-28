@@ -1,5 +1,7 @@
 package de.marcschuler.webrtcserver.service.websocket;
 
+import com.nimbusds.jose.JOSEException;
+import de.marcschuler.webrtcserver.OnyxTest;
 import tools.jackson.databind.ObjectMapper;
 import de.marcschuler.webrtcserver.WebSocketMock;
 import de.marcschuler.webrtcserver.dto.SignedContent;
@@ -20,13 +22,14 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
+import java.text.ParseException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@ActiveProfiles("test")
+@OnyxTest
 class WebSocketConnectionServiceTest {
 
     private WebSocketMock webSocketMock;
@@ -53,7 +56,7 @@ class WebSocketConnectionServiceTest {
     }
 
     @Test
-    void testFullLogin() throws InterruptedException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException {
+    void testFullLogin() throws InterruptedException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException, JOSEException, ParseException {
         var key = cryptoService.generateKeyPair();
         var authChallengeRequest = (AuthChallengeRequest) webSocketMock.recv();
 
@@ -68,27 +71,28 @@ class WebSocketConnectionServiceTest {
 
         //Authenticate
         var authChallengeResponse = new AuthChallengeResponse();
-        authChallengeResponse.setChallenge(cryptoService.signContent(authChallengeRequest.getChallenge(), key.getPrivate()));
+        authChallengeResponse.setChallenge(cryptoService.signContent(authChallengeRequest.getChallenge(), key));
         authChallengeResponse.setUsername("marc");
-        authChallengeResponse.setPublicKey(cryptoService.exportPublicKeyToJSON(key.getPublic()));
+        authChallengeResponse.setPublicKey(key.toPublicJWK().toJSONObject());
         webSocketMock.sendMessage(authChallengeResponse);
 
         //Success
         var authSuccessMessage = (AuthSuccessMessage) webSocketMock.recv();
         assertEquals(AuthSuccessMessage.class, authSuccessMessage.getClass(), "Got a success message");
         assertNotNull(authSuccessMessage.getJwt(), "jwt exists");
-        assertEquals(cryptoService.generateKeyId(key.getPublic()), authService.verifyJWT(authSuccessMessage.getJwt()), "jwt is valid");
+        assertEquals(cryptoService.generateKeyId(key), authService.verifyJWT(authSuccessMessage.getJwt()), "jwt is valid");
 
         assertEquals(1, webSocketConnectionService.clients().size(),"client found");
         assertEquals(1, webSocketConnectionService.clientsInteractable().size(),"client interactable");
         me = webSocketConnectionService.clients().get(0);
         assertEquals("marc",me.getUser().getUsername(),"user is right");
-        assertEquals(cryptoService.generateKeyId(key.getPublic()),me.getUser().getId(),"is is derived from key");
+        assertEquals(cryptoService.generateKeyId(key),me.getUser().getId(),"is is derived from key");
         assertEquals(WebClientState.LOGGED_IN,me.getState(),"state is logged in");
         assertNull(me.getChannel(),"no channel is set");
         assertNotNull(me.getSession(),"session is available");
 
         webSocketMock.close();
+        Thread.sleep(500);
         assertEquals(0,webSocketConnectionService.clients().size(),"no one connected");
     }
 
@@ -104,9 +108,9 @@ class WebSocketConnectionServiceTest {
 
         //Authenticate
         var authChallengeResponse = new AuthChallengeResponse();
-        authChallengeResponse.setChallenge(new SignedContent(null,null));
+        authChallengeResponse.setChallenge(new SignedContent(null));
         authChallengeResponse.setUsername("marc");
-        authChallengeResponse.setPublicKey(cryptoService.exportPublicKeyToJSON(key.getPublic()));
+        authChallengeResponse.setPublicKey(key.toPublicJWK().toJSONObject());
         webSocketMock.sendMessage(authChallengeResponse);
         Thread.sleep(1000);
         assertFalse(webSocketMock.isOpen());

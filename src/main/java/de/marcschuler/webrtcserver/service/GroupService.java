@@ -2,7 +2,6 @@ package de.marcschuler.webrtcserver.service;
 
 import de.marcschuler.webrtcserver.data.Group;
 import de.marcschuler.webrtcserver.data.Permission;
-import de.marcschuler.webrtcserver.dto.data.GroupDTO;
 import de.marcschuler.webrtcserver.dto.data.GroupWriteDTO;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.repository.GroupRepository;
@@ -10,9 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +27,8 @@ public class GroupService {
     }
 
     public void buildGroupPermissions(Group group) {
-        var permissions = group.getPermissions();
+        var permissions = group.getAccessPowers()!=null?group.getAccessPowers():new HashMap<Permission.PermissionType, Integer>();
+        group.setAccessPowers(permissions);
         permissions.forEach((permissionType, integer) -> {
             if (!permissionType.isChannel())
                 permissions.remove(permissionType);

@@ -1,5 +1,6 @@
 package de.marcschuler.webrtcserver.service;
 
+import de.marcschuler.webrtcserver.OnyxTest;
 import tools.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
@@ -20,7 +21,8 @@ import java.text.ParseException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+
+@OnyxTest
 @Slf4j
 class CryptoServiceTest {
 
@@ -36,11 +38,13 @@ class CryptoServiceTest {
     }
 
     @Test
-    void testValidation() throws SignatureException, NoSuchAlgorithmException, InvalidKeyException, JacksonException {
+    void testValidation() throws SignatureException, NoSuchAlgorithmException, InvalidKeyException, JacksonException, JOSEException, ParseException {
         var pair = cryptoService.generateKeyPair();
-        var content = cryptoService.signContent("Test String", pair.getPrivate());
+        var content = cryptoService.signContent("Test String", pair);
         log.info(objectMapper.writeValueAsString(content));
-        cryptoService.verifyContent(content, pair.getPublic());
+
+        var publicKeyPair = cryptoService.importPublicKey(pair.toPublicJWK().toJSONObject());
+        cryptoService.verifyContent(content, publicKeyPair);
     }
 
     @Test
@@ -48,21 +52,30 @@ class CryptoServiceTest {
 
         ClassPathResource resource = new ClassPathResource("crypto/publickey-1.txt");
         String content = Files.readString(resource.getFile().toPath());
-        var key = cryptoService.parsePublicKey(JWK.parse(content));
-        assertEquals("i2lMeB/Sw94WvkLiAccs9/HE7g2RMazoqKl0hqSeW+k=", cryptoService.generateKeyId(key));
+        var key = cryptoService.importPublicKey(content);
+        assertEquals("gF7RbPyj2RmmvKnh3B6KO0anmcJ_dovrcqZ5z45-cv4", cryptoService.generateKeyId(key));
+    }
+
+
+    @Test
+    void testThumbprint() throws ParseException {
+        var keyPair = cryptoService.generateKeyPair();
+
+        assertEquals(cryptoService.generateKeyId(keyPair), cryptoService.generateKeyId(keyPair.toPublicJWK()));
+        assertEquals(cryptoService.generateKeyId(keyPair), cryptoService.generateKeyId(cryptoService.importKeyPair(keyPair.toJSONString())));
     }
 
     @Test
     void testJWKExportImport() throws JacksonException, ParseException, InvalidKeySpecException, JOSEException, SignatureException, NoSuchAlgorithmException, InvalidKeyException {
         var keyPair = cryptoService.generateKeyPair();
-        var publicJWK = cryptoService.exportPublicKeyToJSON(keyPair.getPublic()).toString();
-        var importedKey = cryptoService.parsePublicKey(JWK.parse(publicJWK));
+        var publicJWK = keyPair.toPublicJWK().toJSONString();
+        var importedKey = cryptoService.importPublicKey(publicJWK);
 
 
-        var content = cryptoService.signContent("Test String", keyPair.getPrivate());
+        var content = cryptoService.signContent("Test String", keyPair);
 
         //Normal and exported+imported public key should behave equally
-        cryptoService.verifyContent(content,keyPair.getPublic());
+        cryptoService.verifyContent(content,keyPair);
         cryptoService.verifyContent(content,importedKey);
 
     }

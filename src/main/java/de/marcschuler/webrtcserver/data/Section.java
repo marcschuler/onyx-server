@@ -1,5 +1,6 @@
 package de.marcschuler.webrtcserver.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -23,7 +24,8 @@ public class Section {
 
     @OneToMany(
             cascade = CascadeType.ALL,
-            orphanRemoval = true
+            orphanRemoval = true,
+             fetch = FetchType.EAGER
     )
     @JoinColumn(name="section_id")
     @OrderColumn(name = "channel_order")
@@ -31,6 +33,7 @@ public class Section {
 
     @ManyToOne
     @ToString.Exclude
+    @JsonIgnore
     @JoinColumn(name = "server_id", insertable = false, updatable = false)
     private Server server;
 }

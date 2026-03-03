@@ -20,6 +20,7 @@ public class Section {
     @Id
     @GeneratedValue
     private UUID id;
+    @Column(length = 32)
     private String name;
 
     @OneToMany(

@@ -3,10 +3,7 @@ package de.marcschuler.webrtcserver.data;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.marcschuler.webrtcserver.data.policy.PolicyItem;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.Map;
 import java.util.UUID;
@@ -19,10 +16,10 @@ public class Channel {
     @Id
     @GeneratedValue
     private UUID id;
-    @Column(nullable = false)
+    @Column(nullable = false, length = 32)
     private String name;
 
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @ManyToOne(cascade = CascadeType.ALL, optional = false,fetch =  FetchType.EAGER)
     private Chat chat;
 
     @ManyToOne

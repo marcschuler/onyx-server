@@ -32,7 +32,7 @@ public class Server {
             fetch = FetchType.EAGER
     )
     @JoinColumn(name = "server_id")
-    @OrderColumn(name = "channel_order")
+    @OrderColumn(name = "section_order")
     private List<Section> sections = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL,

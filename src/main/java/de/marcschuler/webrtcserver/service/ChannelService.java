@@ -9,10 +9,14 @@ import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.repository.ChannelRepository;
 import de.marcschuler.webrtcserver.repository.SectionRepository;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,14 +32,19 @@ public class ChannelService {
 
     private final ServerMapper serverMapper;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     public Channel create(String name, Section section) {
         var channel = new Channel();
         channel.setName(name);
         channel.setChat(new Chat());
         section.getChannels().add(channel);
+        channel =  channelRepository.save(channel);
         sectionRepository.save(section);
         webSocketService.updateServerTree();
-        return channelRepository.save(channel);
+        log.info("Creating channel {} ({})", channel.getName(),channel.getId());
+        return channel;
     }
 
     public Optional<Channel> get(UUID channelId) {
@@ -50,15 +59,13 @@ public class ChannelService {
     }
 
     public void move(Channel channel, Section newSection, int newOrder) {
-        var section = channel.getSection();
-        section.getChannels().removeIf(c -> c == channel);
-        newSection.getChannels().add(channel);
+        if (channel.getSection().getId().equals(newSection.getId())) {
+            log.warn("Tried to move channel {} ({}) to the same section {} ({})", channel.getName(), channel.getId(), newSection.getName(), newSection.getId());
+            return;
+        }
         channel.setSection(newSection);
-
-        sectionRepository.save(section);
-        sectionRepository.save(newSection);
-
-        order(channel, newOrder);
+        channel = channelRepository.save(channel);
+        //order(channelRepository.findById(channel.getId()).orElseThrow(), newOrder);
     }
 
     public void delete(Channel channel) {
@@ -66,6 +73,7 @@ public class ChannelService {
         section.getChannels().removeIf(c -> c.equals(channel));
         sectionRepository.save(section);
         webSocketService.updateServerTree();
+        log.info("Removed channel {}:{}", channel.getId(), channel.getName());
     }
 
     public void edit(Channel channel, ChannelWriteDTO channelDTO) {

@@ -24,5 +24,5 @@ public class GroupWriteDTO {
     private UUID parentId;
 
     @NotNull
-    private Map<Permission.PermissionType,Integer> permissions;
+    private Map<Permission.PermissionType,Integer> accessPowers;
 }

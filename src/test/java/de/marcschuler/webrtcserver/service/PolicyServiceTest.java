@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @OnyxTest
 @Slf4j
 class PolicyServiceTest {
@@ -38,7 +36,7 @@ class PolicyServiceTest {
 
     @Test
     void testSimpleAdminChannelPolicy() throws PolicyCheckException {
-        assertEquals(PolicyService.PolicyResult.ALLOW, policyService.canAccess(List.of(POLICY_AP_100), new PolicyCheckerContext(Permission.PermissionType.CHANNEL, testService.userAdmin(), testService.channelLobby(), Map.of())));
+        assertEquals(PolicyService.PolicyResult.ALLOW, policyService.checkAccess(List.of(POLICY_AP_100), new PolicyCheckerContext(Permission.PermissionType.CHANNEL, testService.userAdmin(), testService.channelLobby(), Map.of())));
     }
 
 }

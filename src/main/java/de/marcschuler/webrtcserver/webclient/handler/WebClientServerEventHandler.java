@@ -1,6 +1,7 @@
 package de.marcschuler.webrtcserver.webclient.handler;
 
 import de.marcschuler.webrtcserver.data.Channel;
+import de.marcschuler.webrtcserver.error.webclient.PolicyCheckException;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.ChannelService;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;

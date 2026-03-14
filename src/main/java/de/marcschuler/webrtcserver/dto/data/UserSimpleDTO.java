@@ -4,6 +4,7 @@ import tools.jackson.databind.JsonNode;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,5 +20,5 @@ public class UserSimpleDTO {
     private FileDTO avatar;
 
     @NotNull
-    private Set<GroupDTO> groups;
+    private List<GroupDTO> groups;
 }

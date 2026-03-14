@@ -45,6 +45,9 @@ public class ChatService {
     }
 
     public Message createMessage(Chat chat, User user, String markdown) {
+        if (markdown.trim().isEmpty())
+            throw new IllegalArgumentException("markdown cannot be empty or whitespace only");
+
         var content = new MarkdownMessageContent();
         content.setText(markdown);
 
@@ -63,4 +66,5 @@ public class ChatService {
                 new IncomeMessageEvent(chat.getId(), messageMapper.mapToDTO(message)));
         return message;
     }
+
 }

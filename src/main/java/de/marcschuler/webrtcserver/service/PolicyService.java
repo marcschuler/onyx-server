@@ -51,16 +51,7 @@ public class PolicyService {
     }
 
 
-    public EvaluationContext buildContext(Map<String, Object> map) {
-        SimpleEvaluationContext context = SimpleEvaluationContext.forReadOnlyDataBinding()
-                .withInstanceMethods()
-                .build();
-        map.forEach(context::setVariable);
-        return context;
-    }
-
-
-    public PolicyResult canAccess(List<Policy> policies, PolicyCheckerContext context) throws PolicyCheckException {
+    public PolicyResult checkAccess(List<Policy> policies, PolicyCheckerContext context) throws PolicyCheckException {
         var sortedPolicies = policies.stream().sorted().toList();
         for (var policy : sortedPolicies) {
             //noinspection unchecked);

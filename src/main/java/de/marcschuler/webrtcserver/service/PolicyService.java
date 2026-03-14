@@ -1,9 +1,6 @@
 package de.marcschuler.webrtcserver.service;
 
-import de.marcschuler.webrtcserver.data.policy.AccessPowerPolicy;
-import de.marcschuler.webrtcserver.data.policy.Policy;
-import de.marcschuler.webrtcserver.data.policy.RolePolicy;
-import de.marcschuler.webrtcserver.data.policy.SpeLPolicy;
+import de.marcschuler.webrtcserver.data.policy.*;
 import de.marcschuler.webrtcserver.dto.data.policy.PolicyWriteDTO;
 import de.marcschuler.webrtcserver.error.webclient.PolicyCheckException;
 import de.marcschuler.webrtcserver.mapper.PolicyMapper;
@@ -15,10 +12,7 @@ import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.spel.support.SimpleEvaluationContext;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -51,19 +45,33 @@ public class PolicyService {
     }
 
 
-    public PolicyResult checkAccess(List<Policy> policies, PolicyCheckerContext context) throws PolicyCheckException {
+    public void checkAccess(PolicyItem policyItem, PolicyCheckerContext context) throws PolicyCheckException {
+        checkAccess(policyItem.getPolicies(), context);
+    }
+
+    /**
+     * Checks wether a user has access to a specific resource
+     * @param policies a list of policies the resource has
+     * @param context the context
+     * @throws PolicyCheckException if the user is not allowed to access the resource
+     */
+    public void checkAccess(Collection<Policy> policies, PolicyCheckerContext context) throws PolicyCheckException {
         var sortedPolicies = policies.stream().sorted().toList();
+
+        if (sortedPolicies.isEmpty())
+            throw new PolicyCheckException("No policies defined", context.getPermissionType());
+
         for (var policy : sortedPolicies) {
             //noinspection unchecked);
             var policyChecker = (PolicyChecker<Policy>) policyCheckerFromPolicy(policy);
 
             var result = policyChecker.check(policy, context);
             log.debug("Checked policy with result {}", result);
-            if (result.isPresent())
-                return result.get() ? PolicyResult.ALLOW : PolicyResult.DENY;
+            if (result.isPresent() && !result.get())
+                throw new PolicyCheckException("Policy '" + policy.getName() + "' denied access", context.getPermissionType());
         }
         log.debug("No policies explicitly allowed or denied it.");
-        return PolicyResult.DENY;
+        throw new PolicyCheckException("No policies explicitly allowed or denied.", context.getPermissionType());
     }
 
     private PolicyChecker<? extends Policy> policyCheckerFromPolicy(Policy policy) {

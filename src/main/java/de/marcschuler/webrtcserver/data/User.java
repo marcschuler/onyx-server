@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Entity(name = "server_users")
+@Entity(name = "SERVER_USERS")
 @Data
 public class User {
     @Id

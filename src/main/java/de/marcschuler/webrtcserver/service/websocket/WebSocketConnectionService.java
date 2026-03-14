@@ -1,10 +1,13 @@
 package de.marcschuler.webrtcserver.service.websocket;
 
+import de.marcschuler.webrtcserver.data.Permission;
 import de.marcschuler.webrtcserver.data.User;
+import de.marcschuler.webrtcserver.error.webclient.PolicyCheckException;
+import de.marcschuler.webrtcserver.service.PolicyService;
+import de.marcschuler.webrtcserver.service.policy.PolicyCheckerContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.jsontype.NamedType;
 import de.marcschuler.webrtcserver.data.Channel;
 import de.marcschuler.webrtcserver.error.webclient.NoClientException;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
@@ -19,12 +22,10 @@ import de.marcschuler.webrtcserver.webclient.messages.auth.AuthChallengeResponse
 import de.marcschuler.webrtcserver.webclient.messages.client.ClientChannelJoinMessage;
 import de.marcschuler.webrtcserver.webclient.messages.client.ClientChannelLeaveMessage;
 import de.marcschuler.webrtcserver.webclient.messages.connection.KickMessage;
-import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.reflections.Reflections;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
@@ -33,7 +34,6 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
-import java.lang.reflect.Modifier;
 import java.util.*;
 
 @Service
@@ -43,6 +43,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
 
     private final ApplicationEventPublisher applicationEventPublisher;
     private final AuthService authService;
+    private final PolicyService policyService;
 
     @Autowired
     @Lazy
@@ -80,10 +81,22 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
         }
 
         log.debug("Sending event {} to bus", event.getClass().getSimpleName());
-        applicationEventPublisher.publishEvent(new ClientMessage<>(event, client));
+        try {
+            applicationEventPublisher.publishEvent(new ClientMessage<>(event, client));
+        } catch (PolicyCheckException e) {
+            log.info("User did not have permission to {}: {}", e.getMessage(), e.getMessage());
+            log.debug("Exception was", e);
+        } catch (Exception e) {
+            log.error("Uncaught exception while handling a message from client '{}'", client, e);
+            throw new RuntimeException(e);
+        }
     }
 
-    public void moveClient(WebClient client, Channel channel) {
+    public void moveClient(WebClient client, Channel channel) throws PolicyCheckException {
+        policyService.checkAccess(channel.getPolicies().get(Permission.PermissionType.CHANNEL_JOIN),
+                new PolicyCheckerContext(Permission.PermissionType.CHANNEL_JOIN, client.getUser(),
+                        channel, Map.of()));
+
         var channelBefore = client.getChannel();
         client.setChannel(channel);
 
@@ -181,6 +194,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
 
     /**
      * All clients that are interactable. Basically logged in and have a user field.
+     *
      * @return
      */
     public List<WebClient> clientsInteractable() {

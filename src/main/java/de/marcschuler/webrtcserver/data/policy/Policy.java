@@ -20,6 +20,7 @@ public abstract class Policy implements Comparable<Policy> {
     @Column(unique = true)
     private int priority;
 
+    @Column(nullable = false)
     private String name;
     private String description;
 

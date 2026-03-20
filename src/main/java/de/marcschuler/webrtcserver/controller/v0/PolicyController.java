@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -20,6 +21,13 @@ public class PolicyController {
     private final PolicyService policyService;
 
     private final PolicyMapper policyMapper;
+
+    @GetMapping
+    public List<PolicyDTO> policies(){
+        return policyService.all().stream()
+                .map(policyMapper::mapToDTO)
+                .toList();
+    }
 
     @PostMapping
     public PolicyDTO create(@RequestBody PolicyWriteDTO policyWriteDTO) {

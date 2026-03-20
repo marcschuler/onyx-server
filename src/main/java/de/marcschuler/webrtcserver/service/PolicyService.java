@@ -1,6 +1,7 @@
 package de.marcschuler.webrtcserver.service;
 
 import de.marcschuler.webrtcserver.data.policy.*;
+import de.marcschuler.webrtcserver.dto.data.policy.PolicyDTO;
 import de.marcschuler.webrtcserver.dto.data.policy.PolicyWriteDTO;
 import de.marcschuler.webrtcserver.error.webclient.PolicyCheckException;
 import de.marcschuler.webrtcserver.mapper.PolicyMapper;
@@ -81,6 +82,10 @@ public class PolicyService {
             case SpeLPolicy _ -> spelPolicyChecker;
             default -> throw new IllegalStateException("Unknown policy: " + policy);
         };
+    }
+
+    public List<Policy> all() {
+        return this.policyRepository.findAll();
     }
 
     public enum PolicyResult {

@@ -43,7 +43,7 @@ public class RolePolicyChecker implements PolicyChecker<RolePolicy> {
                 return Optional.of(givenIds.equals(wantedIds));
             }
             default -> {
-                throw new PolicyCheckException("No operator set");
+                throw new PolicyCheckException("No operator set", context.getPermissionType());
             }
         }
 

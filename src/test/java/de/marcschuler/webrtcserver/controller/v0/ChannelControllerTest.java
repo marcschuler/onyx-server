@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @OnyxTest
 @Slf4j
+@SuppressWarnings("LoggingSimilarMessage")
 class ChannelControllerTest {
 
     @Autowired

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.util.UUID;
 
@@ -14,12 +16,14 @@ import java.util.UUID;
         visible = true
 )
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = RolePolicyDTO.class, name = "SIMPLE"),
+        @JsonSubTypes.Type(value = RolePolicyDTO.class, name = "ROLE")
 })
 @Data
+@NoArgsConstructor
+@SuperBuilder
 public class PolicyDTO extends PolicyWriteDTO {
     @NotNull
-    private UUID id;
+    protected UUID id;
 
 
 }

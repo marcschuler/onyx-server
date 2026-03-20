@@ -63,9 +63,16 @@ public class ChannelService {
             log.warn("Tried to move channel {} ({}) to the same section {} ({})", channel.getName(), channel.getId(), newSection.getName(), newSection.getId());
             return;
         }
-        channel.setSection(newSection);
-        channel = channelRepository.save(channel);
-        //order(channelRepository.findById(channel.getId()).orElseThrow(), newOrder);
+        var oldSection = channel.getSection();
+
+        newSection.getChannels().add(newOrder, channel);
+        sectionRepository.save(newSection);
+        channelRepository.save(channel);
+
+        oldSection.getChannels().remove(channel);
+        sectionRepository.save(oldSection);
+
+
     }
 
     public void delete(Channel channel) {

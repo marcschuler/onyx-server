@@ -1,15 +1,21 @@
 package de.marcschuler.webrtcserver.dto.data.policy;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
+@SuperBuilder
 public class PolicyWriteDTO {
 
     @NotNull
-    private int order;
+    protected int order;
 
     @NotNull
-    private String name;
-    private String description;
+    protected String name;
+    protected String description;
 }

@@ -23,6 +23,12 @@ public class ChannelController implements OrderableController {
 
     private final ServerMapper serverMapper;
 
+    @GetMapping("{id}")
+    public ChannelDTO channel(@PathVariable UUID id){
+        return channelService.get(id).map(serverMapper::mapToDTO)
+                .orElseThrow();
+    }
+
     @PostMapping
     public ChannelDTO create(@RequestBody ChannelCreateDTO channelDTO) {
         var section = sectionService.get(channelDTO.getSectionId()).orElseThrow();

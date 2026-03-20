@@ -2,7 +2,10 @@ package de.marcschuler.webrtcserver.service;
 
 import de.marcschuler.webrtcserver.data.*;
 import de.marcschuler.webrtcserver.data.message.MarkdownMessageContent;
+import de.marcschuler.webrtcserver.data.policy.RolePolicy;
 import de.marcschuler.webrtcserver.dto.data.GroupWriteDTO;
+import de.marcschuler.webrtcserver.dto.data.policy.PolicyWriteDTO;
+import de.marcschuler.webrtcserver.dto.data.policy.RolePolicyDTO;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.repository.*;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
@@ -13,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +29,7 @@ public class ServerService {
     private WebSocketService webSocketService;
 
     private final GroupService groupService;
+    private final PolicyService policyService;
 
     private final ServerRepository serverRepository;
     private final GroupRepository groupRepository;
@@ -64,6 +65,22 @@ public class ServerService {
         var group3 = groupService.create(new GroupWriteDTO("User","Default group for known users",null,null, Map.of()));
 
         server.setGroups(List.of(group1, group2,group3));
+
+        var policy1 = policyService.create(RolePolicyDTO.builder()
+                .operator(RolePolicy.SimplePolicyOperator.IN)
+                .operand(RolePolicy.SimplePolicyOperand.GROUP)
+                .ids(Set.of(group1.getId()))
+                .build());
+        var policy2 = policyService.create(RolePolicyDTO.builder()
+                .operator(RolePolicy.SimplePolicyOperator.IN)
+                .operand(RolePolicy.SimplePolicyOperand.GROUP)
+                .ids(Set.of(group2.getId()))
+                .build());
+        var policy3 = policyService.create(RolePolicyDTO.builder()
+                .operator(RolePolicy.SimplePolicyOperator.IN)
+                .operand(RolePolicy.SimplePolicyOperand.GROUP)
+                .ids(Set.of(group3.getId()))
+                .build());
 
         var section1 = new Section();
         section1.setName("Lobby");

@@ -37,8 +37,8 @@ public class ServerService {
     private final ServerMapper serverMapper;
 
     public Server defaultServer() {
-        var servers =  serverRepository.findAll();
-        if (servers.size()!=1)
+        var servers = serverRepository.findAll();
+        if (servers.size() != 1)
             log.error("More than one server active!");
         return servers.get(0);//one should exist at any time
     }
@@ -60,26 +60,32 @@ public class ServerService {
         //TODO create default AccessPowerPolicies for the channels
 
 
-        var group1 = groupService.create(new GroupWriteDTO("Admin","A Administrator is allowed to to anything",null,null, Map.of()));
-        var group2 = groupService.create(new GroupWriteDTO("Mod","A Moderator is allowed to moderate users",null,null, Map.of()));
-        var group3 = groupService.create(new GroupWriteDTO("User","Default group for known users",null,null, Map.of()));
+        var group1 = groupService.create(new GroupWriteDTO("Admin", "A Administrator is allowed to to anything", null, null, Map.of()));
+        var group2 = groupService.create(new GroupWriteDTO("Mod", "A Moderator is allowed to moderate users", null, null, Map.of()));
+        var group3 = groupService.create(new GroupWriteDTO("User", "Default group for known users", null, null, Map.of()));
 
-        server.setGroups(List.of(group1, group2,group3));
+        server.setGroups(List.of(group1, group2, group3));
 
         var policy1 = policyService.create(RolePolicyDTO.builder()
                 .operator(RolePolicy.SimplePolicyOperator.IN)
                 .operand(RolePolicy.SimplePolicyOperand.GROUP)
                 .ids(Set.of(group1.getId()))
+                .priority(100)
+                .name("Only Admins")
                 .build());
         var policy2 = policyService.create(RolePolicyDTO.builder()
                 .operator(RolePolicy.SimplePolicyOperator.IN)
                 .operand(RolePolicy.SimplePolicyOperand.GROUP)
-                .ids(Set.of(group2.getId()))
+                .ids(Set.of(group1.getId(), group2.getId()))
+                .priority(50)
+                .name("Admins + Mods")
                 .build());
         var policy3 = policyService.create(RolePolicyDTO.builder()
                 .operator(RolePolicy.SimplePolicyOperator.IN)
                 .operand(RolePolicy.SimplePolicyOperand.GROUP)
-                .ids(Set.of(group3.getId()))
+                .ids(Set.of(group1.getId(), group2.getId(), group3.getId()))
+                .name("Admins + Mods + User")
+                .priority(10)
                 .build());
 
         var section1 = new Section();

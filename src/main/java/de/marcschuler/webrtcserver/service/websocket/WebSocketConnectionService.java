@@ -5,6 +5,7 @@ import de.marcschuler.webrtcserver.data.User;
 import de.marcschuler.webrtcserver.error.webclient.PolicyCheckException;
 import de.marcschuler.webrtcserver.service.PolicyService;
 import de.marcschuler.webrtcserver.service.policy.PolicyCheckerContext;
+import de.marcschuler.webrtcserver.webclient.messages.ErrorMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import tools.jackson.databind.ObjectMapper;
@@ -86,6 +87,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
         } catch (PolicyCheckException e) {
             log.info("User did not have permission to {}: {}", e.getMessage(), e.getMessage());
             log.debug("Exception was", e);
+            sendToClient(client, new ErrorMessage("No permission for '" + e.getPermissionType() + "'"));
         } catch (Exception e) {
             log.error("Uncaught exception while handling a message from client '{}'", client, e);
             throw new RuntimeException(e);
@@ -93,9 +95,10 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
     }
 
     public void moveClient(WebClient client, Channel channel) throws PolicyCheckException {
-        policyService.checkAccess(channel.getPolicies().get(Permission.PermissionType.CHANNEL_JOIN),
-                new PolicyCheckerContext(Permission.PermissionType.CHANNEL_JOIN, client.getUser(),
-                        channel, Map.of()));
+        if (channel != null)
+            policyService.checkAccess(channel.getPolicies().get(Permission.PermissionType.CHANNEL_JOIN),
+                    new PolicyCheckerContext(Permission.PermissionType.CHANNEL_JOIN, client.getUser(),
+                            channel, Map.of()));
 
         var channelBefore = client.getChannel();
         client.setChannel(channel);

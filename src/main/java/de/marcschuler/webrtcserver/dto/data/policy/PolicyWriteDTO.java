@@ -13,7 +13,7 @@ import lombok.experimental.SuperBuilder;
 public class PolicyWriteDTO {
 
     @NotNull
-    protected int order;
+    protected int priority;
 
     @NotNull
     protected String name;

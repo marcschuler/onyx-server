@@ -24,4 +24,6 @@ public class Group {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Map<Permission.PermissionType,Integer> accessPowers;
+
+    private boolean showInTree;
 }

@@ -47,6 +47,8 @@ public class PolicyService {
 
 
     public void checkAccess(PolicyItem policyItem, PolicyCheckerContext context) throws PolicyCheckException {
+        if (policyItem == null)
+            return;
         checkAccess(policyItem.getPolicies(), context);
     }
 

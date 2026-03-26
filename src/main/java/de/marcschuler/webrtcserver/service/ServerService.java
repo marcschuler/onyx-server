@@ -60,9 +60,9 @@ public class ServerService {
         //TODO create default AccessPowerPolicies for the channels
 
 
-        var group1 = groupService.create(new GroupWriteDTO("Admin", "A Administrator is allowed to to anything", null, null, Map.of()));
-        var group2 = groupService.create(new GroupWriteDTO("Mod", "A Moderator is allowed to moderate users", null, null, Map.of()));
-        var group3 = groupService.create(new GroupWriteDTO("User", "Default group for known users", null, null, Map.of()));
+        var group1 = groupService.create(new GroupWriteDTO("Admin", "A Administrator is allowed to to anything", null, null, Map.of(),true));
+        var group2 = groupService.create(new GroupWriteDTO("Mod", "A Moderator is allowed to moderate users", null, null, Map.of(),true));
+        var group3 = groupService.create(new GroupWriteDTO("User", "Default group for known users", null, null, Map.of(),false));
 
         server.setGroups(List.of(group1, group2, group3));
 

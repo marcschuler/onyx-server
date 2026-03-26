@@ -25,4 +25,7 @@ public class GroupWriteDTO {
 
     @NotNull
     private Map<Permission.PermissionType,Integer> accessPowers;
+
+    @NotNull
+    private boolean showInTree;
 }

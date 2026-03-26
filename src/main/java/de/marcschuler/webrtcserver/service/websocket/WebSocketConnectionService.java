@@ -2,6 +2,7 @@ package de.marcschuler.webrtcserver.service.websocket;
 
 import de.marcschuler.webrtcserver.data.Permission;
 import de.marcschuler.webrtcserver.data.User;
+import de.marcschuler.webrtcserver.error.webclient.ClientKickException;
 import de.marcschuler.webrtcserver.error.webclient.PolicyCheckException;
 import de.marcschuler.webrtcserver.service.PolicyService;
 import de.marcschuler.webrtcserver.service.policy.PolicyCheckerContext;
@@ -88,6 +89,10 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
             log.info("User did not have permission to {}: {}", e.getMessage(), e.getMessage());
             log.debug("Exception was", e);
             sendToClient(client, new ErrorMessage("No permission for '" + e.getPermissionType() + "'"));
+        } catch (ClientKickException e) {
+            log.info("Kicking client. Reason: {}", e.getMessage());
+            log.debug("Exception was", e);
+            kickClient(client,e.getReason());
         } catch (Exception e) {
             log.error("Uncaught exception while handling a message from client '{}'", client, e);
             throw new RuntimeException(e);
@@ -133,7 +138,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
             log.warn("Kicking message failed", e);
         }
         sessions.remove(client);
-        client.getSession().close();
+        client.getSession().close(); //TODO check if we can ignore the IOException
     }
 
     public void sendToClient(WebClient client, MessageBody messageBody) throws IOException {

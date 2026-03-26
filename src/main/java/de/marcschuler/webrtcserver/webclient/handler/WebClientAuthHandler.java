@@ -6,6 +6,7 @@ import com.nimbusds.jose.jwk.OctetKeyPair;
 import de.marcschuler.webrtcserver.config.WebRTConfig;
 import de.marcschuler.webrtcserver.data.ClientState;
 import de.marcschuler.webrtcserver.data.User;
+import de.marcschuler.webrtcserver.error.webclient.ClientKickException;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.AuthService;
 import de.marcschuler.webrtcserver.service.CryptoService;
@@ -92,11 +93,16 @@ public class WebClientAuthHandler {
                     u.setId(keyId);
                     u.setPublicKey(publicKey);
                     u.setKnownSince(Instant.now());
-                    u.setState(ClientState.INVITATION_PENDING);
+                    u.setState(ClientState.ACTIVE);
                     return u;
                 });
         log.info("User connected: {} ({} formerly known as {})", keyId, username, user.getUsername());
+        if (user.getState()==ClientState.BANNED){
+            throw new ClientKickException("User is already banned",KickReason.BANNED);
+        }
+
         user.setUsername(username);
+        user.setLastSeen(Instant.now());
         event.getClient().setUser(user);
         event.getClient().setState(WebClientState.LOGGED_IN);
         userService.save(user);

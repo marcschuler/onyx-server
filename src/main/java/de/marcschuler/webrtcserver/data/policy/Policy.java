@@ -12,21 +12,13 @@ import java.util.UUID;
         discriminatorType = DiscriminatorType.STRING
 )
 @Data
-public abstract class Policy implements Comparable<Policy> {
+public abstract class Policy {
     @Id
     @GeneratedValue
     private UUID id;
-
-    @Column(unique = true)
-    private int priority;
 
     @Column(nullable = false)
     private String name;
     private String description;
 
-
-    @Override
-    public int compareTo(Policy o) {
-        return Integer.compare(this.priority, o.priority);
-    }
 }

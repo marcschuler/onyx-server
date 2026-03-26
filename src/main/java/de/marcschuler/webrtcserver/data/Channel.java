@@ -1,7 +1,6 @@
 package de.marcschuler.webrtcserver.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import de.marcschuler.webrtcserver.data.policy.PolicyItem;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,7 +11,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Channel {
+public class Channel implements Policyable {
     @Id
     @GeneratedValue
     private UUID id;
@@ -32,6 +31,6 @@ public class Channel {
     @ManyToMany
     @JsonIgnore
     @ToString.Exclude
-    private Map<Permission.PermissionType, PolicyItem> policies;
+    private Map<Permission.PermissionType, de.marcschuler.webrtcserver.data.policy.PolicyItem> policies;
 
 }

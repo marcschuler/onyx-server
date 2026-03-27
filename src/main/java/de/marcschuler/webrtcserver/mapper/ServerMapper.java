@@ -2,6 +2,7 @@ package de.marcschuler.webrtcserver.mapper;
 
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import de.marcschuler.webrtcserver.data.policy.Policy;
+import de.marcschuler.webrtcserver.data.policy.PolicyItem;
 import de.marcschuler.webrtcserver.dto.data.policy.PolicyDTO;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
 import de.marcschuler.webrtcserver.webclient.WebClient;
@@ -43,8 +44,8 @@ public abstract class ServerMapper {
 
     @Mapping(target = "chatId", source = "chat.id")
     public abstract ChannelExtendedDTO mapToDTOExtended(Channel channel);
-
     public abstract SectionExtendedDTO mapToDTOExtended(Section section);
+    public abstract PolicyItemDTO mapToDTO(PolicyItem policyItem);
 
 
     @Mapping(target = "publicKey", source = "keys")

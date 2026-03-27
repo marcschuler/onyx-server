@@ -13,9 +13,6 @@ import lombok.experimental.SuperBuilder;
 public class PolicyWriteDTO {
 
     @NotNull
-    protected int priority;
-
-    @NotNull
     protected String name;
     protected String description;
 }

@@ -11,6 +11,15 @@ public class Permission implements Serializable {
     private PermissionType type;
 
     public enum PermissionType{
+        SERVER,
+        SERVER_JOIN,
+        SERVER_EDIT,
+        SERVER_EDIT_DESCRIPTION,
+        SERVER_EDIT_TITLE,
+        SERVER_EDIT_ICON,
+
+        SECTION_CHANNEL_CREATE,
+
         CHANNEL,
         CHANNEL_JOIN,
         CHANNEL_EDIT,

@@ -31,6 +31,7 @@ public class Channel implements Policyable {
     @ManyToMany
     @JsonIgnore
     @ToString.Exclude
+    @Column(nullable = false)
     private Map<Permission.PermissionType, de.marcschuler.webrtcserver.data.policy.PolicyItem> policies;
 
 }

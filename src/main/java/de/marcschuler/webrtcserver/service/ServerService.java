@@ -70,22 +70,19 @@ public class ServerService {
                 .operator(RolePolicy.SimplePolicyOperator.IN)
                 .operand(RolePolicy.SimplePolicyOperand.GROUP)
                 .ids(Set.of(group1.getId()))
-                .priority(100)
                 .name("Only Admins")
                 .build());
         var policy2 = policyService.create(RolePolicyDTO.builder()
                 .operator(RolePolicy.SimplePolicyOperator.IN)
                 .operand(RolePolicy.SimplePolicyOperand.GROUP)
                 .ids(Set.of(group1.getId(), group2.getId()))
-                .priority(50)
                 .name("Admins + Mods")
                 .build());
         var policy3 = policyService.create(RolePolicyDTO.builder()
-                .operator(RolePolicy.SimplePolicyOperator.IN)
+                .operator(RolePolicy.SimplePolicyOperator.NOT_IN)
                 .operand(RolePolicy.SimplePolicyOperand.GROUP)
-                .ids(Set.of(group1.getId(), group2.getId(), group3.getId()))
-                .name("Admins + Mods + User")
-                .priority(10)
+                .ids(Set.of())
+                .name("Everyone")
                 .build());
 
         var section1 = new Section();

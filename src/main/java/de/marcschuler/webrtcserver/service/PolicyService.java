@@ -1,5 +1,6 @@
 package de.marcschuler.webrtcserver.service;
 
+import de.marcschuler.webrtcserver.data.Channel;
 import de.marcschuler.webrtcserver.data.policy.*;
 import de.marcschuler.webrtcserver.dto.data.policy.PolicyDTO;
 import de.marcschuler.webrtcserver.dto.data.policy.PolicyWriteDTO;
@@ -44,7 +45,7 @@ public class PolicyService {
     public void delete(Policy policy) {
         policyRepository.delete(policy);
     }
-
+    
 
     public void checkAccess(PolicyItem policyItem, PolicyCheckerContext context) throws PolicyCheckException {
         if (policyItem == null)
@@ -77,12 +78,17 @@ public class PolicyService {
         throw new PolicyCheckException("No policies explicitly allowed or denied.", context.getPermissionType());
     }
 
+    /**
+     *
+     * @param policy the policy to check with
+     * @return the specific implementation for this policy
+     */
     private PolicyChecker<? extends Policy> policyCheckerFromPolicy(Policy policy) {
         return switch (policy) {
             case AccessPowerPolicy _ -> accessPowerPolicyChecker;
             case RolePolicy _ -> rolePolicyChecker;
             case SpeLPolicy _ -> spelPolicyChecker;
-            default -> throw new IllegalStateException("Unknown policy: " + policy);
+            default -> throw new IllegalStateException("Unknown policy: " + policy.getClass().getName());
         };
     }
 

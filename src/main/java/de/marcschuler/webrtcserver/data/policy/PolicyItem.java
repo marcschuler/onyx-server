@@ -1,11 +1,9 @@
 package de.marcschuler.webrtcserver.data.policy;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -17,5 +15,6 @@ public class PolicyItem {
     private UUID id;
 
     @ManyToMany
-    private Set<Policy> policies;
+    @OrderColumn(name = "policies_order")
+    private List<Policy> policies;
 }

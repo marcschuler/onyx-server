@@ -1,17 +1,13 @@
 package de.marcschuler.webrtcserver.service;
 
-import de.marcschuler.webrtcserver.data.Channel;
 import de.marcschuler.webrtcserver.data.policy.*;
 import de.marcschuler.webrtcserver.dto.data.policy.PolicyDTO;
-import de.marcschuler.webrtcserver.dto.data.policy.PolicyWriteDTO;
 import de.marcschuler.webrtcserver.error.webclient.PolicyCheckException;
 import de.marcschuler.webrtcserver.mapper.PolicyMapper;
 import de.marcschuler.webrtcserver.repository.PolicyRepository;
 import de.marcschuler.webrtcserver.service.policy.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.expression.EvaluationContext;
-import org.springframework.expression.spel.support.SimpleEvaluationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -29,8 +25,8 @@ public class PolicyService {
     private final RolePolicyChecker rolePolicyChecker;
     private final SpelPolicyChecker spelPolicyChecker;
 
-    public Policy create(PolicyWriteDTO policyWriteDTO) {
-        var policy = policyMapper.mapFromDTO(policyWriteDTO);
+    public Policy create(PolicyDTO policyDTO) {
+        var policy = policyMapper.mapFromDTO(policyDTO);
         return policyRepository.save(policy);
     }
 
@@ -38,8 +34,8 @@ public class PolicyService {
         return policyRepository.findById(id);
     }
 
-    public void edit(Policy policy, PolicyWriteDTO policyWriteDTO) {
-        policyMapper.update(policy, policyWriteDTO);
+    public void edit(Policy policy, PolicyDTO policyDTO) {
+        policyMapper.update(policy, policyDTO);
     }
 
     public void delete(Policy policy) {

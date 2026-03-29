@@ -24,7 +24,7 @@ import java.security.interfaces.EdECPublicKey;
 import java.util.List;
 import java.util.Map;
 
-@Mapper(componentModel = "spring", uses = MessageMapper.class)
+@Mapper(componentModel = "spring", uses = {MessageMapper.class, PolicyMapper.class})
 public abstract class ServerMapper {
 
     @Autowired
@@ -45,7 +45,6 @@ public abstract class ServerMapper {
     @Mapping(target = "chatId", source = "chat.id")
     public abstract ChannelExtendedDTO mapToDTOExtended(Channel channel);
     public abstract SectionExtendedDTO mapToDTOExtended(Section section);
-    public abstract PolicyItemDTO mapToDTO(PolicyItem policyItem);
 
 
     @Mapping(target = "publicKey", source = "keys")

@@ -1,7 +1,5 @@
 package de.marcschuler.webrtcserver.controller.v0;
 
-import de.marcschuler.webrtcserver.dto.data.ChannelDTO;
-import de.marcschuler.webrtcserver.dto.data.policy.PolicyWriteDTO;
 import de.marcschuler.webrtcserver.dto.data.policy.PolicyDTO;
 import de.marcschuler.webrtcserver.mapper.PolicyMapper;
 import de.marcschuler.webrtcserver.service.PolicyService;
@@ -30,15 +28,15 @@ public class PolicyController {
     }
 
     @PostMapping
-    public PolicyDTO create(@RequestBody PolicyWriteDTO policyWriteDTO) {
-        var policy = policyService.create(policyWriteDTO);
+    public PolicyDTO create(@RequestBody PolicyDTO policyDTO) {
+        var policy = policyService.create(policyDTO);
         return policyMapper.mapToDTO(policy);
     }
 
     @PutMapping("{id}")
-    public PolicyDTO edit(@PathVariable UUID id, @RequestBody PolicyWriteDTO policyWriteDTO) {
+    public PolicyDTO edit(@PathVariable UUID id, @RequestBody PolicyDTO policyDTO) {
         var policy = policyService.get(id).orElseThrow();
-        policyService.edit(policy, policyWriteDTO);
+        policyService.edit(policy, policyDTO);
         return policyMapper.mapToDTO(policy);
     }
 

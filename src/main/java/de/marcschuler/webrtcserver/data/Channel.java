@@ -28,7 +28,7 @@ public class Channel implements Policyable {
     private Section section;
 
     @Enumerated(EnumType.STRING)
-    @ManyToMany
+    @OneToMany(cascade = CascadeType.ALL)
     @JsonIgnore
     @ToString.Exclude
     @Column(nullable = false)

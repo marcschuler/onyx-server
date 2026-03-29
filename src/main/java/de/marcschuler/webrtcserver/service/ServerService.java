@@ -4,7 +4,6 @@ import de.marcschuler.webrtcserver.data.*;
 import de.marcschuler.webrtcserver.data.message.MarkdownMessageContent;
 import de.marcschuler.webrtcserver.data.policy.RolePolicy;
 import de.marcschuler.webrtcserver.dto.data.GroupWriteDTO;
-import de.marcschuler.webrtcserver.dto.data.policy.PolicyWriteDTO;
 import de.marcschuler.webrtcserver.dto.data.policy.RolePolicyDTO;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.repository.*;

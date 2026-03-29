@@ -3,6 +3,7 @@ package de.marcschuler.webrtcserver.data.policy;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -15,6 +16,7 @@ public class PolicyItem {
     private UUID id;
 
     @ManyToMany
+    @Column(nullable = false)
     @OrderColumn(name = "policies_order")
-    private List<Policy> policies;
+    private List<Policy> policies = new ArrayList<>();
 }

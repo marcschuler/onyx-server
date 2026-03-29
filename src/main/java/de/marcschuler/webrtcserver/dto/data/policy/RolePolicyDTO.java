@@ -4,6 +4,7 @@ import de.marcschuler.webrtcserver.data.policy.RolePolicy;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -11,7 +12,10 @@ import java.util.Set;
 import java.util.UUID;
 
 @SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
+@EqualsAndHashCode(callSuper = true)
 public final class RolePolicyDTO extends PolicyDTO{
     @NotNull
     private RolePolicy.SimplePolicyOperand operand;

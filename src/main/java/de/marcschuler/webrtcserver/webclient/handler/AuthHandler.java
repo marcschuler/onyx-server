@@ -1,7 +1,6 @@
 package de.marcschuler.webrtcserver.webclient.handler;
 
 import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import de.marcschuler.webrtcserver.config.WebRTConfig;
 import de.marcschuler.webrtcserver.data.ClientState;
@@ -14,13 +13,12 @@ import de.marcschuler.webrtcserver.service.UserService;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
 import de.marcschuler.webrtcserver.webclient.KickReason;
-import de.marcschuler.webrtcserver.webclient.WebClient;
 import de.marcschuler.webrtcserver.webclient.WebClientState;
 import de.marcschuler.webrtcserver.webclient.ClientMessage;
 import de.marcschuler.webrtcserver.dto.AuthChallenge;
 import de.marcschuler.webrtcserver.webclient.messages.auth.AuthChallengeResponse;
 import de.marcschuler.webrtcserver.webclient.messages.auth.AuthSuccessMessage;
-import de.marcschuler.webrtcserver.webclient.messages.client.ClientChannelJoinMessage;
+import de.marcschuler.webrtcserver.webclient.messages.client.ClientServerJoinEvent;
 import de.marcschuler.webrtcserver.webclient.messages.peer.IceServerMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,16 +29,14 @@ import tools.jackson.core.JacksonException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
 import java.security.SignatureException;
-import java.security.spec.InvalidKeySpecException;
 import java.text.ParseException;
 import java.time.Instant;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class WebClientAuthHandler {
+public class AuthHandler {
 
     private final WebSocketConnectionService webSocketConnectionService;
     private final WebSocketService webSocketService;
@@ -70,7 +66,8 @@ public class WebClientAuthHandler {
         AuthChallenge challenge;
         try {
             challenge = cryptoService.verifyContent(content, AuthChallenge.class, publicKey);
-        } catch (InvalidKeyException | JacksonException | SignatureException | NoSuchAlgorithmException | ParseException e) {
+        } catch (InvalidKeyException | JacksonException | SignatureException | NoSuchAlgorithmException |
+                 ParseException e) {
             log.warn("Client signature could not be verified {}", event.getClient());
             throw new RuntimeException("Could not verify signature", e);
         }
@@ -81,9 +78,9 @@ public class WebClientAuthHandler {
 
         var keyId = cryptoService.generateKeyId(publicKey);
         if (webSocketConnectionService.clientFromKeyId(keyId).isPresent()) {
-            var existingUsername =webSocketConnectionService.clientFromKeyId(keyId).get().getUser().getUsername();
-            log.info("Client {} is already connected as {}. Kicking new instance", event.getBody().getUsername(),existingUsername);
-            webSocketConnectionService.kickClient(event.getClient(), KickReason.ALREADY_CONNECTED);
+            var existingUsername = webSocketConnectionService.clientFromKeyId(keyId).get().getUser().getUsername();
+            log.info("Client {} is already connected as {}. Kicking new instance", event.getBody().getUsername(), existingUsername);
+            webSocketConnectionService.kickClient(event.getClient(), KickReason.ALREADY_CONNECTED, null);
             return;
         }
         var user = userService.findById(keyId)
@@ -97,8 +94,8 @@ public class WebClientAuthHandler {
                     return u;
                 });
         log.info("User connected: {} ({} formerly known as {})", keyId, username, user.getUsername());
-        if (user.getState()==ClientState.BANNED){
-            throw new ClientKickException("User is already banned",KickReason.BANNED);
+        if (user.getState() == ClientState.BANNED) {
+            throw new ClientKickException("User is already banned", KickReason.BANNED);
         }
 
         user.setUsername(username);
@@ -116,17 +113,15 @@ public class WebClientAuthHandler {
         iceServerData.setIceServers(serverMapper.mapToDTO(webRTConfig.getConfig().getIce()));
         event.getClient().sendMessage(iceServerData);
 
+        webSocketConnectionService.sendToAll(
+                new ClientServerJoinEvent(serverMapper.mapToDTO(user))
+        );
+
+        //TODO
         var serverTreeChangeEvent = webSocketService.createServerTreeChangeEvent(event.getClient());
         event.getClient().sendMessage(serverTreeChangeEvent);
 
-        for (WebClient client : webSocketConnectionService.clients()) {
-            if (client != event.getClient() && client.getChannel() != null) {
-                webSocketConnectionService.sendToClient(event.getClient(), new ClientChannelJoinMessage(
-                        serverMapper.mapToDTO(client.getUser()),
-                        client.getChannel().getId()
-                ));
-            }
-        }
+
     }
 
 }

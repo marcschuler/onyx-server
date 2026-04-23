@@ -15,9 +15,11 @@ import java.util.List;
  * when a change is made, e.g. new channels or a client switched channels.
  * Clients should figure out what changed if there are interested at all.
  * This represents a change that is visible from the client.
- * So this could fire on join or when the client permissions are changed
+ * In future this event should fire less or no more because every change
+ * should have it's own event
  */
 @Data
+@Deprecated
 public class ServerTreeChangeMessage extends MessageBody {
 
     @NotNull

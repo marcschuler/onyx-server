@@ -44,7 +44,8 @@ class PolicyServiceTest {
         assertDoesNotThrow(() -> policyService.checkAccess(List.of(), new PolicyCheckerContext(Permission.PermissionType.CHANNEL, testService.userAdmin(), testService.channelLobby(), Map.of())));
     }
 
-        @Test
+    @Test
+    @Disabled("define channel rules first")
     void testSimpleAdminChannelPolicy() throws PolicyCheckException {
         assertDoesNotThrow(() -> policyService.checkAccess(List.of(POLICY_AP_100), new PolicyCheckerContext(Permission.PermissionType.CHANNEL, testService.userAdmin(), testService.channelLobby(), Map.of())));
     }

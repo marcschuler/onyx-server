@@ -72,6 +72,7 @@ public abstract class ServerMapper {
 
     public abstract Channel update(@MappingTarget Channel channel, ChannelWriteDTO channelDTO);
 
+    @Mapping(target = "avatarId",source = "avatar.id")
     public abstract UserSimpleDTO mapToDTO(User user);
 
     public abstract List<UserSimpleDTO> mapToDTOList(List<User> user);

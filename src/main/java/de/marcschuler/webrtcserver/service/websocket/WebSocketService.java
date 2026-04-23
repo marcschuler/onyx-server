@@ -2,7 +2,6 @@ package de.marcschuler.webrtcserver.service.websocket;
 
 import de.marcschuler.webrtcserver.data.Channel;
 import de.marcschuler.webrtcserver.data.Chat;
-import de.marcschuler.webrtcserver.data.User;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.ServerService;
 import de.marcschuler.webrtcserver.webclient.WebClient;
@@ -10,9 +9,6 @@ import de.marcschuler.webrtcserver.webclient.messages.server.ServerTreeChangeMes
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.mapstruct.AfterMapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.Named;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -51,6 +47,7 @@ public class WebSocketService {
                 .toList();
     }
 
+    @Deprecated
     @Transactional
     public ServerTreeChangeMessage createServerTreeChangeEvent(WebClient webClient) {
         var users = webSocketConnectionService.users();
@@ -69,11 +66,12 @@ public class WebSocketService {
 
     }
 
+    @Deprecated
     @Transactional
     public void updateServerTree() {
         for (var client : webSocketConnectionService.clients()) {
             try {
-                webSocketConnectionService.sendToClient(client, createServerTreeChangeEvent(client));
+                webSocketConnectionService.send(client, createServerTreeChangeEvent(client));
             } catch (Exception e) {
                 log.error("Could not send server tree update", e);
             }

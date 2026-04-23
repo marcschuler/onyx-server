@@ -1,13 +1,15 @@
 package de.marcschuler.webrtcserver.controller.v0;
 
 import de.marcschuler.webrtcserver.dto.data.MessageDTO;
-import de.marcschuler.webrtcserver.dto.data.MessageWriteDTO;
 import de.marcschuler.webrtcserver.dto.data.message.MessageCreationDTO;
 import de.marcschuler.webrtcserver.mapper.MessageMapper;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.ChatService;
 import de.marcschuler.webrtcserver.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -26,15 +28,23 @@ public class ChatController {
     private final UserService userService;
 
     private final MessageMapper messageMapper;
-    private final ServerMapper serverMapper;
 
-    @GetMapping("{id}/message")
+    @GetMapping("{id}/messages")
     @Transactional(readOnly = true)
-    public List<MessageDTO> messages(@PathVariable UUID id) {
+    public Page<MessageDTO> messages(@PathVariable UUID id, Pageable page) {
         var chat = chatService.chatById(id).orElseThrow();
-        return chatService.messagesInChat(chat)
-                .map(messageMapper::mapToDTO)
-                .toList();
+        return chatService.page(chat, page)
+                .map(messageMapper::mapToDTO);
+    }
+
+    @GetMapping("{id}/messages/latest")
+    public Page<MessageDTO> messages(@PathVariable UUID id, @RequestParam(defaultValue = "50") int size) {
+        var chat = chatService.chatById(id).orElseThrow();
+        var count = chatService.countMessages(chat);
+        var lastPage = (int) Math.max(0, (count - 1) / size);
+        var page = PageRequest.of(lastPage, size);
+        return chatService.page(chat, page)
+                .map(messageMapper::mapToDTO);
     }
 
     @PostMapping("{id}/message")

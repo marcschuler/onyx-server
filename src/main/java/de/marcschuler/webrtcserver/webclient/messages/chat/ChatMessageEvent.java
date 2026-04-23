@@ -9,10 +9,14 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+/**
+ * An event that fires when a new message was sent to a chat you currently watch
+ * The server may not send you an event for every channel
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class IncomeMessageEvent extends MessageBody {
+public class ChatMessageEvent extends MessageBody {
     @NotNull
     private UUID chatId;
     @NotNull

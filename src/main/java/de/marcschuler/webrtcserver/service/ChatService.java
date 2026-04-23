@@ -4,15 +4,18 @@ import de.marcschuler.webrtcserver.data.Chat;
 import de.marcschuler.webrtcserver.data.Message;
 import de.marcschuler.webrtcserver.data.User;
 import de.marcschuler.webrtcserver.data.message.MarkdownMessageContent;
+import de.marcschuler.webrtcserver.dto.data.MessageDTO;
 import de.marcschuler.webrtcserver.mapper.MessageMapper;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.repository.ChatRepository;
 import de.marcschuler.webrtcserver.repository.MessageRepository;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
-import de.marcschuler.webrtcserver.webclient.messages.chat.IncomeMessageEvent;
+import de.marcschuler.webrtcserver.webclient.messages.chat.ChatMessageEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -62,9 +65,16 @@ public class ChatService {
         log.info("New message in chat {}", chat.getId());
 
         var clients = this.webSocketConnectionService.clientsInteractable();
-        this.webSocketConnectionService.sendToClients(clients,
-                new IncomeMessageEvent(chat.getId(), messageMapper.mapToDTO(message)));
+        this.webSocketConnectionService.send(clients,
+                new ChatMessageEvent(chat.getId(), messageMapper.mapToDTO(message)));
         return message;
     }
 
+    public Page<Message> page(Chat chat, Pageable page) {
+        return messageRepository.findMessagesByChatIs(chat,page);
+    }
+
+    public long countMessages(Chat chat) {
+        return messageRepository.countMessageByChatIs(chat);
+    }
 }

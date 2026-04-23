@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ClientChannelLeaveMessage extends MessageBody {
+public class ClientChannelLeaveEvent extends MessageBody {
     @NotNull
     private UserSimpleDTO user;
 }

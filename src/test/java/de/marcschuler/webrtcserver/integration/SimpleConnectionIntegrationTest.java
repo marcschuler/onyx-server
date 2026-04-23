@@ -4,6 +4,7 @@ import com.nimbusds.jose.JOSEException;
 import de.marcschuler.webrtcserver.IntegrationHelper;
 import de.marcschuler.webrtcserver.OnyxTest;
 import de.marcschuler.webrtcserver.WebSocketMock;
+import de.marcschuler.webrtcserver.webclient.messages.client.ClientServerJoinEvent;
 import de.marcschuler.webrtcserver.webclient.messages.peer.IceServerMessage;
 import de.marcschuler.webrtcserver.webclient.messages.server.ServerTreeChangeMessage;
 import org.junit.jupiter.api.AfterEach;
@@ -46,6 +47,7 @@ public class SimpleConnectionIntegrationTest {
     @Test
     void testServerTree() throws InterruptedException {
         client.recv(IceServerMessage.class);
+        client.recv(ClientServerJoinEvent.class);
         var tree = client.recv(ServerTreeChangeMessage.class);
         assertNotNull(tree,"tree exists");
         assertEquals(3,tree.getSections().size(),"three sections");
@@ -54,6 +56,6 @@ public class SimpleConnectionIntegrationTest {
     @Test
     void testChannelJoin() throws InterruptedException, JacksonException {
         client.recv(IceServerMessage.class);
-        var tree = client.recv(ServerTreeChangeMessage.class);
+        var tree = client.recv(ClientServerJoinEvent.class);
     }
 }

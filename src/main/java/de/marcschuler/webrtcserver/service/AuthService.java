@@ -9,12 +9,9 @@ import com.nimbusds.jose.crypto.Ed25519Verifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import de.marcschuler.webrtcserver.data.User;
-import de.marcschuler.webrtcserver.error.webclient.ProblemDetailException;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
 import de.marcschuler.webrtcserver.dto.AuthChallenge;
-import de.marcschuler.webrtcserver.webclient.messages.auth.JwtTokenMessage;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
+import de.marcschuler.webrtcserver.webclient.messages.auth.JwtTokenEvent;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -75,7 +72,7 @@ public class AuthService {
                 .forEach(client -> {
                     try {
                         @SuppressWarnings("DataFlowIssue") var jwt = createJWT(client.getUser());
-                        client.sendMessage(new JwtTokenMessage(jwt));
+                        client.sendMessage(new JwtTokenEvent(jwt));
                     } catch (IOException | JOSEException e) {
                         log.error("Could not send message to client", e);
                     }

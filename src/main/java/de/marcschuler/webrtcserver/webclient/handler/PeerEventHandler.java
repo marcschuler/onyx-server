@@ -21,7 +21,7 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class WebClientPeerEventHandler {
+public class PeerEventHandler {
 
     private final WebSocketConnectionService webSocketConnectionService;
 
@@ -38,7 +38,7 @@ public class WebClientPeerEventHandler {
         if (clientToChannel == null || !clientToChannel.equals(clientFromChannel)) {
             log.warn("Clients try to connect to each other without being in the same channel {}<->{}", clientFromChannel, clientToChannel);
         }
-        webSocketConnectionService.sendToClient(clientTo, forwardEvent);
+        webSocketConnectionService.send(clientTo, forwardEvent);
     }
 
     @EventListener
@@ -53,6 +53,6 @@ public class WebClientPeerEventHandler {
         if (clientToChannel == null || !clientToChannel.equals(clientFromChannel)) {
             log.warn("Clients try to connect to each other without being in the same channel {}<->{}", clientFromChannel, clientToChannel);
         }
-        webSocketConnectionService.sendToClient(clientTo, forwardEvent);
+        webSocketConnectionService.send(clientTo, forwardEvent);
     }
 }

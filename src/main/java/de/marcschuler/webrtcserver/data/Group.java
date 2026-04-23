@@ -25,5 +25,5 @@ public class Group {
     @Column(nullable = false)
     private Map<Permission.PermissionType,Integer> accessPowers;
 
-    private boolean showInTree;
+    private boolean showInTree = true;
 }

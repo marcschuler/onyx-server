@@ -17,7 +17,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ClientChannelJoinMessage extends MessageBody {
+public class ClientChannelJoinEvent extends MessageBody {
     @NotNull
     private UserSimpleDTO user;
     @Nullable

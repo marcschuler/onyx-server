@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class JwtTokenMessage extends MessageBody {
+public class JwtTokenEvent extends MessageBody {
     @NotNull
     private String jwt;
 }

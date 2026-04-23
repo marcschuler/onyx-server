@@ -142,6 +142,5 @@ public class ServerService {
 
     public void save(Server server) {
         this.serverRepository.save(server);
-        this.webSocketService.updateServerTree();
     }
 }

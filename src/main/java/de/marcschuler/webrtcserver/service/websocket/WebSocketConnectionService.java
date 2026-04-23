@@ -7,6 +7,8 @@ import de.marcschuler.webrtcserver.error.webclient.PolicyCheckException;
 import de.marcschuler.webrtcserver.service.PolicyService;
 import de.marcschuler.webrtcserver.service.policy.PolicyCheckerContext;
 import de.marcschuler.webrtcserver.webclient.messages.ErrorMessage;
+import de.marcschuler.webrtcserver.webclient.messages.connection.ClientKickEvent;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import tools.jackson.databind.ObjectMapper;
@@ -21,11 +23,10 @@ import de.marcschuler.webrtcserver.webclient.ClientMessage;
 import de.marcschuler.webrtcserver.webclient.messages.MessageBody;
 import de.marcschuler.webrtcserver.webclient.messages.auth.AuthChallengeRequest;
 import de.marcschuler.webrtcserver.webclient.messages.auth.AuthChallengeResponse;
-import de.marcschuler.webrtcserver.webclient.messages.client.ClientChannelJoinMessage;
-import de.marcschuler.webrtcserver.webclient.messages.client.ClientChannelLeaveMessage;
-import de.marcschuler.webrtcserver.webclient.messages.connection.KickMessage;
+import de.marcschuler.webrtcserver.webclient.messages.client.ClientChannelJoinEvent;
+import de.marcschuler.webrtcserver.webclient.messages.client.ClientChannelLeaveEvent;
+import de.marcschuler.webrtcserver.webclient.messages.connection.KickedEvent;
 import jakarta.validation.constraints.NotNull;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -36,6 +37,7 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -66,7 +68,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
         var client = new WebClient(session);
         client.setState(WebClientState.NOT_AUTHORIZED);
         sessions.add(client);
-        sendToClient(client, new AuthChallengeRequest(authService.createChallenge()));
+        send(client, new AuthChallengeRequest(authService.createChallenge()));
     }
 
     @Override
@@ -78,47 +80,46 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
         if (!client.getState().isInteractionAllowed()) {
             if (!allowedEventsWhenUnauthorized.contains(event.getClass())) {
                 log.warn("Client tried to use event without being logged in {}", event.getClass());
-                kickClient(client, KickReason.UNAUTHORIZED_REQUEST);
+                kickClient(client, KickReason.UNAUTHORIZED_REQUEST,null);
             }
         }
 
         log.debug("Sending event {} to bus", event.getClass().getSimpleName());
         try {
-            applicationEventPublisher.publishEvent(new ClientMessage<>(event, client));
+            applicationEventPublisher.publishEvent(new ClientMessage<>(event, client, LocalDateTime.now()));
         } catch (PolicyCheckException e) {
             log.info("User did not have permission to {}: {}", e.getMessage(), e.getMessage());
             log.debug("Exception was", e);
-            sendToClient(client, new ErrorMessage("No permission for '" + e.getPermissionType() + "'"));
+            send(client, new ErrorMessage("No permission for '" + e.getPermissionType() + "'"));
         } catch (ClientKickException e) {
             log.info("Kicking client. Reason: {}", e.getMessage());
             log.debug("Exception was", e);
-            kickClient(client,e.getReason());
+            kickClient(client, e.getReason(),null);
         } catch (Exception e) {
             log.error("Uncaught exception while handling a message from client '{}'", client, e);
             throw new RuntimeException(e);
         }
     }
 
-    public void moveClient(WebClient client, Channel channel) throws PolicyCheckException {
-        if (channel != null)
-            policyService.checkAccess(channel.getPolicies().get(Permission.PermissionType.CHANNEL_JOIN),
-                    new PolicyCheckerContext(Permission.PermissionType.CHANNEL_JOIN, client.getUser(),
-                            channel, Map.of()));
+    public void joinChannel(@NonNull WebClient client, @NonNull Channel channel) throws PolicyCheckException {
+        policyService.checkAccess(channel.getPolicies().get(Permission.PermissionType.CHANNEL_JOIN),
+                new PolicyCheckerContext(Permission.PermissionType.CHANNEL_JOIN, client.getUser(),
+                        channel, Map.of()));
 
-        var channelBefore = client.getChannel();
         client.setChannel(channel);
+        sendToAll(new ClientChannelJoinEvent(
+                serverMapper.mapToDTO(client.getUser()),
+                channel.getId()
+        ));
+    }
 
-        if (channel != null) {
-            sendToAllClients(new ClientChannelJoinMessage(
-                    serverMapper.mapToDTO(client.getUser()),
-                    channel.getId()
-            ));
-        } else if (channelBefore != null) {
-            sendToAllClients(new ClientChannelLeaveMessage(serverMapper.mapToDTO(client.getUser())));
-        } else {
-            log.warn("Ignored channel change request because moving from null to null");
+    public void leaveChannel(@NonNull WebClient client) {
+        if (client.getChannel() == null) {
+            log.warn("Client {} already is in no channel", client);
+            return;
         }
-        webSocketService.updateServerTree();
+        client.setChannel(null);
+        sendToAll(new ClientChannelLeaveEvent(serverMapper.mapToDTO(client.getUser())));
     }
 
 
@@ -127,42 +128,44 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
      *
      * @param client the client to kick
      * @param reason the reason. May be null
-     * @throws IOException if there is an error kicking the client.
      */
-    public void kickClient(WebClient client, KickReason reason) throws IOException {
+    public void kickClient(WebClient client, KickReason reason, String message) {
         client.setState(WebClientState.INVALID);
         log.info("Kicking client {} for reason: {}", client, reason);
         try {
-            sendToClient(client, new KickMessage(reason));
+            send(client, new KickedEvent(reason, message));
         } catch (Exception e) { //we can ignore this
             log.warn("Kicking message failed", e);
         }
         sessions.remove(client);
-        client.getSession().close(); //TODO check if we can ignore the IOException
+        if (client.getUser() != null) {
+            sendToAll(new ClientKickEvent(serverMapper.mapToDTO(client.getUser()), reason, message));
+        }
+        try {
+            client.getSession().close(); //TODO check if we can ignore the IOException
+        } catch (IOException e) {
+            log.error("Could not close session", e);
+        }
     }
 
-    public void sendToClient(WebClient client, MessageBody messageBody) throws IOException {
+    public void send(WebClient client, MessageBody messageBody) {
         var data = objectMapper.writeValueAsBytes(messageBody);
         log.debug("Sending to client {}: {}", client, data);
-        client.getSession().sendMessage(new TextMessage(data));
-    }
-
-    public void sendToAllClients(MessageBody messageBody) {
-        sendToClients(sessions, messageBody);
-    }
-
-    public void sendToClients(List<WebClient> clients, MessageBody messageBody) {
-        var exceptions = false;
-        for (var client : clients) {
-            try {
-                sendToClient(client, messageBody);
-            } catch (IOException e) {
-                log.error("Could not send to a single client", e);
-                exceptions = true;
-            }
+        try {
+            client.getSession().sendMessage(new TextMessage(data));
+        } catch (IOException e) {
+            log.error("Could not send message to client: {}", client, e);
+            kickClient(client, KickReason.INTERNAL_ERROR,null);
         }
-        if (exceptions)
-            throw new IllegalStateException("Could not send to at least one client ");
+    }
+
+    public void sendToAll(MessageBody messageBody) {
+        send(sessions, messageBody);
+    }
+
+    public void send(List<WebClient> clients, MessageBody messageBody) {
+        clients.parallelStream()
+                .forEach(c -> send(c, messageBody));
     }
 
     @Override
@@ -171,7 +174,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
         clientFromSession(session)
                 .ifPresent(client -> {
                     sessions.remove(client);
-                    moveClient(client, null); //TODO may send another event type?
+                    leaveChannel(client);
                 });
     }
 

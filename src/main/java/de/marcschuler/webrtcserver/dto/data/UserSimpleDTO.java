@@ -17,7 +17,7 @@ public class UserSimpleDTO {
     private Map<String,Object> publicKey;
     @NotNull
     private String username;
-    private FileDTO avatar;
+    private String avatarId;
 
     @NotNull
     private List<GroupDTO> groups;

@@ -8,15 +8,18 @@ import de.marcschuler.webrtcserver.dto.data.ChannelWriteDTO;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.repository.ChannelRepository;
 import de.marcschuler.webrtcserver.repository.SectionRepository;
+import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
+import de.marcschuler.webrtcserver.webclient.messages.channel.ChannelChangeEvent;
+import de.marcschuler.webrtcserver.webclient.messages.channel.ChannelCreateEvent;
+import de.marcschuler.webrtcserver.webclient.messages.channel.ChannelDeleteEvent;
+import de.marcschuler.webrtcserver.webclient.messages.channel.ChannelMoveEvent;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,6 +29,7 @@ import java.util.UUID;
 public class ChannelService {
 
     private final WebSocketService webSocketService;
+    private final WebSocketConnectionService webSocketConnectionService;
 
     private final SectionRepository sectionRepository;
     private final ChannelRepository channelRepository;
@@ -40,10 +44,13 @@ public class ChannelService {
         channel.setName(name);
         channel.setChat(new Chat());
         section.getChannels().add(channel);
-        channel =  channelRepository.save(channel);
+        channel = channelRepository.save(channel);
         sectionRepository.save(section);
-        webSocketService.updateServerTree();
-        log.info("Creating channel {} ({})", channel.getName(),channel.getId());
+        webSocketConnectionService.sendToAll(new ChannelCreateEvent(
+                section.getId(), section.getChannels().indexOf(channel),
+                serverMapper.mapToDTO(channel)
+        ));
+        log.info("Creating channel {} ({})", channel.getName(), channel.getId());
         return channel;
     }
 
@@ -55,7 +62,9 @@ public class ChannelService {
         var section = channel.getSection();
         Util.reorder(section.getChannels(), channel, newOrder);
         sectionRepository.save(section);
-        webSocketService.updateServerTree();
+        webSocketConnectionService.sendToAll(new ChannelMoveEvent(
+                channel.getId(), newOrder, null
+        ));
     }
 
     public void move(Channel channel, Section newSection, int newOrder) {
@@ -72,20 +81,27 @@ public class ChannelService {
         oldSection.getChannels().remove(channel);
         sectionRepository.save(oldSection);
 
-
+        webSocketConnectionService.sendToAll(
+                new ChannelMoveEvent(channel.getId(), newOrder, newSection.getId())
+        );
     }
 
     public void delete(Channel channel) {
-        var section  = channel.getSection();
+        var section = channel.getSection();
+
+        webSocketService.getClientsInChannel(channel)
+                .forEach(webSocketConnectionService::leaveChannel);
+
         section.getChannels().removeIf(c -> c.equals(channel));
         sectionRepository.save(section);
-        webSocketService.updateServerTree();
+
+        webSocketConnectionService.sendToAll(new ChannelDeleteEvent(channel.getId()));
         log.info("Removed channel {}:{}", channel.getId(), channel.getName());
     }
 
     public void edit(Channel channel, ChannelWriteDTO channelDTO) {
         serverMapper.update(channel, channelDTO);
         channelRepository.save(channel);
-        webSocketService.updateServerTree();
+        webSocketConnectionService.sendToAll(new ChannelChangeEvent(serverMapper.mapToDTO(channel)));
     }
 }

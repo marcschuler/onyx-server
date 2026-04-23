@@ -2,9 +2,7 @@ package de.marcschuler.webrtcserver.data;
 
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
@@ -16,7 +14,11 @@ public class Hash {
     @NotNull
     private String hash;
 
+    @RequiredArgsConstructor
+    @Getter
     public enum HashType{
-        SHA_256
+        SHA_256("sha256");
+
+        private final String safeName;
     }
 }

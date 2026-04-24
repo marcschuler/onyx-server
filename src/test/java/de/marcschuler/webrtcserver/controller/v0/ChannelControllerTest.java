@@ -5,6 +5,10 @@ import de.marcschuler.webrtcserver.TestService;
 import de.marcschuler.webrtcserver.dto.data.ChannelCreateDTO;
 import de.marcschuler.webrtcserver.service.SectionService;
 import de.marcschuler.webrtcserver.service.ServerService;
+import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
+import de.marcschuler.webrtcserver.webclient.messages.channel.ChannelCreateEvent;
+import de.marcschuler.webrtcserver.webclient.messages.channel.ChannelDeleteEvent;
+import de.marcschuler.webrtcserver.webclient.messages.channel.ChannelMoveEvent;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
@@ -12,9 +16,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import tools.jackson.databind.ObjectMapper;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.verify;
 
 @OnyxTest
 @Slf4j
@@ -31,6 +39,9 @@ class ChannelControllerTest {
     private ObjectMapper mapper;
     @Autowired
     private TestService testService;
+
+    @MockitoBean
+    private WebSocketConnectionService webSocketConnectionService;
 
     @Test
     void testCreate(){
@@ -52,6 +63,8 @@ class ChannelControllerTest {
 
         assertEquals(2,section.getChannels().size());
         assertEquals(channel.getId(),section.getChannels().getLast().getId());
+
+        verify(webSocketConnectionService).sendToAll(isA(ChannelCreateEvent.class));
     }
 
     @Test
@@ -72,6 +85,7 @@ class ChannelControllerTest {
         assertEquals(2,section.getChannels().size());
         assertNotEquals(channel.getId(),section.getChannels().getFirst().getId());
 
+        verify(webSocketConnectionService).sendToAll(isA(ChannelDeleteEvent.class));
     }
 
     @Test
@@ -86,6 +100,8 @@ class ChannelControllerTest {
         section = testService.sectionTalk();
         assertEquals(2,section.getChannels().size());
         assertEquals(channel.getId(),section.getChannels().getLast().getId());
+
+        verify(webSocketConnectionService).sendToAll(isA(ChannelMoveEvent.class));
     }
 
     @Test
@@ -110,6 +126,7 @@ class ChannelControllerTest {
         assertEquals(2,newSection.getChannels().size());
 
         assertEquals(channel.getId(),newSection.getChannels().getFirst().getId());
+        verify(webSocketConnectionService).sendToAll(isA(ChannelMoveEvent.class));
     }
 
 }

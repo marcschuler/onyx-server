@@ -1,6 +1,7 @@
 package de.marcschuler.webrtcserver.controller.v0;
 
 import de.marcschuler.webrtcserver.dto.data.MessageDTO;
+import de.marcschuler.webrtcserver.dto.data.message.MessageContentDTO;
 import de.marcschuler.webrtcserver.dto.data.message.MessageCreationDTO;
 import de.marcschuler.webrtcserver.mapper.MessageMapper;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
@@ -38,7 +39,7 @@ public class ChatController {
     }
 
     @GetMapping("{id}/messages/latest")
-    public Page<MessageDTO> messages(@PathVariable UUID id, @RequestParam(defaultValue = "50") int size) {
+    public Page<MessageDTO> messagesLatest(@PathVariable UUID id, @RequestParam(defaultValue = "50") int size) {
         var chat = chatService.chatById(id).orElseThrow();
         var count = chatService.countMessages(chat);
         var lastPage = (int) Math.max(0, (count - 1) / size);
@@ -48,10 +49,10 @@ public class ChatController {
     }
 
     @PostMapping("{id}/message")
-    public MessageDTO message(@PathVariable UUID id, @RequestBody MessageCreationDTO message, Principal principal) {
+    public MessageDTO message(@PathVariable UUID id, @RequestBody MessageContentDTO message, Principal principal) {
         var chat = chatService.chatById(id).orElseThrow();
         var user = userService.findById(principal.getName()).orElseThrow();
-        var m = chatService.createMessage(chat, user, message.getMarkdown());
+        var m = chatService.createMessage(chat, user, message);
         return messageMapper.mapToDTO(m);
     }
 }

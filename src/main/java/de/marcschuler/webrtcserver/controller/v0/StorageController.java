@@ -1,16 +1,17 @@
 package de.marcschuler.webrtcserver.controller.v0;
 
 
+import de.marcschuler.webrtcserver.dto.data.FileDTO;
+import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.StorageService;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,9 +25,17 @@ public class StorageController {
 
     private final StorageService storageService;
 
+    private final ServerMapper serverMapper;
+
     @GetMapping(value = "{fileId}/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<InputStream> file(@PathVariable UUID fileId) throws IOException {
+    public ResponseEntity<byte[]> file(@PathVariable UUID fileId) throws IOException {
         var file = storageService.get(fileId).orElseThrow();
         return storageService.buildResponse(file);
+    }
+
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public FileDTO uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
+        var f = storageService.uploadFile(file);
+        return serverMapper.mapToDTO(f);
     }
 }

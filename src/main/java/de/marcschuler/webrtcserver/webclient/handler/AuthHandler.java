@@ -13,6 +13,7 @@ import de.marcschuler.webrtcserver.service.UserService;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
 import de.marcschuler.webrtcserver.webclient.KickReason;
+import de.marcschuler.webrtcserver.webclient.WebClient;
 import de.marcschuler.webrtcserver.webclient.WebClientState;
 import de.marcschuler.webrtcserver.webclient.ClientMessage;
 import de.marcschuler.webrtcserver.dto.AuthChallenge;
@@ -106,6 +107,13 @@ public class AuthHandler {
 
         var authSuccessEvent = new AuthSuccessMessage();
         authSuccessEvent.setJwt(authService.createJWT(user));
+        authSuccessEvent.setMe(serverMapper.mapToDTO(user));
+        authSuccessEvent.setClients(
+                webSocketConnectionService.clientsInteractable().stream()
+                        .filter(c -> !user.getId().equals(c.getUser().getId()))
+                        .map(serverMapper::mapToDTO)
+                        .toList()
+        );
         event.getClient().sendMessage(authSuccessEvent);
 
         //Send ICE config
@@ -113,9 +121,8 @@ public class AuthHandler {
         iceServerData.setIceServers(serverMapper.mapToDTO(webRTConfig.getConfig().getIce()));
         event.getClient().sendMessage(iceServerData);
 
-        webSocketConnectionService.sendToAll(
-                new ClientServerJoinEvent(serverMapper.mapToDTO(user))
-        );
+        // send join messages to all old clients
+        webSocketConnectionService.send(c -> c != event.getClient(), new ClientServerJoinEvent(serverMapper.mapToDTO(user)));
 
         //TODO
         var serverTreeChangeEvent = webSocketService.createServerTreeChangeEvent(event.getClient());

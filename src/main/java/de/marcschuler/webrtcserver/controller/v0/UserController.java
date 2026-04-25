@@ -1,6 +1,8 @@
 package de.marcschuler.webrtcserver.controller.v0;
 
 import de.marcschuler.webrtcserver.data.ClientState;
+import de.marcschuler.webrtcserver.data.File;
+import de.marcschuler.webrtcserver.dto.data.FileDTO;
 import de.marcschuler.webrtcserver.dto.data.GroupDTO;
 import de.marcschuler.webrtcserver.dto.data.UserExtendedDTO;
 import de.marcschuler.webrtcserver.mapper.GroupMapper;
@@ -9,6 +11,7 @@ import de.marcschuler.webrtcserver.service.GroupService;
 import de.marcschuler.webrtcserver.service.StorageService;
 import de.marcschuler.webrtcserver.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -42,24 +45,15 @@ public class UserController {
                 .toList();
     }
 
-
-    @PostMapping("{id}/profile/avatar")
-    public void uploadMedia(@PathVariable String id, @RequestParam("file") MultipartFile file) throws IOException {
-        var f = storageService.uploadFile(file);
-        var user = userService.findById(id).orElseThrow();
-        userService.setUserAvatar(user, f);
-        serverMapper.mapToDTO(f);
-    }
-
     @PutMapping("{id}/state/ban")
-    public UserExtendedDTO ban(@PathVariable String id, @RequestBody String message){
+    public UserExtendedDTO ban(@PathVariable String id, @RequestBody String message) {
         var user = userService.findById(id).orElseThrow();
         userService.ban(user, message);
         return serverMapper.mapToDTOExtended(user);
     }
 
     @PutMapping("{id}/state/unban")
-    public UserExtendedDTO unban(@PathVariable String id){
+    public UserExtendedDTO unban(@PathVariable String id) {
         var user = userService.findById(id).orElseThrow();
         user.setState(ClientState.ACTIVE);
         userService.save(user);
@@ -67,7 +61,7 @@ public class UserController {
     }
 
     @PutMapping("{id}/state/active")
-    public UserExtendedDTO active(@PathVariable String id){
+    public UserExtendedDTO active(@PathVariable String id) {
         var user = userService.findById(id).orElseThrow();
         user.setState(ClientState.ACTIVE);
         userService.save(user);
@@ -96,7 +90,7 @@ public class UserController {
     }
 
     @GetMapping(value = "{id}/avatar", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<InputStream> avatar(@PathVariable String id) throws IOException {
+    public ResponseEntity<byte[]> avatar(@PathVariable String id) throws IOException {
         var user = userService.findById(id).orElseThrow();
         var file = user.getAvatar();
         if (file == null)
@@ -104,15 +98,20 @@ public class UserController {
         return storageService.buildResponse(file);
     }
 
-    @PutMapping("{id}/avatar")
-    public void avatarUpload(@PathVariable String id,MultipartFile avatarFile) throws IOException {
+
+    @PostMapping(value = "{id}/profile/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public FileDTO uploadMedia(@PathVariable String id, @RequestParam("file") MultipartFile file) throws IOException {
+        if (!storageService.isImageType(file))
+            throw new FileUploadException("Only image files are allowed (jpg,png)");
         var user = userService.findById(id).orElseThrow();
-        var file = storageService.uploadFile(avatarFile);
-        userService.setUserAvatar(user,file);
+        var f = storageService.uploadFile(file);
+        userService.setUserAvatar(user, f);
+        return serverMapper.mapToDTO(f);
     }
 
+
     @DeleteMapping("{id}/avatar")
-    public void avatarDelete(@PathVariable String id){
+    public void avatarDelete(@PathVariable String id) {
         var user = userService.findById(id).orElseThrow();
         userService.setUserAvatar(user, null);
     }

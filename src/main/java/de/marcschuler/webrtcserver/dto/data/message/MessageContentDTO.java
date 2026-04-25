@@ -14,6 +14,7 @@ import lombok.Data;
 )
 @JsonSubTypes({
         @JsonSubTypes.Type(value = MarkdownMessageContentDTO.class, name = "MARKDOWN"),
+        @JsonSubTypes.Type(value = FileMessageContentDTO.class, name = "FILE"),
 })
 @Data
 public abstract class MessageContentDTO {

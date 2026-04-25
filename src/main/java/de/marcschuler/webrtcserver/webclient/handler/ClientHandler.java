@@ -24,8 +24,13 @@ public class ClientHandler {
     @Transactional
     public void onChannelJoinRequest(ClientMessage<ClientChannelJoinRequest> event) {
         log.info("User {} wants to  join channel {}", event.getClient().getUser().getUsername(), event.getBody().getChannelId());
-        var channel = channelService.get(event.getBody().getChannelId()).orElseThrow();
-        webSocketConnectionService.joinChannel(event.getClient(), channel);
+        var currentChannel = event.getClient().getChannel();
+        var wantedChannel = channelService.get(event.getBody().getChannelId()).orElseThrow();
+        if (currentChannel == wantedChannel){
+            log.info("Client wanted to join already used channel");
+            return;
+        }
+        webSocketConnectionService.joinChannel(event.getClient(), wantedChannel);
     }
 
     @EventListener

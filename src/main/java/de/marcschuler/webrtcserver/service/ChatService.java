@@ -3,8 +3,13 @@ package de.marcschuler.webrtcserver.service;
 import de.marcschuler.webrtcserver.data.Chat;
 import de.marcschuler.webrtcserver.data.Message;
 import de.marcschuler.webrtcserver.data.User;
+import de.marcschuler.webrtcserver.data.message.FileMessageContent;
 import de.marcschuler.webrtcserver.data.message.MarkdownMessageContent;
+import de.marcschuler.webrtcserver.data.message.MessageContent;
 import de.marcschuler.webrtcserver.dto.data.MessageDTO;
+import de.marcschuler.webrtcserver.dto.data.message.FileMessageContentDTO;
+import de.marcschuler.webrtcserver.dto.data.message.MarkdownMessageContentDTO;
+import de.marcschuler.webrtcserver.dto.data.message.MessageContentDTO;
 import de.marcschuler.webrtcserver.mapper.MessageMapper;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.repository.ChatRepository;
@@ -32,6 +37,8 @@ public class ChatService {
     private final WebSocketService webSocketService;
     private final WebSocketConnectionService webSocketConnectionService;
 
+    private final StorageService storageService;
+
     private final ChatRepository chatRepository;
     private final MessageRepository messageRepository;
 
@@ -47,12 +54,23 @@ public class ChatService {
         return messageRepository.getMessagesByChatIs(chat);
     }
 
-    public Message createMessage(Chat chat, User user, String markdown) {
-        if (markdown.trim().isEmpty())
-            throw new IllegalArgumentException("markdown cannot be empty or whitespace only");
-
-        var content = new MarkdownMessageContent();
-        content.setText(markdown);
+    public Message createMessage(Chat chat, User user, MessageContentDTO messageContent) {
+        MessageContent content = switch (messageContent) {
+            case MarkdownMessageContentDTO dto -> {
+                if (dto.getText().trim().isEmpty())
+                    throw new IllegalArgumentException("markdown cannot be empty or whitespace only");
+                var c = new MarkdownMessageContent();
+                c.setText(dto.getText());
+                yield c;
+            }
+            case FileMessageContentDTO dto -> {
+                var c = new FileMessageContent();
+                var file = storageService.get(dto.getFile().getId()).orElseThrow();
+                c.setFile(file);
+                yield c;
+            }
+            case null, default -> throw new IllegalStateException("Message Content " + messageContent + " not found");
+        };
 
         var message = new Message();
         message.setChat(chat);
@@ -71,7 +89,7 @@ public class ChatService {
     }
 
     public Page<Message> page(Chat chat, Pageable page) {
-        return messageRepository.findMessagesByChatIs(chat,page);
+        return messageRepository.findMessagesByChatIs(chat, page);
     }
 
     public long countMessages(Chat chat) {

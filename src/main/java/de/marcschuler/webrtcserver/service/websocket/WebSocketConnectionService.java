@@ -7,6 +7,7 @@ import de.marcschuler.webrtcserver.error.webclient.PolicyCheckException;
 import de.marcschuler.webrtcserver.service.PolicyService;
 import de.marcschuler.webrtcserver.service.policy.PolicyCheckerContext;
 import de.marcschuler.webrtcserver.webclient.messages.ErrorMessage;
+import de.marcschuler.webrtcserver.webclient.messages.client.ClientServerLeaveEvent;
 import de.marcschuler.webrtcserver.webclient.messages.connection.ClientKickEvent;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Predicate;
 
 @Service
 @Slf4j
@@ -80,7 +82,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
         if (!client.getState().isInteractionAllowed()) {
             if (!allowedEventsWhenUnauthorized.contains(event.getClass())) {
                 log.warn("Client tried to use event without being logged in {}", event.getClass());
-                kickClient(client, KickReason.UNAUTHORIZED_REQUEST,null);
+                kickClient(client, KickReason.UNAUTHORIZED_REQUEST, null);
             }
         }
 
@@ -94,7 +96,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
         } catch (ClientKickException e) {
             log.info("Kicking client. Reason: {}", e.getMessage());
             log.debug("Exception was", e);
-            kickClient(client, e.getReason(),null);
+            kickClient(client, e.getReason(), null);
         } catch (Exception e) {
             log.error("Uncaught exception while handling a message from client '{}'", client, e);
             throw new RuntimeException(e);
@@ -155,12 +157,18 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
             client.getSession().sendMessage(new TextMessage(data));
         } catch (IOException e) {
             log.error("Could not send message to client: {}", client, e);
-            kickClient(client, KickReason.INTERNAL_ERROR,null);
+            kickClient(client, KickReason.INTERNAL_ERROR, null);
         }
     }
 
     public void sendToAll(MessageBody messageBody) {
         send(sessions, messageBody);
+    }
+
+    public void send(Predicate<WebClient> predicate, MessageBody messageBody) {
+        clientsInteractable().stream()
+                .filter(predicate)
+                .forEach(c -> send(c, messageBody));
     }
 
     public void send(List<WebClient> clients, MessageBody messageBody) {
@@ -175,6 +183,8 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
                 .ifPresent(client -> {
                     sessions.remove(client);
                     leaveChannel(client);
+                    if (client.getUser() != null)
+                        sendToAll(new ClientServerLeaveEvent(client.getUser().getId()));
                 });
     }
 

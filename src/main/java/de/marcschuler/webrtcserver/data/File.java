@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
@@ -31,7 +32,7 @@ public class File {
     @Column(nullable = false,updatable = false)
     private String contentType;
     @Column(updatable = false)
-    @Size(min = 1)
+    @Min(1)
     private long size;
 
     @Column(nullable = false,updatable = false)

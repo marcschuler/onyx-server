@@ -13,13 +13,18 @@ import org.springframework.web.server.ResponseStatusException;
 @Slf4j
 public class ErrorHandler {
 
+    @ExceptionHandler(FileUploadException.class)
+    public ResponseEntity<ProblemDetail> handleFileUploadException(FileUploadException ex){
+        log.error("Could not upload file", ex);
+        return buildResponse(HttpStatus.BAD_REQUEST,ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ProblemDetail> handleNotFound(Exception ex) {
         log.error("An unexpected error happened", ex);
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
 
         problem.setTitle("Internal server error");
-        problem.setDetail(ex.getMessage());
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problem);
     }
@@ -28,5 +33,12 @@ public class ErrorHandler {
     public ResponseEntity<Object> handleResponseStatusException(ResponseStatusException ex){
         log.error("An exception on a controller happened", ex);
         return ResponseEntity.of(ex.getBody()).build();
+    }
+
+    private ResponseEntity<ProblemDetail> buildResponse(HttpStatus status, String title){
+        var problemDetail = ProblemDetail.forStatus(status);
+        problemDetail.setTitle(title);
+        return ResponseEntity.status(status)
+                .body(problemDetail);
     }
 }

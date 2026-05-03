@@ -24,7 +24,7 @@ import java.security.interfaces.EdECPublicKey;
 import java.util.List;
 import java.util.Map;
 
-@Mapper(componentModel = "spring", uses = {MessageMapper.class, PolicyMapper.class})
+@Mapper(componentModel = "spring", uses = {MessageMapper.class, PolicyMapper.class, MessageContentMapper.class})
 public abstract class ServerMapper {
 
     @Autowired

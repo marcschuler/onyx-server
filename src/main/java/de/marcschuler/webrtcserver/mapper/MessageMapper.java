@@ -12,13 +12,14 @@ import org.mapstruct.Mapper;
 import org.mapstruct.SubclassExhaustiveStrategy;
 import org.mapstruct.SubclassMapping;
 
-@Mapper(componentModel = "spring", subclassExhaustiveStrategy = SubclassExhaustiveStrategy.RUNTIME_EXCEPTION, uses = ServerMapper.class)
-public abstract class MessageMapper {
+import java.util.List;
 
+@Mapper(componentModel = "spring",
+        subclassExhaustiveStrategy = SubclassExhaustiveStrategy.RUNTIME_EXCEPTION,
+        uses = {ServerMapper.class, MessageContentMapper.class})
+public abstract class MessageMapper {
 
     public abstract MessageDTO mapToDTO(Message message);
 
-    @SubclassMapping(source = MarkdownMessageContent.class, target = MarkdownMessageContentDTO.class)
-    @SubclassMapping(source = FileMessageContent.class, target = FileMessageContentDTO.class)
-    public abstract MessageContentDTO mapToDTO(MessageContent entity);
+
 }

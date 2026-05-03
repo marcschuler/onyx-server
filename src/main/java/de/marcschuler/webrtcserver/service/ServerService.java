@@ -54,7 +54,7 @@ public class ServerService {
         var server = new Server();
         server.setName("Onyx Server");
         server.setKeys(keys); // assuming keys is already defined
-        server.setDescription(new MarkdownMessageContent("This is the default server description."));
+        server.setDescription(List.of(new MarkdownMessageContent("This is the default server description.")));
 
         //TODO create default AccessPowerPolicies for the channels
 

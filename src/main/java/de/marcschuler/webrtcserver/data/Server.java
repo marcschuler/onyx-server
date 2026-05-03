@@ -3,6 +3,7 @@ package de.marcschuler.webrtcserver.data;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import de.marcschuler.webrtcserver.data.message.MarkdownMessageContent;
+import de.marcschuler.webrtcserver.data.message.MessageContent;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -23,8 +24,6 @@ public class Server {
     private UUID id;
     @Size(min = 3, max = 64)
     private String name;
-    @OneToOne(cascade = CascadeType.ALL)
-    private MarkdownMessageContent description; //TODO List<MessageContent>?
 
     @OneToMany(
             cascade = CascadeType.ALL,
@@ -34,6 +33,15 @@ public class Server {
     @JoinColumn(name = "server_id")
     @OrderColumn(name = "section_order")
     private List<Section> sections = new ArrayList<>();
+
+
+    @OneToMany(
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
+    )
+    @OrderColumn(name = "description_order")
+    private List<MessageContent> description;
 
     @OneToMany(cascade = CascadeType.ALL,
             orphanRemoval = true,fetch = FetchType.EAGER)

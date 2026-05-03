@@ -6,6 +6,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.server.ResponseStatusException;
 
 
@@ -16,6 +17,13 @@ public class ErrorHandler {
     @ExceptionHandler(FileUploadException.class)
     public ResponseEntity<ProblemDetail> handleFileUploadException(FileUploadException ex){
         log.error("Could not upload file", ex);
+        return buildResponse(HttpStatus.BAD_REQUEST,ex.getMessage());
+    }
+
+    //TODO does not work. Need to catch at a deeper level (HandlerExceptionResolver)
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ProblemDetail> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex){
+        log.error("Uploaded file too big, limit is {}B",ex.getMaxUploadSize(), ex);
         return buildResponse(HttpStatus.BAD_REQUEST,ex.getMessage());
     }
 

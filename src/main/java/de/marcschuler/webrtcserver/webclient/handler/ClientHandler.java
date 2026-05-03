@@ -23,10 +23,10 @@ public class ClientHandler {
     @EventListener
     @Transactional
     public void onChannelJoinRequest(ClientMessage<ClientChannelJoinRequest> event) {
-        log.info("User {} wants to  join channel {}", event.getClient().getUser().getUsername(), event.getBody().getChannelId());
+        log.info("User {} wants to join channel {}", event.getClient().getUser().getUsername(), event.getBody().getChannelId());
         var currentChannel = event.getClient().getChannel();
         var wantedChannel = channelService.get(event.getBody().getChannelId()).orElseThrow();
-        if (currentChannel == wantedChannel){
+        if (currentChannel != null && currentChannel.getId().equals(wantedChannel.getId())) {
             log.info("Client wanted to join already used channel");
             return;
         }
@@ -36,7 +36,7 @@ public class ClientHandler {
     @EventListener
     @Transactional
     public void onChannelLeaveRequest(ClientMessage<ClientChannelLeaveRequest> event) {
-        log.info("User {} wants leave his channel", event.getClient().getUser().getUsername());
+        log.info("User {} wants to leave the channel", event.getClient().getUser().getUsername());
         webSocketConnectionService.leaveChannel(event.getClient());
     }
 

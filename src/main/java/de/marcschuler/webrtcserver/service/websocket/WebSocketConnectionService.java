@@ -152,7 +152,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
 
     public void send(WebClient client, MessageBody messageBody) {
         var data = objectMapper.writeValueAsBytes(messageBody);
-        log.debug("Sending to client {}: {}", client, data);
+        log.debug("Sending to client {}: {}", client, new String(data));
         try {
             client.getSession().sendMessage(new TextMessage(data));
         } catch (IOException e) {

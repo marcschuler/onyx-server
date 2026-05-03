@@ -76,7 +76,6 @@ public abstract class ServerMapper {
     public abstract UserSimpleDTO mapToDTO(User user);
 
     @Mapping(target = "channelId",source = "channel.id")
-
     public abstract UserOnlineDTO mapToDTO(WebClient client);
 
     public abstract List<UserSimpleDTO> mapToDTOList(List<User> user);

@@ -1,5 +1,7 @@
 package de.marcschuler.webrtcserver;
 
+import com.nimbusds.jose.jwk.OctetKeyPair;
+import lombok.Getter;
 import tools.jackson.databind.ObjectMapper;
 import de.marcschuler.webrtcserver.webclient.messages.MessageBody;
 import de.marcschuler.webrtcserver.webclient.messages.auth.AuthChallengeResponse;
@@ -14,6 +16,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.*;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 @RequiredArgsConstructor
 @Slf4j
 public class WebSocketMock {
@@ -22,6 +26,8 @@ public class WebSocketMock {
 
     private WebSocketSession session;
     private final BlockingQueue<String> messageQueue = new LinkedBlockingQueue<>();
+    @Getter
+    private final OctetKeyPair keyPair;
 
     public void connect() throws ExecutionException, InterruptedException, TimeoutException {
         StandardWebSocketClient client = new StandardWebSocketClient();
@@ -50,8 +56,17 @@ public class WebSocketMock {
         this.session = responseFuture.get(5, TimeUnit.SECONDS);
     }
 
-    public void sendMessage(String message) throws IOException {
-        session.sendMessage(new TextMessage(message));
+    public void sendMessage(MessageBody message) {
+        sendMessage(objectMapper.writeValueAsString(message));
+    }
+
+
+    public void sendMessage(String message) {
+        try {
+            session.sendMessage(new TextMessage(message));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // Receive the next message
@@ -81,18 +96,21 @@ public class WebSocketMock {
     }
 
     public <T extends MessageBody> T recv(Class<T> wantedMessage) throws InterruptedException, JacksonException {
-        return recv(wantedMessage,1);
+        return recv(wantedMessage, 1);
     }
 
-        // Receive the next message of a special type
+    // Receive the next message of a special type
     public <T extends MessageBody> T recv(Class<T> wantedMessage, int maxTries) throws InterruptedException, JacksonException {
         var i = 0;
         while (i < maxTries) {
             var m = messageQueue.poll(5, TimeUnit.SECONDS);
+            if (m == null) {
+                throw new IllegalStateException("No message in queue");
+            }
             T t = (T) objectMapper.readValue(m, MessageBody.class);
             if (t.getClass().equals(wantedMessage))
                 return t;
-            log.info("ignoring message {} that is not {}", t.getClass(), wantedMessage);
+            log.warn("ignoring message {} that is not {}", t.getClass(), wantedMessage);
             i++;
         }
         throw new IllegalStateException("Could not find message");
@@ -103,7 +121,13 @@ public class WebSocketMock {
         session.close();
     }
 
-    public void sendMessage(AuthChallengeResponse authChallengeResponse) throws IOException {
-        sendMessage(objectMapper.writeValueAsString(authChallengeResponse));
+
+    public void recvNothing() {
+        try {
+            var result = messageQueue.poll(3, TimeUnit.SECONDS);
+            assertNull(result);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

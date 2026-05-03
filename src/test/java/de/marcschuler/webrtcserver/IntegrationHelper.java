@@ -2,6 +2,7 @@ package de.marcschuler.webrtcserver;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.OctetKeyPair;
+import lombok.Getter;
 import tools.jackson.databind.ObjectMapper;
 import de.marcschuler.webrtcserver.service.AuthService;
 import de.marcschuler.webrtcserver.service.CryptoService;
@@ -31,6 +32,7 @@ public class IntegrationHelper {
     private final CryptoService cryptoService;
     private final ObjectMapper objectMapper;
 
+
     public WebSocketMock quickConnect() throws IOException, SignatureException, NoSuchAlgorithmException, ExecutionException, InvalidKeyException, InterruptedException, TimeoutException, JOSEException {
         return quickConnect(RandomStringUtils.randomAlphanumeric(8));
     }
@@ -40,7 +42,7 @@ public class IntegrationHelper {
     }
 
     public WebSocketMock quickConnect(OctetKeyPair keyPair, String username) throws ExecutionException, InterruptedException, TimeoutException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException, JOSEException {
-        var mock = new WebSocketMock(objectMapper);
+        var mock = new WebSocketMock(objectMapper,keyPair);
         mock.connect();
 
         var authChallengeRequest = (AuthChallengeRequest) mock.recv();

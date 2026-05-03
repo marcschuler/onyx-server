@@ -1,6 +1,7 @@
 package de.marcschuler.webrtcserver.service.websocket;
 
 import com.nimbusds.jose.JOSEException;
+import de.marcschuler.webrtcserver.IntegrationHelper;
 import de.marcschuler.webrtcserver.OnyxTest;
 import tools.jackson.databind.ObjectMapper;
 import de.marcschuler.webrtcserver.WebSocketMock;
@@ -28,6 +29,7 @@ import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+// Low level connection tests
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @OnyxTest
 class WebSocketConnectionServiceTest {
@@ -36,6 +38,7 @@ class WebSocketConnectionServiceTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
 
     @Autowired
     private CryptoService cryptoService;
@@ -46,7 +49,7 @@ class WebSocketConnectionServiceTest {
 
     @BeforeEach
     void setUp() throws ExecutionException, InterruptedException, TimeoutException {
-        webSocketMock = new WebSocketMock(objectMapper);
+        webSocketMock = new WebSocketMock(objectMapper, null);
         webSocketMock.connect();
     }
 

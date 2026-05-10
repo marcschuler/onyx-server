@@ -1,17 +1,13 @@
 package de.marcschuler.webrtcserver.config;
 
-import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.OctetKeyPair;
-import de.marcschuler.webrtcserver.data.Hash;
+import de.marcschuler.webrtcserver.data.file.Hash;
 import de.marcschuler.webrtcserver.service.CryptoService;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 
-import java.security.KeyPair;
-import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
 import java.text.ParseException;
 
 @Configuration

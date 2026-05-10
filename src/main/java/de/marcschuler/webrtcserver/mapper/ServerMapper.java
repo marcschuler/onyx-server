@@ -1,14 +1,10 @@
 package de.marcschuler.webrtcserver.mapper;
 
 import com.nimbusds.jose.jwk.OctetKeyPair;
-import de.marcschuler.webrtcserver.data.policy.Policy;
-import de.marcschuler.webrtcserver.data.policy.PolicyItem;
-import de.marcschuler.webrtcserver.dto.data.policy.PolicyDTO;
+import de.marcschuler.webrtcserver.data.file.File;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
 import de.marcschuler.webrtcserver.webclient.WebClient;
 import org.mapstruct.*;
-import tools.jackson.databind.JsonNode;
-import com.nimbusds.jose.jwk.JWK;
 import de.marcschuler.webrtcserver.config.WebRTConfig;
 import de.marcschuler.webrtcserver.data.*;
 import de.marcschuler.webrtcserver.dto.*;
@@ -16,11 +12,7 @@ import de.marcschuler.webrtcserver.dto.data.*;
 import de.marcschuler.webrtcserver.service.CryptoService;
 import de.marcschuler.webrtcserver.webclient.messages.server.ServerTreeChangeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
-import tools.jackson.core.JacksonException;
 
-import java.security.KeyPair;
-import java.security.PublicKey;
-import java.security.interfaces.EdECPublicKey;
 import java.util.List;
 import java.util.Map;
 

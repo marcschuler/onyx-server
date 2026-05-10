@@ -1,6 +1,6 @@
 package de.marcschuler.webrtcserver.data.message;
 
-import de.marcschuler.webrtcserver.data.File;
+import de.marcschuler.webrtcserver.data.file.File;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;

@@ -9,5 +9,4 @@ public interface OrderableController {
 
     @PutMapping("{id}/order/{newOrder}")
     void order(@PathVariable UUID id, @PathVariable int newOrder);
-
 }

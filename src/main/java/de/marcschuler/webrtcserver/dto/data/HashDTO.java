@@ -1,6 +1,6 @@
 package de.marcschuler.webrtcserver.dto.data;
 
-import de.marcschuler.webrtcserver.data.Hash;
+import de.marcschuler.webrtcserver.data.file.Hash;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 

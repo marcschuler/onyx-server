@@ -37,8 +37,9 @@ import java.util.concurrent.TimeUnit;
 public class AuthService {
 
     private final CryptoService cryptoService;
-
-    private final ServerService serverService;
+    @Autowired
+    @Lazy
+    private ServerService serverService;
     @Autowired
     @Lazy
     private WebSocketConnectionService webSocketConnectionService;

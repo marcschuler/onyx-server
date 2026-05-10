@@ -25,7 +25,6 @@ public class Section {
 
     @OneToMany(
             cascade = CascadeType.ALL,
-            orphanRemoval = true,
              fetch = FetchType.EAGER
     )
     @JoinColumn(name="section_id")

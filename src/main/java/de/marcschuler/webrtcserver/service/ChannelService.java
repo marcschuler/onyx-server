@@ -59,6 +59,7 @@ public class ChannelService {
     }
 
     public void order(Channel channel, int newOrder) {
+        log.info("Reordering channel {} to order {}", channel.getName(), newOrder);
         var section = channel.getSection();
         Util.reorder(section.getChannels(), channel, newOrder);
         sectionRepository.save(section);
@@ -72,6 +73,7 @@ public class ChannelService {
             log.warn("Tried to move channel {} ({}) to the same section {} ({})", channel.getName(), channel.getId(), newSection.getName(), newSection.getId());
             return;
         }
+        log.info("Moving channel {} to section {} and order {}", channel.getName(), newSection.getName(), newOrder);
         var oldSection = channel.getSection();
 
         newSection.getChannels().add(newOrder, channel);

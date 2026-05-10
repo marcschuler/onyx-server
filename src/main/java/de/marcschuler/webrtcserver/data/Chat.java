@@ -1,6 +1,7 @@
 package de.marcschuler.webrtcserver.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import de.marcschuler.webrtcserver.data.message.Message;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,7 +1,6 @@
 package de.marcschuler.webrtcserver.controller.v0;
 
 import de.marcschuler.webrtcserver.data.ClientState;
-import de.marcschuler.webrtcserver.data.File;
 import de.marcschuler.webrtcserver.dto.data.FileDTO;
 import de.marcschuler.webrtcserver.dto.data.GroupDTO;
 import de.marcschuler.webrtcserver.dto.data.UserExtendedDTO;
@@ -20,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
 

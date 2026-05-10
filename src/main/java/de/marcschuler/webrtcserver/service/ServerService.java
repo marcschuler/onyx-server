@@ -1,13 +1,21 @@
 package de.marcschuler.webrtcserver.service;
 
+import de.marcschuler.webrtcserver.Util;
+import de.marcschuler.webrtcserver.config.WebRTConfig;
 import de.marcschuler.webrtcserver.data.*;
 import de.marcschuler.webrtcserver.data.message.MarkdownMessageContent;
+import de.marcschuler.webrtcserver.data.message.MessageContent;
 import de.marcschuler.webrtcserver.data.policy.RolePolicy;
 import de.marcschuler.webrtcserver.dto.data.GroupWriteDTO;
+import de.marcschuler.webrtcserver.dto.data.ServerWriteDTO;
+import de.marcschuler.webrtcserver.dto.data.message.MessageContentDTO;
 import de.marcschuler.webrtcserver.dto.data.policy.RolePolicyDTO;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.repository.*;
+import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
+import de.marcschuler.webrtcserver.webclient.messages.section.SectionMoveEvent;
+import de.marcschuler.webrtcserver.webclient.messages.server.ServerChangeEvent;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,10 +33,11 @@ public class ServerService {
     private final CryptoService cryptoService;
     @Autowired
     @Lazy
-    private WebSocketService webSocketService;
+    private WebSocketConnectionService webSocketConnectionService;
 
     private final GroupService groupService;
     private final PolicyService policyService;
+    private final ChatService chatService;
 
     private final ServerRepository serverRepository;
     private final GroupRepository groupRepository;
@@ -59,9 +68,9 @@ public class ServerService {
         //TODO create default AccessPowerPolicies for the channels
 
 
-        var group1 = groupService.create(new GroupWriteDTO("Admin", "A Administrator is allowed to to anything", null, null, Map.of(),true));
-        var group2 = groupService.create(new GroupWriteDTO("Mod", "A Moderator is allowed to moderate users", null, null, Map.of(),true));
-        var group3 = groupService.create(new GroupWriteDTO("User", "Default group for known users", null, null, Map.of(),false));
+        var group1 = groupService.create(new GroupWriteDTO("Admin", "A Administrator is allowed to to anything", null, null, Map.of(), true));
+        var group2 = groupService.create(new GroupWriteDTO("Mod", "A Moderator is allowed to moderate users", null, null, Map.of(), true));
+        var group3 = groupService.create(new GroupWriteDTO("User", "Default group for known users", null, null, Map.of(), false));
 
         server.setGroups(List.of(group1, group2, group3));
 
@@ -140,7 +149,53 @@ public class ServerService {
         return serverRepository.findById(serverId);
     }
 
+    public Server update(Server server, ServerWriteDTO serverDto) {
+        server = serverMapper.update(server, serverDto);
+        sendUpdate(server);
+        return server;
+    }
+
     public void save(Server server) {
         this.serverRepository.save(server);
     }
+
+    public void deleteDescription(Server server, UUID descriptionId) {
+        server.getDescription().removeIf(s -> s.getId().equals(descriptionId));
+        serverRepository.save(server);
+    }
+
+    public MessageContent createDescription(Server server, MessageContentDTO messageDto) {
+        var content = chatService.createMessageContent(messageDto);
+        server.getDescription().add(content);
+        serverRepository.save(server);
+        sendUpdate(server);
+        return content;
+    }
+
+    public MessageContent updateDescription(Server server, MessageContent messageContent, MessageContentDTO messageDto) {
+        messageContent = chatService.updateMessageContent(messageContent, messageDto);
+        serverRepository.save(server);
+        sendUpdate(server);
+        return messageContent;
+    }
+
+    public Optional<MessageContent> descriptionFromId(Server server, UUID id) {
+        return server.getDescription().stream()
+                .filter(d -> d.getId().equals(id))
+                .findFirst();
+    }
+
+    public void orderDescription(Server server, MessageContent content, int newOrder) {
+        Util.reorder(server.getDescription(), content, newOrder);
+        serverRepository.save(server);
+        sendUpdate(server);
+    }
+
+    private void sendUpdate(Server server){
+        webSocketConnectionService.sendToAll(
+                new ServerChangeEvent(serverMapper.mapToDTO(server))
+        );
+    }
+
+
 }

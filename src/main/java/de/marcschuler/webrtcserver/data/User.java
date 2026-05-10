@@ -1,16 +1,14 @@
 package de.marcschuler.webrtcserver.data;
 
 import com.nimbusds.jose.jwk.OctetKeyPair;
+import de.marcschuler.webrtcserver.data.file.File;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-import java.security.PublicKey;
 import java.time.Instant;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity(name = "SERVER_USERS")

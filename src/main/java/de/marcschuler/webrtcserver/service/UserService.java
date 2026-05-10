@@ -1,7 +1,7 @@
 package de.marcschuler.webrtcserver.service;
 
 import de.marcschuler.webrtcserver.data.ClientState;
-import de.marcschuler.webrtcserver.data.File;
+import de.marcschuler.webrtcserver.data.file.File;
 import de.marcschuler.webrtcserver.data.User;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.repository.UserRepository;

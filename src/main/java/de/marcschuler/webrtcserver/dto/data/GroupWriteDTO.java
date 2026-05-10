@@ -1,6 +1,6 @@
 package de.marcschuler.webrtcserver.dto.data;
 
-import de.marcschuler.webrtcserver.data.File;
+import de.marcschuler.webrtcserver.data.file.File;
 import de.marcschuler.webrtcserver.data.Permission;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

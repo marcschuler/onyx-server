@@ -43,6 +43,13 @@ public class Server {
     @OrderColumn(name = "description_order")
     private List<MessageContent> description;
 
+    @OneToMany(
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
+    )
+    private List<Invite> invites;
+
     @OneToMany(cascade = CascadeType.ALL,
             orphanRemoval = true,fetch = FetchType.EAGER)
     private List<Group> groups = new ArrayList<>();

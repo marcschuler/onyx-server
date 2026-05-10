@@ -1,5 +1,6 @@
 package de.marcschuler.webrtcserver.data;
 
+import de.marcschuler.webrtcserver.data.file.File;
 import jakarta.persistence.*;
 import lombok.Data;
 

@@ -11,6 +11,4 @@ import java.util.List;
 public class ServerWriteDTO {
     @NotNull
     private String name;
-    @NotNull
-    private List<MessageContentDTO> description;
 }

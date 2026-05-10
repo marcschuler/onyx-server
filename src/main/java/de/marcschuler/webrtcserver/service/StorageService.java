@@ -1,9 +1,8 @@
 package de.marcschuler.webrtcserver.service;
 
-import de.marcschuler.webrtcserver.data.File;
-import de.marcschuler.webrtcserver.data.Hash;
+import de.marcschuler.webrtcserver.data.file.File;
+import de.marcschuler.webrtcserver.data.file.Hash;
 import de.marcschuler.webrtcserver.repository.FileRepository;
-import jdk.jfr.ContentType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;

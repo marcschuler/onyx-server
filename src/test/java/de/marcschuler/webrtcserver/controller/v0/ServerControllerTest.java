@@ -1,0 +1,49 @@
+package de.marcschuler.webrtcserver.controller.v0;
+
+import de.marcschuler.webrtcserver.OnyxTest;
+import de.marcschuler.webrtcserver.dto.data.message.MarkdownMessageContentDTO;
+import de.marcschuler.webrtcserver.service.ServerService;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@OnyxTest
+@Slf4j
+class ServerControllerTest {
+
+    @Autowired
+    private ServerController serverController;
+    @Autowired
+    private ServerController.ServerDescriptionController serverDescriptionController;
+
+    @Autowired
+    private ServerService serverService;
+
+    @Test
+    void testDescriptions() {
+        var serverId = serverService.defaultServer().getId();
+
+        var server = serverController.get(serverId);
+        assertEquals(1, server.getDescription().size());
+
+        serverDescriptionController.delete(serverId, server.getDescription().get(0).getId());
+        server = serverController.get(serverId);
+        assertEquals(0, server.getDescription().size());
+
+        var content = new MarkdownMessageContentDTO();
+        content.setText("example");
+        var contentResponse = serverDescriptionController.create(content, serverId);
+        assertNotNull(contentResponse.getId());
+        assertInstanceOf(MarkdownMessageContentDTO.class, contentResponse);
+        assertEquals("example", ((MarkdownMessageContentDTO) contentResponse).getText());
+
+        content.setText("kohlekohlekohle");
+        contentResponse = serverDescriptionController.edit(content, serverId, contentResponse.getId());
+        assertInstanceOf(MarkdownMessageContentDTO.class, contentResponse);
+        assertEquals("kohlekohlekohle", ((MarkdownMessageContentDTO) contentResponse).getText());
+    }
+
+
+}

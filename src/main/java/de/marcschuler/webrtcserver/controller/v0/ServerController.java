@@ -1,7 +1,6 @@
 package de.marcschuler.webrtcserver.controller.v0;
 
 import de.marcschuler.webrtcserver.dto.data.ServerDTO;
-import de.marcschuler.webrtcserver.dto.data.ServerWriteDTO;
 import de.marcschuler.webrtcserver.dto.data.message.MessageContentDTO;
 import de.marcschuler.webrtcserver.mapper.MessageContentMapper;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
@@ -24,7 +23,7 @@ public class ServerController {
     private final MessageContentMapper messageContentMapper;
 
     @PutMapping("{serverId}")
-    public ServerDTO edit(@PathVariable UUID serverId, @RequestBody ServerWriteDTO serverDto) {
+    public ServerDTO edit(@PathVariable UUID serverId, @RequestBody ServerDTO serverDto) {
         var server = serverService.get(serverId).orElseThrow();
         server = serverService.update(server, serverDto);
         return serverMapper.mapToDTO(server);

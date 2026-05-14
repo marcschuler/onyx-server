@@ -1,20 +1,18 @@
 package de.marcschuler.webrtcserver.service;
 
 import de.marcschuler.webrtcserver.Util;
-import de.marcschuler.webrtcserver.config.WebRTConfig;
 import de.marcschuler.webrtcserver.data.*;
 import de.marcschuler.webrtcserver.data.message.MarkdownMessageContent;
 import de.marcschuler.webrtcserver.data.message.MessageContent;
-import de.marcschuler.webrtcserver.data.policy.RolePolicy;
-import de.marcschuler.webrtcserver.dto.data.GroupWriteDTO;
-import de.marcschuler.webrtcserver.dto.data.ServerWriteDTO;
+import de.marcschuler.webrtcserver.data.Channel;
+import de.marcschuler.webrtcserver.data.permission.PermissionType;
+import de.marcschuler.webrtcserver.dto.PermissionDTO;
+import de.marcschuler.webrtcserver.dto.data.GroupDTO;
+import de.marcschuler.webrtcserver.dto.data.ServerDTO;
 import de.marcschuler.webrtcserver.dto.data.message.MessageContentDTO;
-import de.marcschuler.webrtcserver.dto.data.policy.RolePolicyDTO;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.repository.*;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
-import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
-import de.marcschuler.webrtcserver.webclient.messages.section.SectionMoveEvent;
 import de.marcschuler.webrtcserver.webclient.messages.server.ServerChangeEvent;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +34,6 @@ public class ServerService {
     private WebSocketConnectionService webSocketConnectionService;
 
     private final GroupService groupService;
-    private final PolicyService policyService;
     private final ChatService chatService;
 
     private final ServerRepository serverRepository;
@@ -65,33 +62,17 @@ public class ServerService {
         server.setKeys(keys); // assuming keys is already defined
         server.setDescription(List.of(new MarkdownMessageContent("This is the default server description.")));
 
-        //TODO create default AccessPowerPolicies for the channels
 
+        var permissionsAdmin = new PermissionDTO();
+        permissionsAdmin.setPermissions(Set.of(PermissionType.SERVER, PermissionType.SECTION, PermissionType.CHANNEL));
 
-        var group1 = groupService.create(new GroupWriteDTO("Admin", "A Administrator is allowed to to anything", null, null, Map.of(), true));
-        var group2 = groupService.create(new GroupWriteDTO("Mod", "A Moderator is allowed to moderate users", null, null, Map.of(), true));
-        var group3 = groupService.create(new GroupWriteDTO("User", "Default group for known users", null, null, Map.of(), false));
+        var permissionsMod = new PermissionDTO();
+        permissionsMod.setPermissions(Set.of(PermissionType.SECTION, PermissionType.CHANNEL));
+        var group1 = groupService.create(new GroupDTO(null, "Admin", "You can do anything \uD83D\uDE0E", null, null, List.of(permissionsAdmin), true));
+        var group2 = groupService.create(new GroupDTO(null, "Mod", "Manage your server and your user", null, null, List.of(permissionsMod), true));
+        var group3 = groupService.create(new GroupDTO(null, "User", "Default group for known users", null, null, List.of(), false));
 
         server.setGroups(List.of(group1, group2, group3));
-
-        var policy1 = policyService.create(RolePolicyDTO.builder()
-                .operator(RolePolicy.SimplePolicyOperator.IN)
-                .operand(RolePolicy.SimplePolicyOperand.GROUP)
-                .ids(Set.of(group1.getId()))
-                .name("Only Admins")
-                .build());
-        var policy2 = policyService.create(RolePolicyDTO.builder()
-                .operator(RolePolicy.SimplePolicyOperator.IN)
-                .operand(RolePolicy.SimplePolicyOperand.GROUP)
-                .ids(Set.of(group1.getId(), group2.getId()))
-                .name("Admins + Mods")
-                .build());
-        var policy3 = policyService.create(RolePolicyDTO.builder()
-                .operator(RolePolicy.SimplePolicyOperator.NOT_IN)
-                .operand(RolePolicy.SimplePolicyOperand.GROUP)
-                .ids(Set.of())
-                .name("Everyone")
-                .build());
 
         var section1 = new Section();
         section1.setName("Lobby");
@@ -149,7 +130,7 @@ public class ServerService {
         return serverRepository.findById(serverId);
     }
 
-    public Server update(Server server, ServerWriteDTO serverDto) {
+    public Server update(Server server, ServerDTO serverDto) {
         server = serverMapper.update(server, serverDto);
         sendUpdate(server);
         return server;
@@ -191,7 +172,7 @@ public class ServerService {
         sendUpdate(server);
     }
 
-    private void sendUpdate(Server server){
+    private void sendUpdate(Server server) {
         webSocketConnectionService.sendToAll(
                 new ServerChangeEvent(serverMapper.mapToDTO(server))
         );

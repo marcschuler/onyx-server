@@ -4,7 +4,7 @@ import de.marcschuler.webrtcserver.Util;
 import de.marcschuler.webrtcserver.data.Channel;
 import de.marcschuler.webrtcserver.data.Chat;
 import de.marcschuler.webrtcserver.data.Section;
-import de.marcschuler.webrtcserver.dto.data.ChannelWriteDTO;
+import de.marcschuler.webrtcserver.dto.data.ChannelDTO;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.repository.ChannelRepository;
 import de.marcschuler.webrtcserver.repository.SectionRepository;
@@ -101,7 +101,7 @@ public class ChannelService {
         log.info("Removed channel {}:{}", channel.getId(), channel.getName());
     }
 
-    public void edit(Channel channel, ChannelWriteDTO channelDTO) {
+    public void edit(Channel channel, ChannelDTO channelDTO) {
         serverMapper.update(channel, channelDTO);
         channelRepository.save(channel);
         webSocketConnectionService.sendToAll(new ChannelChangeEvent(serverMapper.mapToDTO(channel)));

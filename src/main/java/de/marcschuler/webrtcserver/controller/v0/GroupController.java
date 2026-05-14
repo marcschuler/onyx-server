@@ -1,7 +1,7 @@
 package de.marcschuler.webrtcserver.controller.v0;
 
 import de.marcschuler.webrtcserver.dto.data.GroupDTO;
-import de.marcschuler.webrtcserver.dto.data.GroupWriteDTO;
+import de.marcschuler.webrtcserver.mapper.GroupMapper;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.GroupService;
 import lombok.RequiredArgsConstructor;
@@ -19,26 +19,26 @@ public class GroupController {
 
     private final GroupService groupService;
 
-    private final ServerMapper serverMapper;
+    private final GroupMapper groupMapper;
 
     @GetMapping
     public List<GroupDTO> all() {
         return groupService.all().stream()
-                .map(serverMapper::mapToDTO)
+                .map(groupMapper::mapToDTO)
                 .toList();
     }
 
     @PostMapping
-    public GroupDTO create(@RequestBody GroupWriteDTO groupWriteDTO) {
+    public GroupDTO create(@RequestBody GroupDTO groupWriteDTO) {
         var group = groupService.create(groupWriteDTO);
-        return serverMapper.mapToDTO(group);
+        return groupMapper.mapToDTO(group);
     }
 
     @PutMapping("{id}")
-    public GroupDTO edit(@PathVariable UUID id, @RequestBody GroupWriteDTO groupWriteDTO) {
+    public GroupDTO edit(@PathVariable UUID id, @RequestBody GroupDTO groupWriteDTO) {
         var group = groupService.get(id).orElseThrow();
         groupService.edit(group, groupWriteDTO);
-        return serverMapper.mapToDTO(group);
+        return groupMapper.mapToDTO(group);
     }
 
     @DeleteMapping("{id}")

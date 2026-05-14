@@ -1,23 +1,118 @@
 package de.marcschuler.webrtcserver.service;
 
+import de.marcschuler.webrtcserver.data.Channel;
+import de.marcschuler.webrtcserver.data.Group;
+import de.marcschuler.webrtcserver.data.Section;
 import de.marcschuler.webrtcserver.data.User;
+import de.marcschuler.webrtcserver.data.permission.Permission;
+import de.marcschuler.webrtcserver.data.permission.PermissionType;
+import de.marcschuler.webrtcserver.error.webclient.PermissionDeniedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
+
+import static de.marcschuler.webrtcserver.service.PermissionService.PermissionState.*;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class PermissionService {
 
-    public List<String> permissionsForUser(User user){
-        return List.of(); //TODO
+    public void checkAccess(@NonNull User user, @Nullable Channel channel, @NonNull PermissionType type) {
+        checkAccess(user,channel!=null?channel.getSection():null,channel,type);
     }
 
 
-    public boolean hasPermission(User user, String permission){
-        return false; //TODO
+        /**
+         * Checks wether a user in a specific section and channel can do an action
+         *
+         * @param user    the user to check
+         * @param section the section, may be null
+         * @param channel the channel of the section, may be null
+         * @param type
+         */
+    public void checkAccess(@NonNull User user, @Nullable Section section, @Nullable Channel channel, @NonNull PermissionType type) {
+        var groups = buildGroupContext(user, section, channel);
+
+        for (var group : groups) {
+            for (var permission : group.getPermissions()) {
+                var state = checkAccessForSinglePermission(permission, section, channel, type);
+                if (state == ALLOW) {
+                    log.debug("Permission {} has access for section {} and channel {}", permission, section, channel);
+                    return;
+                }
+                if (state == DENY) {
+                    log.debug("Permission {} denied access for section {} and channel {}", permission, section, channel);
+                    throw new PermissionDeniedException("Group " + group.getName() + " denied access", type);
+                }
+            }
+        }
+        log.debug("Permissions have nothing defined for section {} and channel {}", section, channel);
+        throw new PermissionDeniedException("Permission denied access. No rule given", type);
     }
+
+    public PermissionState checkAccessForSinglePermission(Permission permission, Section section, Channel channel, PermissionType type) {
+        log.trace("Checking Permission {} for section {} and channel {}", permission, section, channel);
+        // Check if the permission has the wanted type or its parent
+        while (true) {
+            if (permission.getPermissions().contains(type))
+                break;
+            var root = type.root();
+            if (root == type) { //reached end of tree
+                return UNKNOWN;
+            } else {
+                type = root;
+            }
+        }
+
+        // Check if we are limited to channel
+        if (permission.getLimitedToChannel() != null && !permission.getLimitedToChannel().isEmpty() &&
+                !permission.getLimitedToChannel().contains(channel))
+            return UNKNOWN;
+
+        // Check if we are limited to sections
+        if (permission.getLimitedToSection() != null && !permission.getLimitedToSection().isEmpty() &&
+                !permission.getLimitedToSection().contains(section))
+            return UNKNOWN;
+
+        // check if negated
+        if (permission.isNegated()) {
+            return DENY;
+        } else {
+            return ALLOW;
+        }
+    }
+
+    public Set<Group> buildGroupContext(@NonNull User user, @Nullable Section section, @Nullable Channel channel) {
+        var groups = new TreeSet<Group>();
+
+        groups.addAll(user.getGroups());
+
+        if (section != null && user.getSectionGroups()!=null) {
+            var sectionGroups = user.getSectionGroups().stream()
+                    .filter(s -> s.getSection().equals(section))
+                    .flatMap(s -> s.getGroups().stream())
+                    .toList();
+                groups.addAll(sectionGroups);
+        }
+        if (channel != null && user.getChannelGroups()!=null) {
+            var channelGroups = user.getChannelGroups().stream()
+                    .filter(s -> s.getChannel().equals(channel))
+                    .flatMap(s -> s.getGroups().stream())
+                    .toList();
+            groups.addAll(channelGroups);
+        }
+        return groups;
+    }
+
+    public enum PermissionState {
+        ALLOW,
+        DENY,
+        UNKNOWN
+    }
+
 }

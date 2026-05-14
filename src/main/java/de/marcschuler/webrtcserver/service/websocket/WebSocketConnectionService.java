@@ -1,11 +1,10 @@
 package de.marcschuler.webrtcserver.service.websocket;
 
-import de.marcschuler.webrtcserver.data.Permission;
 import de.marcschuler.webrtcserver.data.User;
+import de.marcschuler.webrtcserver.data.permission.PermissionType;
 import de.marcschuler.webrtcserver.error.webclient.ClientKickException;
-import de.marcschuler.webrtcserver.error.webclient.PolicyCheckException;
-import de.marcschuler.webrtcserver.service.PolicyService;
-import de.marcschuler.webrtcserver.service.policy.PolicyCheckerContext;
+import de.marcschuler.webrtcserver.error.webclient.PermissionDeniedException;
+import de.marcschuler.webrtcserver.service.PermissionService;
 import de.marcschuler.webrtcserver.webclient.messages.ErrorMessage;
 import de.marcschuler.webrtcserver.webclient.messages.client.ClientServerLeaveEvent;
 import de.marcschuler.webrtcserver.webclient.messages.connection.ClientKickEvent;
@@ -49,7 +48,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
 
     private final ApplicationEventPublisher applicationEventPublisher;
     private final AuthService authService;
-    private final PolicyService policyService;
+    private final PermissionService permissionService;
 
     @Autowired
     @Lazy
@@ -89,7 +88,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
         log.debug("Sending event {} to bus", event.getClass().getSimpleName());
         try {
             applicationEventPublisher.publishEvent(new ClientMessage<>(event, client, LocalDateTime.now()));
-        } catch (PolicyCheckException e) {
+        } catch (PermissionDeniedException e) {
             log.info("User did not have permission to {}: {}", e.getMessage(), e.getMessage());
             log.debug("Exception was", e);
             send(client, new ErrorMessage("No permission for '" + e.getPermissionType() + "'"));
@@ -103,10 +102,10 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
         }
     }
 
-    public void joinChannel(@NonNull WebClient client, @NonNull Channel channel) throws PolicyCheckException {
-        policyService.checkAccess(channel.getPolicies().get(Permission.PermissionType.CHANNEL_JOIN),
-                new PolicyCheckerContext(Permission.PermissionType.CHANNEL_JOIN, client.getUser(),
-                        channel, Map.of()));
+    public void joinChannel(@NonNull WebClient client, @NonNull Channel channel) throws PermissionDeniedException {
+       permissionService.checkAccess(client.getUser(),
+               client.getChannel(),
+               PermissionType.CHANNEL_JOIN);
 
         client.setChannel(channel);
         sendToAll(new ClientChannelJoinEvent(

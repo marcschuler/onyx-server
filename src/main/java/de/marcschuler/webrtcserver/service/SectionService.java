@@ -1,10 +1,9 @@
 package de.marcschuler.webrtcserver.service;
 
 import de.marcschuler.webrtcserver.Util;
-import de.marcschuler.webrtcserver.data.Channel;
 import de.marcschuler.webrtcserver.data.Section;
 import de.marcschuler.webrtcserver.data.Server;
-import de.marcschuler.webrtcserver.dto.data.SectionWriteDTO;
+import de.marcschuler.webrtcserver.dto.data.SectionDTO;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.repository.SectionRepository;
 import de.marcschuler.webrtcserver.repository.ServerRepository;
@@ -37,7 +36,7 @@ public class SectionService {
         return sectionRepository.findById(id);
     }
 
-    public Section create(Server server, SectionWriteDTO sectionWriteDTO) {
+    public Section create(Server server, SectionDTO sectionWriteDTO) {
         var section = serverMapper.mapFromDTO(sectionWriteDTO);
         server.getSections().add(section);
         serverRepository.save(server);
@@ -68,7 +67,7 @@ public class SectionService {
     }
 
 
-    public void update(Section section, SectionWriteDTO sectionDto) {
+    public void update(Section section, SectionDTO sectionDto) {
         log.info("Updating section {}", section.getName());
         serverMapper.update(section, sectionDto);
         this.sectionRepository.save(section);

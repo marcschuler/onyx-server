@@ -2,20 +2,17 @@ package de.marcschuler.webrtcserver.controller.v0;
 
 import de.marcschuler.webrtcserver.OnyxTest;
 import de.marcschuler.webrtcserver.TestService;
-import de.marcschuler.webrtcserver.dto.data.ChannelCreateDTO;
+import de.marcschuler.webrtcserver.dto.data.ChannelDTO;
+import de.marcschuler.webrtcserver.dto.data.SectionDTO;
 import de.marcschuler.webrtcserver.service.SectionService;
 import de.marcschuler.webrtcserver.service.ServerService;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
 import de.marcschuler.webrtcserver.webclient.messages.channel.ChannelCreateEvent;
 import de.marcschuler.webrtcserver.webclient.messages.channel.ChannelDeleteEvent;
 import de.marcschuler.webrtcserver.webclient.messages.channel.ChannelMoveEvent;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import tools.jackson.databind.ObjectMapper;
 
@@ -49,7 +46,8 @@ class ChannelControllerTest {
         assertEquals(1,section.getChannels().size());
 
         log.info("Create channel in section {}", section.getId());
-        var createDTO  =new ChannelCreateDTO(section.getId(),0);
+        var createDTO  =new ChannelDTO();
+        createDTO.setSectionId(section.getId());
         createDTO.setName("New Channel Name");
         var channel = channelController.create(createDTO);
 
@@ -71,7 +69,8 @@ class ChannelControllerTest {
     void testCreateDelete(){
         var section = testService.sectionTalk();
         assertEquals(2,section.getChannels().size());
-        var dto = new ChannelCreateDTO(section.getId(),0);
+        var dto = new ChannelDTO();
+        dto.setSectionId(section.getId());
         dto.setName("New Channel Name");
         var channel = channelController.create(dto);
 

@@ -1,7 +1,5 @@
 package de.marcschuler.webrtcserver.controller.v0;
 
-import de.marcschuler.webrtcserver.data.Permission;
-import de.marcschuler.webrtcserver.data.policy.PolicyItem;
 import de.marcschuler.webrtcserver.dto.AuthChallenge;
 import de.marcschuler.webrtcserver.dto.IceServer;
 import de.marcschuler.webrtcserver.dto.SignedContent;
@@ -48,24 +46,12 @@ public class TodoController {
     public UserSimpleDTO userSimpleDTO(){
         return null;
     }
-    @GetMapping("serverwritabledto")
-    public ServerWriteDTO serverWritableDTO(){
-        return null;
-    }
     @GetMapping("channelExtendedDTO")
     public ChannelExtendedDTO channelExtendedDTO(){
         return null;
     }
     @GetMapping("sectionextendeddto")
     public SectionExtendedDTO sectionExtendedDTO(){
-        return null;
-    }
-    @GetMapping("permissionType")
-    public Permission.PermissionType permissionType(){
-        return null;
-    }
-    @GetMapping("policyItem")
-    public PolicyItem policyItem(){
         return null;
     }
 }

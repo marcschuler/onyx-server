@@ -1,7 +1,6 @@
 package de.marcschuler.webrtcserver.controller.v0;
 
 import de.marcschuler.webrtcserver.dto.data.SectionDTO;
-import de.marcschuler.webrtcserver.dto.data.SectionWriteDTO;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.SectionService;
 import de.marcschuler.webrtcserver.service.ServerService;
@@ -22,13 +21,13 @@ public class SectionController implements OrderableController {
     private final ServerMapper serverMapper;
 
     @PostMapping
-    public SectionDTO create(@RequestBody SectionWriteDTO sectionDto) {
+    public SectionDTO create(@RequestBody SectionDTO sectionDto) {
         var server = serverService.defaultServer();
         return serverMapper.mapToDTO(sectionService.create(server, sectionDto));
     }
 
     @PutMapping("{sectionId}")
-    public SectionDTO edit(@RequestBody SectionWriteDTO sectionDto, @PathVariable UUID sectionId) {
+    public SectionDTO edit(@RequestBody SectionDTO sectionDto, @PathVariable UUID sectionId) {
         var section = sectionService.findById(sectionId).orElseThrow();
         sectionService.update(section, sectionDto);
         return serverMapper.mapToDTO(section);

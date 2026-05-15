@@ -6,6 +6,7 @@ import de.marcschuler.webrtcserver.data.message.MarkdownMessageContent;
 import de.marcschuler.webrtcserver.data.message.MessageContent;
 import de.marcschuler.webrtcserver.data.Channel;
 import de.marcschuler.webrtcserver.data.permission.PermissionType;
+import de.marcschuler.webrtcserver.dto.GroupCreateDTO;
 import de.marcschuler.webrtcserver.dto.PermissionDTO;
 import de.marcschuler.webrtcserver.dto.data.GroupDTO;
 import de.marcschuler.webrtcserver.dto.data.ServerDTO;
@@ -64,13 +65,13 @@ public class ServerService {
 
 
         var permissionsAdmin = new PermissionDTO();
-        permissionsAdmin.setPermissions(Set.of(PermissionType.SERVER, PermissionType.SECTION, PermissionType.CHANNEL));
+        permissionsAdmin.setPermissions(List.of(PermissionType.SERVER, PermissionType.SECTION, PermissionType.CHANNEL));
 
         var permissionsMod = new PermissionDTO();
-        permissionsMod.setPermissions(Set.of(PermissionType.SECTION, PermissionType.CHANNEL));
-        var group1 = groupService.create(new GroupDTO(null, "Admin", "You can do anything \uD83D\uDE0E", null, null, List.of(permissionsAdmin), true));
-        var group2 = groupService.create(new GroupDTO(null, "Mod", "Manage your server and your user", null, null, List.of(permissionsMod), true));
-        var group3 = groupService.create(new GroupDTO(null, "User", "Default group for known users", null, null, List.of(), false));
+        permissionsMod.setPermissions(List.of(PermissionType.SECTION, PermissionType.CHANNEL));
+        var group1 = groupService.create(new GroupCreateDTO("Admin", "You can do anything \uD83D\uDE0E"));
+        var group2 = groupService.create(new GroupCreateDTO("Mod", "Manage your server and your user"));
+        var group3 = groupService.create(new GroupCreateDTO("User", "Default group for known users"));
 
         server.setGroups(List.of(group1, group2, group3));
 

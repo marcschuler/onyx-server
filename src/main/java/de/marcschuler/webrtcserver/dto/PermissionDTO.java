@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -19,9 +20,9 @@ public class PermissionDTO {
     private UUID id;
 
     @NotNull
-    private Set<PermissionType> permissions;
+    private List<PermissionType> permissions;
     @NotNull
     private boolean negated;
-    private Set<UUID> limitedToSection;
-    private Set<UUID> limitedToChannel;
+    private List<UUID> limitedToSection;
+    private List<UUID> limitedToChannel;
 }

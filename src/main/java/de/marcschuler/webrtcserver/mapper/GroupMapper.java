@@ -4,27 +4,34 @@ import de.marcschuler.webrtcserver.data.Channel;
 import de.marcschuler.webrtcserver.data.Group;
 import de.marcschuler.webrtcserver.data.Section;
 import de.marcschuler.webrtcserver.data.permission.Permission;
+import de.marcschuler.webrtcserver.dto.GroupCreateDTO;
 import de.marcschuler.webrtcserver.dto.PermissionDTO;
 import de.marcschuler.webrtcserver.dto.data.GroupDTO;
 import de.marcschuler.webrtcserver.service.ChannelService;
 import de.marcschuler.webrtcserver.service.SectionService;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 import java.util.*;
 import java.util.stream.Collectors;
-@Mapper(componentModel = "spring", subclassExhaustiveStrategy = SubclassExhaustiveStrategy.RUNTIME_EXCEPTION, uses = ServerMapper.class)
+
+@Mapper(componentModel = "spring", subclassExhaustiveStrategy = SubclassExhaustiveStrategy.RUNTIME_EXCEPTION)
 public abstract class GroupMapper {
 
     @Autowired
+    @Lazy
     protected ChannelService channelService;
     @Autowired
+    @Lazy
     protected SectionService sectionService;
 
     public abstract List<GroupDTO> mapToDTO(Set<Group> groups);
 
     @Mapping(target = "permissions", qualifiedByName = "permissionFromDTO")
     public abstract Group mapFromDTO(GroupDTO groupDTO);
+
+    public abstract Group mapFromDTO(GroupCreateDTO groupCreateDTO);
 
     @Mapping(target = "permissions", qualifiedByName = "permissionFromDTO")
     public abstract Group update(@MappingTarget Group group, GroupDTO groupDTO);
@@ -49,7 +56,7 @@ public abstract class GroupMapper {
     // --- helpers ---
 
     @Named("uuidsToSections")
-    protected Set<Section> uuidsToSections(Set<UUID> uuids) {
+    protected Set<Section> uuidsToSections(List<UUID> uuids) {
         if (uuids == null || uuids.isEmpty()) return Collections.emptySet();
         return uuids.stream()
                 .map(sectionService::get)
@@ -58,7 +65,7 @@ public abstract class GroupMapper {
     }
 
     @Named("uuidsToChannels")
-    protected Set<Channel> uuidsToChannels(Set<UUID> uuids) {
+    protected Set<Channel> uuidsToChannels(List<UUID> uuids) {
         if (uuids == null || uuids.isEmpty()) return Collections.emptySet();
         return uuids.stream()
                 .map(channelService::get)
@@ -67,18 +74,18 @@ public abstract class GroupMapper {
     }
 
     @Named("sectionsToUuids")
-    protected Set<UUID> sectionsToUuids(Set<Section> sections) {
-        if (sections == null || sections.isEmpty()) return Collections.emptySet();
+    protected List<UUID> sectionsToUuids(Set<Section> sections) {
+        if (sections == null || sections.isEmpty()) return Collections.emptyList();
         return sections.stream()
                 .map(Section::getId)
-                .collect(Collectors.toSet());
+                .toList();
     }
 
     @Named("channelsToUuids")
-    protected Set<UUID> channelsToUuids(Set<Channel> channels) {
-        if (channels == null || channels.isEmpty()) return Collections.emptySet();
+    protected List<UUID> channelsToUuids(Set<Channel> channels) {
+        if (channels == null || channels.isEmpty()) return Collections.emptyList();
         return channels.stream()
                 .map(Channel::getId)
-                .collect(Collectors.toSet());
+                .toList();
     }
 }

@@ -2,6 +2,7 @@ package de.marcschuler.webrtcserver.controller.v0;
 
 import de.marcschuler.webrtcserver.OnyxTest;
 import de.marcschuler.webrtcserver.TestService;
+import de.marcschuler.webrtcserver.dto.ChannelCreateDTO;
 import de.marcschuler.webrtcserver.dto.data.ChannelDTO;
 import de.marcschuler.webrtcserver.dto.data.SectionDTO;
 import de.marcschuler.webrtcserver.service.SectionService;
@@ -46,7 +47,7 @@ class ChannelControllerTest {
         assertEquals(1,section.getChannels().size());
 
         log.info("Create channel in section {}", section.getId());
-        var createDTO  =new ChannelDTO();
+        var createDTO  =new ChannelCreateDTO();
         createDTO.setSectionId(section.getId());
         createDTO.setName("New Channel Name");
         var channel = channelController.create(createDTO);
@@ -69,7 +70,7 @@ class ChannelControllerTest {
     void testCreateDelete(){
         var section = testService.sectionTalk();
         assertEquals(2,section.getChannels().size());
-        var dto = new ChannelDTO();
+        var dto = new ChannelCreateDTO();
         dto.setSectionId(section.getId());
         dto.setName("New Channel Name");
         var channel = channelController.create(dto);

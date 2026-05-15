@@ -1,5 +1,6 @@
 package de.marcschuler.webrtcserver.controller.v0;
 
+import de.marcschuler.webrtcserver.dto.ChannelCreateDTO;
 import de.marcschuler.webrtcserver.dto.data.ChannelDTO;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.ChannelService;
@@ -28,9 +29,9 @@ public class ChannelController implements OrderableController {
     }
 
     @PostMapping
-    public ChannelDTO create(@RequestBody ChannelDTO channelDTO) {
-        var section = sectionService.get(channelDTO.getSectionId()).orElseThrow();
-        var channel = channelService.create(channelDTO.getName(), section);
+    public ChannelDTO create(@RequestBody ChannelCreateDTO channelCreateDTO) {
+        var section = sectionService.get(channelCreateDTO.getSectionId()).orElseThrow();
+        var channel = channelService.create(channelCreateDTO.getName(), section);
         return serverMapper.mapToDTO(channel);
     }
 

@@ -1,6 +1,7 @@
 package de.marcschuler.webrtcserver.service;
 
 import de.marcschuler.webrtcserver.data.Group;
+import de.marcschuler.webrtcserver.dto.GroupCreateDTO;
 import de.marcschuler.webrtcserver.dto.data.GroupDTO;
 import de.marcschuler.webrtcserver.mapper.GroupMapper;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
@@ -20,8 +21,8 @@ public class GroupService {
 
     private final GroupMapper groupMapper;
 
-    public Group create(GroupDTO groupDTO) {
-        var group = groupMapper.mapFromDTO(groupDTO);
+    public Group create(GroupCreateDTO groupCreateDTO) {
+        var group = groupMapper.mapFromDTO(groupCreateDTO);
         return groupRepository.save(group);
     }
 

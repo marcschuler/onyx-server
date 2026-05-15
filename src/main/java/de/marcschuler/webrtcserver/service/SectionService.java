@@ -3,6 +3,7 @@ package de.marcschuler.webrtcserver.service;
 import de.marcschuler.webrtcserver.Util;
 import de.marcschuler.webrtcserver.data.Section;
 import de.marcschuler.webrtcserver.data.Server;
+import de.marcschuler.webrtcserver.dto.SectionCreateDTO;
 import de.marcschuler.webrtcserver.dto.data.SectionDTO;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.repository.SectionRepository;
@@ -36,13 +37,13 @@ public class SectionService {
         return sectionRepository.findById(id);
     }
 
-    public Section create(Server server, SectionDTO sectionWriteDTO) {
-        var section = serverMapper.mapFromDTO(sectionWriteDTO);
+    public Section create(Server server, SectionCreateDTO sectionCreateDTO) {
+        var section = serverMapper.mapFromDTO(sectionCreateDTO);
         server.getSections().add(section);
         serverRepository.save(server);
 
         webSocketConnectionService.sendToAll(
-                new SectionCreateEvent(serverMapper.mapToDTO(section),
+                new SectionCreateEvent(serverMapper.mapToDTOExtended(section),
                         server.getSections().indexOf(section))
         );
 

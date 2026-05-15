@@ -1,5 +1,6 @@
 package de.marcschuler.webrtcserver.controller.v0;
 
+import de.marcschuler.webrtcserver.dto.GroupCreateDTO;
 import de.marcschuler.webrtcserver.dto.data.GroupDTO;
 import de.marcschuler.webrtcserver.mapper.GroupMapper;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
@@ -29,8 +30,8 @@ public class GroupController {
     }
 
     @PostMapping
-    public GroupDTO create(@RequestBody GroupDTO groupWriteDTO) {
-        var group = groupService.create(groupWriteDTO);
+    public GroupDTO create(@RequestBody GroupCreateDTO groupCreateDTO) {
+        var group = groupService.create(groupCreateDTO);
         return groupMapper.mapToDTO(group);
     }
 

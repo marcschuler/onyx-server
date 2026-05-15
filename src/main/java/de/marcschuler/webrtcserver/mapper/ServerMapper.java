@@ -50,7 +50,8 @@ public abstract class ServerMapper {
     /**
      * SECTIONS
      */
-    public abstract Section mapFromDTO(SectionDTO channel);
+    public abstract Section mapFromDTO(SectionDTO sectionDTO);
+    public abstract Section mapFromDTO(SectionCreateDTO sectionCreateDTO);
 
     public abstract SectionDTO mapToDTO(Section section);
 

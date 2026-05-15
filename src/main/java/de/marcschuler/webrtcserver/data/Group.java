@@ -27,7 +27,7 @@ public class Group implements Comparable<Group> {
     private List<Group> inheritsFrom;
 
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private List<Permission> permissions;
 
     private boolean label = true;

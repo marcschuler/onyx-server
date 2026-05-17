@@ -1,7 +1,8 @@
 package de.marcschuler.webrtcserver.webclient.handler;
 
-import de.marcschuler.webrtcserver.mapper.ServerMapper;
+import de.marcschuler.webrtcserver.data.permission.PermissionType;
 import de.marcschuler.webrtcserver.service.ChannelService;
+import de.marcschuler.webrtcserver.service.PermissionService;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
 import de.marcschuler.webrtcserver.webclient.ClientMessage;
 import de.marcschuler.webrtcserver.webclient.messages.client.ClientChannelJoinRequest;
@@ -19,17 +20,16 @@ public class ClientHandler {
 
     private final WebSocketConnectionService webSocketConnectionService;
     private final ChannelService channelService;
+    private final PermissionService permissionService;
 
     @EventListener
     @Transactional
     public void onChannelJoinRequest(ClientMessage<ClientChannelJoinRequest> event) {
         log.info("User {} wants to join channel {}", event.getClient().getUser().getUsername(), event.getBody().getChannelId());
-        var currentChannel = event.getClient().getChannel();
         var wantedChannel = channelService.get(event.getBody().getChannelId()).orElseThrow();
-        if (currentChannel != null && currentChannel.getId().equals(wantedChannel.getId())) {
-            log.info("Client wanted to join already used channel");
-            return;
-        }
+        
+        permissionService.checkClientAccess(event.getClient(), wantedChannel, PermissionType.CHANNEL_JOIN);
+
         webSocketConnectionService.joinChannel(event.getClient(), wantedChannel);
     }
 

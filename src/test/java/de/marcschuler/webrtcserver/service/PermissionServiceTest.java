@@ -5,6 +5,7 @@ import de.marcschuler.webrtcserver.TestService;
 import de.marcschuler.webrtcserver.data.User;
 import de.marcschuler.webrtcserver.data.permission.PermissionType;
 import de.marcschuler.webrtcserver.error.webclient.PermissionDeniedException;
+import de.marcschuler.webrtcserver.webclient.WebClient;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,14 +27,18 @@ class PermissionServiceTest {
     @Test
     void testNoPermission() {
         assertThrows(PermissionDeniedException.class, () -> {
-           permissionService.checkAccess(new User(),null,null,PermissionType.CHANNEL);
+            var client = new WebClient(null);
+            client.setUser(new User());
+            permissionService.checkClientAccess(client, null, null, PermissionType.CHANNEL);
         });
     }
 
     @Test
     void testNoPermissionInChannel() {
         assertThrows(PermissionDeniedException.class, () -> {
-            permissionService.checkAccess(new User(),testService.sectionLobby(),testService.channelLobby(),PermissionType.CHANNEL);
+            var client = new WebClient(null);
+            client.setUser(new User());
+            permissionService.checkClientAccess(client, testService.sectionLobby(), testService.channelLobby(), PermissionType.CHANNEL);
         });
     }
 
@@ -45,7 +50,9 @@ class PermissionServiceTest {
 
     @Test
     void testAdminAccess() {
-        permissionService.checkAccess(testService.userAdmin(), null, null, PermissionType.CHANNEL_DELETE);
+        var client = new WebClient(null);
+        client.setUser(testService.userAdmin());
+        permissionService.checkClientAccess(client, null, null, PermissionType.CHANNEL_DELETE);
     }
 
 }

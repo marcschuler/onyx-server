@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -56,25 +57,62 @@ public class ServerService {
 
     @Transactional
     public Server generateDefault() {
+        /**
+         * BASIC SERVER
+         */
         var keys = cryptoService.generateKeyPair();
-
         var server = new Server();
         server.setName("Onyx Server");
-        server.setKeys(keys); // assuming keys is already defined
-        server.setDescription(List.of(new MarkdownMessageContent("This is the default server description.")));
+        server.setKeys(keys);
+        server.setDescription(List.of(
+                new MarkdownMessageContent("""
+                        # ONYX
+                        Welcome to your self hosted onyx server instance \uD83E\uDEA8"""),
+                new MarkdownMessageContent("""
+                        ## Admin Rights
+                        To gain admin access, a invite code was provided in the log during first startup. Click on your user settings in the bottom left corner and enter the code.
+                        
+                        The code can only be used for one account and expires in 14 days."""),
+                new MarkdownMessageContent("""
+                        ## Documentation
+                        
+                        - TODO: Link to our administrator documentation""")));
 
 
+        /**
+         * GROUPS & PERMISSIONS
+         */
         var permissionsAdmin = new PermissionDTO();
-        permissionsAdmin.setPermissions(List.of(PermissionType.SERVER, PermissionType.SECTION, PermissionType.CHANNEL));
+        permissionsAdmin.setPermissions(List.of(PermissionType.SERVER, PermissionType.SECTION, PermissionType.CHANNEL, PermissionType.USER, PermissionType.SELF));
 
         var permissionsMod = new PermissionDTO();
-        permissionsMod.setPermissions(List.of(PermissionType.SECTION, PermissionType.CHANNEL));
-        var group1 = groupService.create(new GroupCreateDTO("Admin", "You can do anything \uD83D\uDE0E"));
-        var group2 = groupService.create(new GroupCreateDTO("Mod", "Manage your server and your user"));
-        var group3 = groupService.create(new GroupCreateDTO("User", "Default group for known users"));
+        permissionsMod.setPermissions(List.of(PermissionType.SECTION, PermissionType.CHANNEL, PermissionType.USER_KICK, PermissionType.USER_ACTIVATE, PermissionType.SELF));
 
-        server.setGroups(List.of(group1, group2, group3));
+        var permissionsUser = new PermissionDTO();
+        permissionsUser.setPermissions(List.of(PermissionType.SELF));
+        var groupAdmin = groupService.create(new GroupCreateDTO("Admin", "You can do anything \uD83D\uDE0E"));
+        var groupMod = groupService.create(new GroupCreateDTO("Mod", "Manage your server and your user"));
+        var groupUser = groupService.create(new GroupCreateDTO("User", "Default group for known users"));
 
+        server.setGroups(List.of(groupAdmin, groupMod, groupUser));
+
+        var adminInvite = new Invite();
+        adminInvite.setCode(Util.randomCode(16));
+        adminInvite.setTitle("Admin Invite");
+        adminInvite.setUsages(1);
+        adminInvite.setEndDate(LocalDateTime.now().plusDays(14));
+        adminInvite.setGroups(List.of(groupAdmin));
+
+        server.setInvites(List.of(adminInvite));
+        log.info(" ---------- ADMIN CODE ----------");
+        log.info("Your Admin Invite Code is: {}", adminInvite.getCode());
+        log.info("Enter it in your app. Do not share it with anyone");
+        log.info(" ---------- ADMIN CODE ----------");
+
+
+        /**
+         * SECTIONS & CHANNELS
+         */
         var section1 = new Section();
         section1.setName("Lobby");
         section1.setServer(server);
@@ -123,6 +161,9 @@ public class ServerService {
         section2.setChannels(List.of(channel2, channel3));
         section3.setChannels(List.of(channel4, channel5, channel6));
 
+        /**
+         * SAVE
+         */
         return serverRepository.save(server);
 
     }

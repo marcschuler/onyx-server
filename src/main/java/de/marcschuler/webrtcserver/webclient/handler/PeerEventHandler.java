@@ -26,7 +26,7 @@ public class PeerEventHandler {
     private final WebSocketConnectionService webSocketConnectionService;
 
     @EventListener
-    public void onOffer(ClientMessage<PeerOffer> event) throws IOException {
+    public void onOffer(ClientMessage<PeerOffer> event) {
         var clientFrom = event.getClient().getUser().getUsername();
         log.info("Forwarding peer offer from {} to {}", clientFrom, event.getBody().getClientTo());
         var clientTo = webSocketConnectionService.clientFromKeyId(event.getBody().getClientTo()).get();
@@ -36,7 +36,7 @@ public class PeerEventHandler {
         var clientFromChannel = event.getClient().getChannel();
         var clientToChannel = clientTo.getChannel();
         if (clientToChannel == null || !clientToChannel.equals(clientFromChannel)) {
-            log.warn("Clients try to connect to each other without being in the same channel {}<->{}", clientFromChannel, clientToChannel);
+            log.warn("Client tried to connect without being in the same channel {}<->{}", clientFromChannel, clientToChannel);
         }
         webSocketConnectionService.send(clientTo, forwardEvent);
     }
@@ -51,7 +51,7 @@ public class PeerEventHandler {
         var clientFromChannel = event.getClient().getChannel();
         var clientToChannel = clientTo.getChannel();
         if (clientToChannel == null || !clientToChannel.equals(clientFromChannel)) {
-            log.warn("Clients try to connect to each other without being in the same channel {}<->{}", clientFromChannel, clientToChannel);
+            log.warn("Client tried to answer without being in the same channel {}<->{}", clientFromChannel, clientToChannel);
         }
         webSocketConnectionService.send(clientTo, forwardEvent);
     }

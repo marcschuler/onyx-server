@@ -1,10 +1,11 @@
 package de.marcschuler.webrtcserver.controller.v0;
 
+import de.marcschuler.webrtcserver.data.permission.PermissionType;
 import de.marcschuler.webrtcserver.dto.GroupCreateDTO;
 import de.marcschuler.webrtcserver.dto.data.GroupDTO;
 import de.marcschuler.webrtcserver.mapper.GroupMapper;
-import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.GroupService;
+import de.marcschuler.webrtcserver.service.PermissionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import java.util.UUID;
 public class GroupController {
 
     private final GroupService groupService;
+    private final PermissionService permissionService;
 
     private final GroupMapper groupMapper;
 
@@ -31,12 +33,16 @@ public class GroupController {
 
     @PostMapping
     public GroupDTO create(@RequestBody GroupCreateDTO groupCreateDTO) {
+        permissionService.checkControllerAccess(null, PermissionType.SERVER_GROUP_CREATE);
+
         var group = groupService.create(groupCreateDTO);
         return groupMapper.mapToDTO(group);
     }
 
     @PutMapping("{id}")
     public GroupDTO edit(@PathVariable UUID id, @RequestBody GroupDTO groupWriteDTO) {
+        permissionService.checkControllerAccess(null, PermissionType.SERVER_GROUP_EDIT);
+
         var group = groupService.get(id).orElseThrow();
         groupService.edit(group, groupWriteDTO);
         return groupMapper.mapToDTO(group);
@@ -44,6 +50,8 @@ public class GroupController {
 
     @DeleteMapping("{id}")
     public void delete(@PathVariable UUID id) {
+        permissionService.checkControllerAccess(null, PermissionType.SERVER_GROUP_DELETE);
+
         var group = groupService.get(id).orElseThrow();
         groupService.delete(group);
     }

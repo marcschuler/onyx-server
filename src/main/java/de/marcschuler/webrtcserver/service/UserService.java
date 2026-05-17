@@ -9,6 +9,7 @@ import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
 import de.marcschuler.webrtcserver.webclient.KickReason;
 import de.marcschuler.webrtcserver.webclient.messages.client.ClientChangeEvent;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -53,7 +54,7 @@ public class UserService {
      *
      * @param user the user to ban
      */
-    public void ban(User user, String message) {
+    public void ban(User user, @Nullable  String message) {
         log.info("Banning user {}", user.getId());
         user.setState(ClientState.BANNED);
         save(user);

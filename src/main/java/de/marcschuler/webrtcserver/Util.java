@@ -1,5 +1,6 @@
 package de.marcschuler.webrtcserver;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
@@ -36,5 +37,9 @@ public class Util {
             return;
         var obj = list.remove(currentOrder);
         list.add(newOrder, obj);
+    }
+
+    public static String randomCode(int length){
+       return RandomStringUtils.secureStrong().nextAlphanumeric(length);
     }
 }

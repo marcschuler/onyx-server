@@ -34,6 +34,7 @@ public class ChatController {
     @Transactional(readOnly = true)
     public Page<MessageDTO> messages(@PathVariable UUID id, Pageable page) {
         var chat = chatService.chatById(id).orElseThrow();
+
         return chatService.page(chat, page)
                 .map(messageMapper::mapToDTO);
     }

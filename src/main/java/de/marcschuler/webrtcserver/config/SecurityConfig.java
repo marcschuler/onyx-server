@@ -1,12 +1,15 @@
 package de.marcschuler.webrtcserver.config;
 
 import com.nimbusds.jose.JOSEException;
+import de.marcschuler.webrtcserver.data.User;
 import de.marcschuler.webrtcserver.service.AuthService;
+import de.marcschuler.webrtcserver.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -46,6 +49,7 @@ public class SecurityConfig {
     public static class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         private final AuthService authService;
+        private final UserService userService;
 
         @Override
         protected void doFilterInternal(
@@ -61,23 +65,26 @@ public class SecurityConfig {
                 filterChain.doFilter(request, response);
                 return;
             }
-            String subject;
+            String userId;
             try {
-                subject = authService.verifyJWT(token);
+                userId = authService.verifyJWT(token);
             } catch (JOSEException | ParseException e) {
                 throw new RuntimeException(e);
             }
-            //TODO get permissions
 
             Authentication auth =
                     new UsernamePasswordAuthenticationToken(
-                            subject,
+                            new AuthenticatedUser(userService.findById(userId).orElseThrow()),
                             null,
-                            List.of() //TODO set permissions
+                            List.of()
                     );
 
             SecurityContextHolder.getContext().setAuthentication(auth);
             filterChain.doFilter(request, response);
         }
+    }
+
+    public record AuthenticatedUser(@NonNull User user) {
+
     }
 }

@@ -120,7 +120,7 @@ public class UserController {
 
 
     @PostMapping(value = "{id}/profile/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public FileDTO uploadMedia(@PathVariable String id, @RequestParam("file") MultipartFile file, @AuthenticationPrincipal SecurityConfig.AuthenticatedUser authUser) throws IOException {
+    public FileDTO avatarUpload(@PathVariable String id, @RequestParam("file") MultipartFile file, @AuthenticationPrincipal SecurityConfig.AuthenticatedUser authUser) throws IOException {
         if (authUser.user().getId().equals(id)) {
             permissionService.checkControllerAccess(null, null, PermissionType.SELF_AVATAR);
         } else {
@@ -145,6 +145,10 @@ public class UserController {
         }
 
         var user = userService.findById(id).orElseThrow();
+
+        if (user.getAvatar() == null)
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User has no avatar");
+
         userService.setUserAvatar(user, null);
     }
 }

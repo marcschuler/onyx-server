@@ -20,6 +20,9 @@ public class ServerDTO  {
 
     @NotNull
     private String name;
+
+    private FileDTO icon;
+
     @NotNull
     private Map<String,Object> publicKey;
     @NotNull

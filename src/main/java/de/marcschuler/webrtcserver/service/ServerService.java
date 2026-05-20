@@ -2,9 +2,11 @@ package de.marcschuler.webrtcserver.service;
 
 import de.marcschuler.webrtcserver.Util;
 import de.marcschuler.webrtcserver.data.*;
+import de.marcschuler.webrtcserver.data.file.File;
 import de.marcschuler.webrtcserver.data.message.MarkdownMessageContent;
 import de.marcschuler.webrtcserver.data.message.MessageContent;
 import de.marcschuler.webrtcserver.data.Channel;
+import de.marcschuler.webrtcserver.data.permission.Permission;
 import de.marcschuler.webrtcserver.data.permission.PermissionType;
 import de.marcschuler.webrtcserver.dto.GroupCreateDTO;
 import de.marcschuler.webrtcserver.dto.PermissionDTO;
@@ -67,32 +69,39 @@ public class ServerService {
         server.setDescription(List.of(
                 new MarkdownMessageContent("""
                         # ONYX
-                        Welcome to your self hosted onyx server instance \uD83E\uDEA8"""),
+                        You're running your own self-hosted ONYX server instance \uD83E\uDEA8"""),
                 new MarkdownMessageContent("""
-                        ## Admin Rights
-                        To gain admin access, a invite code was provided in the log during first startup. Click on your user settings in the bottom left corner and enter the code.
+                        ## Admin Access
+                        An invite code was printed to the server log on first startup.
                         
-                        The code can only be used for one account and expires in 14 days."""),
+                        To redeem it, open your **user settings** (bottom-left corner) and enter the code there.
+                        
+                        > The code is single-use and expires after 14 days."""),
                 new MarkdownMessageContent("""
                         ## Documentation
                         
-                        - TODO: Link to our administrator documentation""")));
+                        - Administrator docs coming soon""")));
 
 
         /**
          * GROUPS & PERMISSIONS
          */
-        var permissionsAdmin = new PermissionDTO();
-        permissionsAdmin.setPermissions(List.of(PermissionType.SERVER, PermissionType.SECTION, PermissionType.CHANNEL, PermissionType.USER, PermissionType.SELF));
+        var permissionsAdmin = new Permission();
+        permissionsAdmin.setPermissions(Set.of(PermissionType.SERVER, PermissionType.SECTION, PermissionType.CHANNEL, PermissionType.USER, PermissionType.SELF));
 
-        var permissionsMod = new PermissionDTO();
-        permissionsMod.setPermissions(List.of(PermissionType.SECTION, PermissionType.CHANNEL, PermissionType.USER_KICK, PermissionType.USER_ACTIVATE, PermissionType.SELF));
+        var permissionsMod = new Permission();
+        permissionsMod.setPermissions(Set.of(PermissionType.SECTION, PermissionType.CHANNEL, PermissionType.USER_KICK, PermissionType.USER_ACTIVATE, PermissionType.SELF));
 
-        var permissionsUser = new PermissionDTO();
-        permissionsUser.setPermissions(List.of(PermissionType.SELF));
+        var permissionsUser = new Permission();
+        permissionsUser.setPermissions(Set.of(PermissionType.SELF, PermissionType.CHANNEL_JOIN));
+
         var groupAdmin = groupService.create(new GroupCreateDTO("Admin", "You can do anything \uD83D\uDE0E"));
         var groupMod = groupService.create(new GroupCreateDTO("Mod", "Manage your server and your user"));
         var groupUser = groupService.create(new GroupCreateDTO("User", "Default group for known users"));
+
+        groupAdmin.setPermissions(List.of(permissionsAdmin));
+        groupMod.setPermissions(List.of(permissionsMod));
+        groupUser.setPermissions(List.of(permissionsUser));
 
         server.setGroups(List.of(groupAdmin, groupMod, groupUser));
 
@@ -210,6 +219,12 @@ public class ServerService {
 
     public void orderDescription(Server server, MessageContent content, int newOrder) {
         Util.reorder(server.getDescription(), content, newOrder);
+        serverRepository.save(server);
+        sendUpdate(server);
+    }
+
+    public void setIcon(Server server, File f) {
+        server.setIcon(f);
         serverRepository.save(server);
         sendUpdate(server);
     }

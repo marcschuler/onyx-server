@@ -1,10 +1,7 @@
 package de.marcschuler.webrtcserver.service;
 
 import de.marcschuler.webrtcserver.config.SecurityConfig;
-import de.marcschuler.webrtcserver.data.Channel;
-import de.marcschuler.webrtcserver.data.Group;
-import de.marcschuler.webrtcserver.data.Section;
-import de.marcschuler.webrtcserver.data.User;
+import de.marcschuler.webrtcserver.data.*;
 import de.marcschuler.webrtcserver.data.permission.Permission;
 import de.marcschuler.webrtcserver.data.permission.PermissionType;
 import de.marcschuler.webrtcserver.error.webclient.PermissionDeniedException;
@@ -65,6 +62,14 @@ public class PermissionService {
      * @param type
      */
     private void checkAccess(@NonNull User user, @Nullable Section section, @Nullable Channel channel, @NonNull PermissionType type) {
+        if (user.getState() == ClientState.BANNED) {
+            log.warn("User {} has been banned", user.getUsername());
+            throw new PermissionDeniedException("User is banned", null);
+        }
+        if (user.getState() == ClientState.PENDING_ACCESS) {
+            throw new PermissionDeniedException("User is pending access", null);
+        }
+
         var groups = buildGroupContext(user, section, channel);
 
         for (var group : groups) {
@@ -81,7 +86,7 @@ public class PermissionService {
             }
         }
         log.debug("Permissions have nothing defined for section {} and channel {}", section, channel);
-        throw new PermissionDeniedException("Permission denied access. No rule given", type);
+        throw new PermissionDeniedException("Permission denied access. No Group.", type);
     }
 
     public PermissionState checkAccessForSinglePermission(Permission permission, Section section, Channel channel, PermissionType type) {

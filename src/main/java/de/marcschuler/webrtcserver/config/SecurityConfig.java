@@ -1,6 +1,7 @@
 package de.marcschuler.webrtcserver.config;
 
 import com.nimbusds.jose.JOSEException;
+import de.marcschuler.webrtcserver.data.ClientState;
 import de.marcschuler.webrtcserver.data.User;
 import de.marcschuler.webrtcserver.service.AuthService;
 import de.marcschuler.webrtcserver.service.UserService;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -72,9 +75,14 @@ public class SecurityConfig {
                 throw new RuntimeException(e);
             }
 
+            var user = userService.findById(userId).orElseThrow();
+
+            if (user.getState() == ClientState.BANNED)
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+
             Authentication auth =
                     new UsernamePasswordAuthenticationToken(
-                            new AuthenticatedUser(userService.findById(userId).orElseThrow()),
+                            new AuthenticatedUser(user),
                             null,
                             List.of()
                     );

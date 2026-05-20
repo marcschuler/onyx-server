@@ -2,6 +2,7 @@ package de.marcschuler.webrtcserver.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nimbusds.jose.jwk.OctetKeyPair;
+import de.marcschuler.webrtcserver.data.file.File;
 import de.marcschuler.webrtcserver.data.message.MarkdownMessageContent;
 import de.marcschuler.webrtcserver.data.message.MessageContent;
 import jakarta.persistence.*;
@@ -24,6 +25,9 @@ public class Server {
     private UUID id;
     @Size(min = 3, max = 64)
     private String name;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    private File icon;
 
     @OneToMany(
             cascade = CascadeType.ALL,

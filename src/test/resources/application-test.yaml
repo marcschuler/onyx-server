@@ -11,3 +11,7 @@ logging:
 onyx:
   init:
     startup-wizzard: false
+  storage:
+    path: target/test
+    files: ${onyx.storage.path}/files
+    previewFiles: ${onyx.storage.path}/preview

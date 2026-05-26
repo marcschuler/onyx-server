@@ -85,15 +85,7 @@ public class AuthHandler {
             return;
         }
         var user = userService.findById(keyId)
-                .orElseGet(() -> {
-                    log.info("New user connected: {} ({})", keyId, username);
-                    var u = new User();
-                    u.setId(keyId);
-                    u.setPublicKey(publicKey);
-                    u.setKnownSince(Instant.now());
-                    u.setState(ClientState.ACTIVE);
-                    return u;
-                });
+                .orElseGet(() -> userService.registerUser(username,publicKey));
         log.info("User connected: {} ({} formerly known as {})", keyId, username, user.getUsername());
         if (user.getState() == ClientState.BANNED) {
             throw new ClientKickException("User is already banned", KickReason.BANNED);

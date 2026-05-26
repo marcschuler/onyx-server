@@ -27,6 +27,12 @@ public class ErrorHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
+    @ExceptionHandler(FilePreviewException.class)
+    public ResponseEntity<ProblemDetail> handleFilePreviewException(FilePreviewException ex) {
+        log.error("Could not generate preview", ex);
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+    }
+
     @ExceptionHandler
     public ResponseEntity<ProblemDetail> handleExpiredJWT(ExpiredJwtException ex) {
         log.error("Expired JWT exception", ex);

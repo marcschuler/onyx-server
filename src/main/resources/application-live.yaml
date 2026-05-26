@@ -2,8 +2,12 @@ spring:
   #datasource:
     #url: jdbc:h2:mem:webrtc
   jpa:
-    show-sql: true
+    show-sql: false
 
 onyx:
   storage:
     path: ./data
+
+logging:
+  level:
+    de.marcschuler: TRACE

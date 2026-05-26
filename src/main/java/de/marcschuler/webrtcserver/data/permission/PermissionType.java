@@ -37,6 +37,11 @@ public enum PermissionType {
     CHANNEL_EDIT,
     CHANNEL_DELETE,
 
+    CHANNEL_CHAT,
+    CHANNEL_CHAT_WRITE,
+    CHANNEL_CHAT_READ,
+
+
     CHANNEL_USER_KICK,
 
     /*
@@ -54,10 +59,7 @@ public enum PermissionType {
         SELF - things users should do
      */
     SELF,
-    SELF_AVATAR
-
-
-    ;
+    SELF_AVATAR;
 
 
     /**

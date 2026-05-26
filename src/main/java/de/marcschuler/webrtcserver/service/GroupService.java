@@ -43,4 +43,8 @@ public class GroupService {
     public List<Group> all() {
         return groupRepository.findAll();
     }
+
+    public List<Group> getGroupsDefaultForNewUser() {
+        return groupRepository.findGroupByDefaultForNewUsersIsTrue();
+    }
 }

@@ -1,20 +1,17 @@
 package de.marcschuler.webrtcserver.controller.v0;
 
 
+import de.marcschuler.webrtcserver.data.file.PreviewFormat;
 import de.marcschuler.webrtcserver.dto.data.FileDTO;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.StorageService;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.http.fileupload.FileUploadException;
-import org.springframework.http.ContentDisposition;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.UUID;
 
 @RestController
@@ -31,6 +28,12 @@ public class StorageController {
     public ResponseEntity<byte[]> file(@PathVariable UUID fileId) throws IOException {
         var file = storageService.get(fileId).orElseThrow();
         return storageService.buildResponse(file);
+    }
+
+    @GetMapping("{fileId}/preview/{format}")
+    public ResponseEntity<byte[]> filePreview(@PathVariable UUID fileId, @PathVariable PreviewFormat format) throws IOException {
+        var file = storageService.get(fileId).orElseThrow();
+        return storageService.buildPreviewResponse(file, format);
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

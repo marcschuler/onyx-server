@@ -73,28 +73,29 @@ public class PermissionService {
         var groups = buildGroupContext(user, section, channel);
 
         for (var group : groups) {
-            for (var permission : group.getPermissions()) {
+            var permissions = group.getPermissions().stream()
+                    .sorted(Comparator.comparingInt(Permission::getPriority))
+                    .toList();
+            for (var permission : permissions) {
                 var state = checkAccessForSinglePermission(permission, section, channel, type);
                 if (state == ALLOW) {
                     log.debug("Permission {} has access for section {} and channel {}", permission, section, channel);
                     return;
                 }
                 if (state == DENY) {
-                    log.debug("Permission {} denied access for section {} and channel {}", permission, section, channel);
-                    throw new PermissionDeniedException("Group " + group.getName() + " denied access", type);
+                    log.debug("Permission {} denied by group {} for  access for section {} and channel {}", group, permission, section, channel);
+                    throw new PermissionDeniedException("Permission denied", type);
                 }
             }
         }
         log.debug("Permissions have nothing defined for section {} and channel {}", section, channel);
-        throw new PermissionDeniedException("Permission denied access. No Group.", type);
+        throw new PermissionDeniedException("Permission denied. Not in Group.", type);
     }
 
     public PermissionState checkAccessForSinglePermission(Permission permission, Section section, Channel channel, PermissionType type) {
         log.trace("Checking Permission {} for section {} and channel {}", permission, section, channel);
         // Check if the permission has the wanted type or its parent
-        while (true) {
-            if (permission.getPermissions().contains(type))
-                break;
+        while (!permission.getPermissions().contains(type)) {
             var root = type.root();
             if (root == type) { //reached end of tree
                 return UNKNOWN;
@@ -102,19 +103,24 @@ public class PermissionService {
                 type = root;
             }
         }
+        log.trace("Checking for type {}",type);
 
         // Check if we are limited to channel
         if (permission.getLimitedToChannel() != null && !permission.getLimitedToChannel().isEmpty() &&
-                !permission.getLimitedToChannel().contains(channel))
+                !permission.getLimitedToChannel().contains(channel)){
+            log.trace("Limited to channel, but channel {} is not in list", channel);
             return UNKNOWN;
+        }
 
         // Check if we are limited to sections
         if (permission.getLimitedToSection() != null && !permission.getLimitedToSection().isEmpty() &&
-                !permission.getLimitedToSection().contains(section))
+                !permission.getLimitedToSection().contains(section)) {
+            log.trace("Limited to section, but section {} is not in list", section);
             return UNKNOWN;
+        }
 
-        // check if negated
-        if (permission.isNegated()) {
+        // check if inverted
+        if (permission.isInverted()) {
             return DENY;
         } else {
             return ALLOW;

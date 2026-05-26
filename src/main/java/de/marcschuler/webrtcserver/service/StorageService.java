@@ -2,9 +2,13 @@ package de.marcschuler.webrtcserver.service;
 
 import de.marcschuler.webrtcserver.data.file.File;
 import de.marcschuler.webrtcserver.data.file.Hash;
+import de.marcschuler.webrtcserver.data.file.PreviewFormat;
+import de.marcschuler.webrtcserver.error.FilePreviewException;
 import de.marcschuler.webrtcserver.repository.FileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.coobird.thumbnailator.Thumbnailator;
+import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ContentDisposition;
@@ -44,15 +48,21 @@ public class StorageService {
     @Value("${onyx.storage.files}")
     private Path basePath;
 
+
+    @Value("${onyx.storage.previewFiles}")
+    private Path previewBasePath;
+
+
     public Optional<File> get(UUID id) {
         return fileRepository.findById(id);
     }
 
     public boolean isImageType(MultipartFile file) {
-        var type = MediaType.parseMediaType(file.getContentType());
-        if (IMAGE_MEDIA_TYPES.contains(type))
-            return true;
-        return false;
+        return isImageType(MediaType.parseMediaType(file.getContentType()));
+    }
+
+    public boolean isImageType(MediaType mediaType) {
+        return IMAGE_MEDIA_TYPES.contains(mediaType);
     }
 
     public File uploadFile(MultipartFile file) throws IOException {
@@ -82,6 +92,49 @@ public class StorageService {
                 .body(Files.readAllBytes(filePath(file.getHash())));
     }
 
+    public ResponseEntity<byte[]> buildPreviewResponse(File file, PreviewFormat format) {
+        byte[] content = getPreviewContent(file, format);
+
+        var disposition = ContentDisposition.attachment()
+                .filename(file.getFilename() + "_preview_" + format.name() + "." + format.getFormat())
+                .build();
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .header(HttpHeaders.CONTENT_DISPOSITION, disposition.toString())
+                .contentLength(content.length)
+                .body(content);
+    }
+
+    public byte[] getPreviewContent(File file, PreviewFormat format) {
+        if (!isImageType(MediaType.parseMediaType(file.getContentType()))) {
+            throw new FilePreviewException("File is not an image, could not generate preview");
+        }
+        var previewPath = previewFilePath(file.getHash(), format);
+        if (!Files.exists(previewPath)) {
+            synchronized (this) {
+                if (!Files.exists(previewPath)) {
+                    try {
+                        log.info("Creating preview of {} at {}@{}:{}", file.getFilename(), format.getFormat(), format.getResolution(), format.getQuality());
+                        Files.createDirectories(previewPath.getParent());
+                        var fos = Files.newOutputStream(previewPath);
+                        Thumbnails.of(streamContent(file))
+                                .outputFormat(format.getFormat())
+                                .outputQuality(format.getQuality())
+                                .size(format.getResolution(), format.getResolution())
+                                .toOutputStream(fos);
+                    } catch (IOException e) {
+                        throw new FilePreviewException("Could not generate image preview", e);
+                    }
+                }
+            }
+        }
+        try {
+            return Files.readAllBytes(previewPath);
+        } catch (IOException e) {
+            throw new FilePreviewException("Could not read image preview", e);
+        }
+    }
+
     public InputStream streamContent(File file) throws IOException {
         var path = filePath(file.getHash());
         return Files.newInputStream(path);
@@ -92,6 +145,13 @@ public class StorageService {
         var typeString = hash.getType().getSafeName();
         var firstBytes = hashString.substring(0, 2);
         return basePath.resolve(typeString + "-" + firstBytes).resolve(hashString);
+    }
+
+    public Path previewFilePath(Hash hash, PreviewFormat format) {
+        var hashString = StringUtils.cleanPath(hash.getHash());
+        var typeString = hash.getType().getSafeName();
+        var firstBytes = hashString.substring(0, 2);
+        return previewBasePath.resolve(typeString + "-" + firstBytes).resolve(hashString).resolve(format.name());
     }
 
     public String hash(byte[] data) {

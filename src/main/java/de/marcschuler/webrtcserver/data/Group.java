@@ -18,10 +18,12 @@ public class Group implements Comparable<Group> {
     private String name;
     private String description;
 
+
     @OneToOne
     private File icon;
 
     private int priority;
+    private boolean defaultForNewUsers;
 
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Group> inheritsFrom;
@@ -30,7 +32,7 @@ public class Group implements Comparable<Group> {
     @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private List<Permission> permissions;
 
-    private boolean label = true;
+    private boolean label;
 
     @Override
     public int compareTo(Group o) {

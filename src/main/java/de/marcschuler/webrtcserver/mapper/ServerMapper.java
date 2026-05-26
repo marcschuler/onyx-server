@@ -45,6 +45,8 @@ public abstract class ServerMapper {
     public abstract ServerDTO mapToDTO(Server server);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "description", ignore = true)
+    @Mapping(target = "icon", ignore = true)
     public abstract Server update(@MappingTarget Server server, ServerDTO dto);
 
     /**

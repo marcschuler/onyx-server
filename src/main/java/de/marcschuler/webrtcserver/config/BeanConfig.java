@@ -1,11 +1,13 @@
 package de.marcschuler.webrtcserver.config;
 
+import de.marcschuler.webrtcserver.data.file.PreviewFormat;
 import de.marcschuler.webrtcserver.dto.SignedContent;
 import de.marcschuler.webrtcserver.webclient.messages.MessageBody;
 import io.swagger.v3.core.converter.AnnotatedType;
 import io.swagger.v3.core.converter.ModelConverters;
 import io.swagger.v3.core.converter.ResolvedSchema;
 import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
@@ -22,6 +24,7 @@ import tools.jackson.databind.module.SimpleModule;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -133,7 +136,21 @@ public class BeanConfig {
             enumSchema.setDescription("A list of all message types");
             enumSchema.setEnum(messageTypes);
             openApi.getComponents().addSchemas("MessageTypes", enumSchema);
+
+            createSchemaFromEnum(openApi, PreviewFormat.class);
         };
+    }
+
+    private void createSchemaFromEnum(OpenAPI openApi, Class<?> c) {
+        if (!c.isEnum())
+            throw new IllegalStateException();
+
+        var enumSchema = new Schema<String>();
+        enumSchema.setType("string");
+        enumSchema.setEnum(Arrays.stream(c.getEnumConstants())
+                .map(Object::toString)
+                .toList());
+        openApi.getComponents().addSchemas(c.getSimpleName(), enumSchema);
     }
 
 }

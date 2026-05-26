@@ -13,4 +13,8 @@ public class GroupCreateDTO {
     private String name;
     @NotNull
     private String description;
+    @NotNull
+    private boolean defaultForNewUsers;
+    @NotNull
+    private boolean label;
 }

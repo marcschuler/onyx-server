@@ -9,8 +9,6 @@ import de.marcschuler.webrtcserver.data.Channel;
 import de.marcschuler.webrtcserver.data.permission.Permission;
 import de.marcschuler.webrtcserver.data.permission.PermissionType;
 import de.marcschuler.webrtcserver.dto.GroupCreateDTO;
-import de.marcschuler.webrtcserver.dto.PermissionDTO;
-import de.marcschuler.webrtcserver.dto.data.GroupDTO;
 import de.marcschuler.webrtcserver.dto.data.ServerDTO;
 import de.marcschuler.webrtcserver.dto.data.message.MessageContentDTO;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
@@ -57,6 +55,7 @@ public class ServerService {
     }
 
 
+    //TODO replace with SQL script once the start configuration is stable
     @Transactional
     public Server generateDefault() {
         /**
@@ -81,43 +80,6 @@ public class ServerService {
                         ## Documentation
                         
                         - Administrator docs coming soon""")));
-
-
-        /**
-         * GROUPS & PERMISSIONS
-         */
-        var permissionsAdmin = new Permission();
-        permissionsAdmin.setPermissions(Set.of(PermissionType.SERVER, PermissionType.SECTION, PermissionType.CHANNEL, PermissionType.USER, PermissionType.SELF));
-
-        var permissionsMod = new Permission();
-        permissionsMod.setPermissions(Set.of(PermissionType.SECTION, PermissionType.CHANNEL, PermissionType.USER_KICK, PermissionType.USER_ACTIVATE, PermissionType.SELF));
-
-        var permissionsUser = new Permission();
-        permissionsUser.setPermissions(Set.of(PermissionType.SELF, PermissionType.CHANNEL_JOIN));
-
-        var groupAdmin = groupService.create(new GroupCreateDTO("Admin", "You can do anything \uD83D\uDE0E"));
-        var groupMod = groupService.create(new GroupCreateDTO("Mod", "Manage your server and your user"));
-        var groupUser = groupService.create(new GroupCreateDTO("User", "Default group for known users"));
-
-        groupAdmin.setPermissions(List.of(permissionsAdmin));
-        groupMod.setPermissions(List.of(permissionsMod));
-        groupUser.setPermissions(List.of(permissionsUser));
-
-        server.setGroups(List.of(groupAdmin, groupMod, groupUser));
-
-        var adminInvite = new Invite();
-        adminInvite.setCode(Util.randomCode(16));
-        adminInvite.setTitle("Admin Invite");
-        adminInvite.setUsages(1);
-        adminInvite.setEndDate(LocalDateTime.now().plusDays(14));
-        adminInvite.setGroups(List.of(groupAdmin));
-
-        server.setInvites(List.of(adminInvite));
-        log.info(" ---------- ADMIN CODE ----------");
-        log.info("Your Admin Invite Code is: {}", adminInvite.getCode());
-        log.info("Enter it in your app. Do not share it with anyone");
-        log.info(" ---------- ADMIN CODE ----------");
-
 
         /**
          * SECTIONS & CHANNELS
@@ -170,6 +132,47 @@ public class ServerService {
         section2.setChannels(List.of(channel2, channel3));
         section3.setChannels(List.of(channel4, channel5, channel6));
 
+
+        /**
+         * GROUPS & PERMISSIONS
+         */
+        var permissionsAdmin = new Permission();
+        permissionsAdmin.setPermissions(Set.of(PermissionType.SERVER, PermissionType.SECTION, PermissionType.CHANNEL, PermissionType.USER, PermissionType.SELF));
+
+        var permissionsMod = new Permission();
+        permissionsMod.setPermissions(Set.of(PermissionType.SECTION, PermissionType.CHANNEL, PermissionType.USER_KICK, PermissionType.USER_ACTIVATE, PermissionType.SELF));
+
+        var permissionsUser = new Permission();
+        permissionsUser.setPermissions(Set.of(PermissionType.SELF, PermissionType.CHANNEL_JOIN));
+        var permissionsUserTeamChannel = new Permission();
+        permissionsUserTeamChannel.setPermissions(Set.of(PermissionType.CHANNEL, PermissionType.SELF));
+        permissionsUserTeamChannel.setInverted(true);
+        permissionsUserTeamChannel.setPriority(100);
+        permissionsUserTeamChannel.setLimitedToChannel(Set.of(channel6));
+
+        var groupAdmin = groupService.create(new GroupCreateDTO("Admin", "You can do anything \uD83D\uDE0E", false, true));
+        var groupMod = groupService.create(new GroupCreateDTO("Mod", "Manage your server and your user", false, true));
+        var groupUser = groupService.create(new GroupCreateDTO("User", "Default group for known users", true, false));
+
+        groupAdmin.setPermissions(List.of(permissionsAdmin));
+        groupMod.setPermissions(List.of(permissionsMod));
+        groupUser.setPermissions(List.of(permissionsUser, permissionsUserTeamChannel));
+
+        server.setGroups(List.of(groupAdmin, groupMod, groupUser));
+
+        var adminInvite = new Invite();
+        adminInvite.setCode(Util.randomCode(16));
+        adminInvite.setTitle("Admin Invite");
+        adminInvite.setUsages(1);
+        adminInvite.setEndDate(LocalDateTime.now().plusDays(14));
+        adminInvite.setGroups(List.of(groupAdmin));
+
+        server.setInvites(List.of(adminInvite));
+        log.info(" ---------- ADMIN CODE ----------");
+        log.info("Your Admin Invite Code is: {}", adminInvite.getCode());
+        log.info("Enter it in your app. Do not share it with anyone");
+        log.info(" ---------- ADMIN CODE ----------");
+
         /**
          * SAVE
          */
@@ -182,7 +185,8 @@ public class ServerService {
     }
 
     public Server update(Server server, ServerDTO serverDto) {
-        server = serverMapper.update(server, serverDto);
+        server.setName(serverDto.getName());
+        serverRepository.save(server);
         sendUpdate(server);
         return server;
     }

@@ -24,6 +24,7 @@ public class Channel {
     @ToString.Exclude
     @JsonIgnore
     @JoinColumn(name = "section_id", insertable = false, updatable = false)
+    @EqualsAndHashCode.Exclude
     private Section section;
 
 }

@@ -68,6 +68,8 @@ public class AuthService {
 
     @Scheduled(fixedRateString = "${onyx.auth.jwt.refresh}", initialDelayString = "1m")
     public void refreshToken() {
+        if (webSocketConnectionService.clientsInteractable().isEmpty())
+            return;
         log.debug("Reissuing JWT for all clients with a lifetime of {}", jwtExpiration);
         webSocketConnectionService.clientsInteractable()
                 .forEach(client -> {
@@ -136,7 +138,7 @@ public class AuthService {
     public String verifyJWT(String jwt) throws JOSEException, ParseException {
         var parsed = SignedJWT.parse(jwt);
         var valid = parsed.verify(new Ed25519Verifier(serverService.defaultServer().getKeys().toPublicJWK()));
-        if (!valid){
+        if (!valid) {
             log.error("No verifiable JWT: {}", jwt);
             throw new SecurityException("Could not verify JWT");
         }

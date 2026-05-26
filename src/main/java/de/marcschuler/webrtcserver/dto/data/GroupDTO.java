@@ -31,6 +31,8 @@ public class GroupDTO {
 
     @NotNull
     private int priority;
+    @NotNull
+    private boolean defaultForNewUsers;
 
 
     private List<PermissionDTO> permissions;

@@ -106,4 +106,14 @@ public class ChannelService {
         channelRepository.save(channel);
         webSocketConnectionService.sendToAll(new ChannelChangeEvent(serverMapper.mapToDTO(channel)));
     }
+
+    /**
+     * Returns the channel for a chat.
+     * May return nothing if a chat is not within a channel (future feature)
+     * @param chat the chat
+     * @return the channel if connected
+     */
+    public Optional<Channel> getByChat(Chat chat) {
+        return channelRepository.findById(chat.getId());
+    }
 }

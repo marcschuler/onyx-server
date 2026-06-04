@@ -73,7 +73,7 @@ public class ServerService {
                         ## Admin Access
                         An invite code was printed to the server log on first startup.
                         
-                        To redeem it, open your **user settings** (bottom-left corner) and enter the code there.
+                        To redeem it, open your **user settings** (bottom-left corner), go to **account settings** and enter the code there.
                         
                         > The code is single-use and expires after 14 days."""),
                 new MarkdownMessageContent("""

@@ -151,7 +151,7 @@ public class StorageService {
         var hashString = StringUtils.cleanPath(hash.getHash());
         var typeString = hash.getType().getSafeName();
         var firstBytes = hashString.substring(0, 2);
-        return previewBasePath.resolve(typeString + "-" + firstBytes).resolve(hashString).resolve(format.name());
+        return previewBasePath.resolve(typeString + "-" + firstBytes).resolve(hashString).resolve(format.name() + "." + format.getFormat());
     }
 
     public String hash(byte[] data) {

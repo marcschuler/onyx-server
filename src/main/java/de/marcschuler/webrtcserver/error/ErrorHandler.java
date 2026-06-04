@@ -27,6 +27,12 @@ public class ErrorHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
+    @ExceptionHandler(InvalidMessageException.class)
+    public ResponseEntity<ProblemDetail> handleInvalidMessageException(InvalidMessageException ex) {
+        log.error("Could not handle message", ex);
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
     @ExceptionHandler(FilePreviewException.class)
     public ResponseEntity<ProblemDetail> handleFilePreviewException(FilePreviewException ex) {
         log.error("Could not generate preview", ex);

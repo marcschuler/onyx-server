@@ -9,6 +9,7 @@ import de.marcschuler.webrtcserver.data.message.MessageContent;
 import de.marcschuler.webrtcserver.dto.data.message.FileMessageContentDTO;
 import de.marcschuler.webrtcserver.dto.data.message.MarkdownMessageContentDTO;
 import de.marcschuler.webrtcserver.dto.data.message.MessageContentDTO;
+import de.marcschuler.webrtcserver.error.InvalidMessageException;
 import de.marcschuler.webrtcserver.mapper.MessageContentMapper;
 import de.marcschuler.webrtcserver.mapper.MessageMapper;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
@@ -76,7 +77,7 @@ public class ChatService {
         return switch (messageContent) {
             case MarkdownMessageContentDTO dto -> {
                 if (dto.getText().trim().isEmpty())
-                    throw new IllegalArgumentException("markdown cannot be empty or whitespace only");
+                    throw new InvalidMessageException("markdown cannot be empty or whitespace only");
                 var c = new MarkdownMessageContent();
                 c.setText(dto.getText());
                 yield c;

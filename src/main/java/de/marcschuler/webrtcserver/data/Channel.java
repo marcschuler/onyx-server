@@ -4,14 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Map;
 import java.util.UUID;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Channel implements Policyable {
+public class Channel {
     @Id
     @GeneratedValue
     private UUID id;
@@ -25,13 +24,7 @@ public class Channel implements Policyable {
     @ToString.Exclude
     @JsonIgnore
     @JoinColumn(name = "section_id", insertable = false, updatable = false)
+    @EqualsAndHashCode.Exclude
     private Section section;
-
-    @Enumerated(EnumType.STRING)
-    @OneToMany(cascade = CascadeType.ALL)
-    @JsonIgnore
-    @ToString.Exclude
-    @Column(nullable = false)
-    private Map<Permission.PermissionType, de.marcschuler.webrtcserver.data.policy.PolicyItem> policies;
 
 }

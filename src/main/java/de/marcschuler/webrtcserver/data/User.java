@@ -5,11 +5,11 @@ import de.marcschuler.webrtcserver.data.file.File;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import jdk.jfr.Experimental;
 import lombok.Data;
 
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity(name = "SERVER_USERS")
 @Data
@@ -23,14 +23,19 @@ public class User {
     @OneToOne
     private File avatar;
 
-    @ManyToMany(fetch =  FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     private Set<Group> groups = new HashSet<>();
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<SectionGroup> sectionGroups = new ArrayList<>();
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<ChannelGroup> channelGroups = new ArrayList<>();
 
     @NotNull
     @Column(nullable = false, unique = true, length = 1024)
     private OctetKeyPair publicKey;
 
-    @NotNull @Enumerated(EnumType.STRING)
+    @NotNull
+    @Enumerated(EnumType.STRING)
     private ClientState state;
 
     @Column(nullable = false)

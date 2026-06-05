@@ -1,4 +1,4 @@
-package de.marcschuler.webrtcserver.dto.data;
+package de.marcschuler.webrtcserver.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -7,10 +7,12 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
-public class ChannelCreateDTO extends ChannelWriteDTO{
+public class ChannelCreateDTO {
+    @NotNull
+    private String name;
     @NotNull
     private UUID sectionId;
     @NotNull

@@ -1,14 +1,14 @@
 package de.marcschuler.webrtcserver.service.websocket;
 
-import de.marcschuler.webrtcserver.data.Permission;
 import de.marcschuler.webrtcserver.data.User;
+import de.marcschuler.webrtcserver.data.permission.PermissionType;
 import de.marcschuler.webrtcserver.error.webclient.ClientKickException;
-import de.marcschuler.webrtcserver.error.webclient.PolicyCheckException;
-import de.marcschuler.webrtcserver.service.PolicyService;
-import de.marcschuler.webrtcserver.service.policy.PolicyCheckerContext;
-import de.marcschuler.webrtcserver.webclient.messages.ErrorMessage;
+import de.marcschuler.webrtcserver.error.webclient.PermissionDeniedException;
+import de.marcschuler.webrtcserver.service.PermissionService;
+import de.marcschuler.webrtcserver.webclient.messages.error.ErrorMessage;
 import de.marcschuler.webrtcserver.webclient.messages.client.ClientServerLeaveEvent;
 import de.marcschuler.webrtcserver.webclient.messages.connection.ClientKickEvent;
+import de.marcschuler.webrtcserver.webclient.messages.error.NoPermissionMessage;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -49,7 +49,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
 
     private final ApplicationEventPublisher applicationEventPublisher;
     private final AuthService authService;
-    private final PolicyService policyService;
+    private final PermissionService permissionService;
 
     @Autowired
     @Lazy
@@ -89,10 +89,10 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
         log.debug("Sending event {} to bus", event.getClass().getSimpleName());
         try {
             applicationEventPublisher.publishEvent(new ClientMessage<>(event, client, LocalDateTime.now()));
-        } catch (PolicyCheckException e) {
+        } catch (PermissionDeniedException e) {
             log.info("User did not have permission to {}: {}", e.getMessage(), e.getMessage());
             log.debug("Exception was", e);
-            send(client, new ErrorMessage("No permission for '" + e.getPermissionType() + "'"));
+            send(client, new NoPermissionMessage(e.getPermissionType()));
         } catch (ClientKickException e) {
             log.info("Kicking client. Reason: {}", e.getMessage());
             log.debug("Exception was", e);
@@ -103,11 +103,12 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
         }
     }
 
-    public void joinChannel(@NonNull WebClient client, @NonNull Channel channel) throws PolicyCheckException {
-        policyService.checkAccess(channel.getPolicies().get(Permission.PermissionType.CHANNEL_JOIN),
-                new PolicyCheckerContext(Permission.PermissionType.CHANNEL_JOIN, client.getUser(),
-                        channel, Map.of()));
-
+    public void joinChannel(@NonNull WebClient client, @NonNull Channel channel) throws PermissionDeniedException {
+        var currentChannel = client.getChannel();
+        if (currentChannel != null && currentChannel.getId().equals(channel.getId())) {
+            log.info("Client wanted to join already used channel {}", channel.getId());
+            return;
+        }
         client.setChannel(channel);
         sendToAll(new ClientChannelJoinEvent(
                 serverMapper.mapToDTO(client.getUser()),

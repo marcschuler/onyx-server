@@ -1,8 +1,9 @@
 package de.marcschuler.webrtcserver.service;
 
 import de.marcschuler.webrtcserver.data.Group;
-import de.marcschuler.webrtcserver.data.Permission;
-import de.marcschuler.webrtcserver.dto.data.GroupWriteDTO;
+import de.marcschuler.webrtcserver.dto.GroupCreateDTO;
+import de.marcschuler.webrtcserver.dto.data.GroupDTO;
+import de.marcschuler.webrtcserver.mapper.GroupMapper;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.repository.GroupRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,35 +19,20 @@ public class GroupService {
 
     private final GroupRepository groupRepository;
 
-    private final ServerMapper serverMapper;
+    private final GroupMapper groupMapper;
 
-    public Group create(GroupWriteDTO policyWriteDTO) {
-        var group = serverMapper.mapFromDTO(policyWriteDTO);
-        buildGroupPermissions(group);
+    public Group create(GroupCreateDTO groupCreateDTO) {
+        var group = groupMapper.mapFromDTO(groupCreateDTO);
         return groupRepository.save(group);
     }
 
-    public void buildGroupPermissions(Group group) {
-        var permissions = group.getAccessPowers()!=null?group.getAccessPowers():new HashMap<Permission.PermissionType, Integer>();
-        group.setAccessPowers(permissions);
-        permissions.forEach((permissionType, integer) -> {
-            if (!permissionType.isChannel())
-                permissions.remove(permissionType);
-            if (integer == null)
-                permissions.remove(permissionType);
-        });
-
-        if (permissions.isEmpty()) {
-            permissions.put(Permission.PermissionType.CHANNEL, 0);
-        }
-    }
 
     public Optional<Group> get(UUID id) {
         return groupRepository.findById(id);
     }
 
-    public void edit(Group group, GroupWriteDTO groupWriteDTO) {
-        serverMapper.update(group, groupWriteDTO);
+    public void edit(Group group, GroupDTO groupWriteDTO) {
+        groupMapper.update(group, groupWriteDTO);
         groupRepository.save(group);
     }
 
@@ -56,5 +42,9 @@ public class GroupService {
 
     public List<Group> all() {
         return groupRepository.findAll();
+    }
+
+    public List<Group> getGroupsDefaultForNewUser() {
+        return groupRepository.findGroupByDefaultForNewUsersIsTrue();
     }
 }

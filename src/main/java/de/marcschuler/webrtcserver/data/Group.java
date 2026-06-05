@@ -1,30 +1,41 @@
 package de.marcschuler.webrtcserver.data;
 
 import de.marcschuler.webrtcserver.data.file.File;
+import de.marcschuler.webrtcserver.data.permission.Permission;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.Map;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity(name = "SERVER_GROUP")
 @Data
-public class Group {
+public class Group implements Comparable<Group> {
     @Id
     @GeneratedValue
     private UUID id;
     private String name;
     private String description;
 
+
     @OneToOne
     private File icon;
 
-    @ManyToOne
-    private Group parent;
-    @ElementCollection
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Map<Permission.PermissionType,Integer> accessPowers;
+    private int priority;
+    private boolean defaultForNewUsers;
 
-    private boolean showInTree = true;
+    @ManyToMany(fetch = FetchType.EAGER)
+    private List<Group> inheritsFrom;
+
+
+    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    private List<Permission> permissions;
+
+    private boolean label;
+
+    @Override
+    public int compareTo(Group o) {
+        return Integer.compare(this.priority, o.priority);
+    }
 }

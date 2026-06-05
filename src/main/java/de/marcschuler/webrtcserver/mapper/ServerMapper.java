@@ -2,6 +2,7 @@ package de.marcschuler.webrtcserver.mapper;
 
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import de.marcschuler.webrtcserver.data.file.File;
+import de.marcschuler.webrtcserver.data.Channel;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
 import de.marcschuler.webrtcserver.webclient.WebClient;
 import org.mapstruct.*;
@@ -16,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.Map;
 
-@Mapper(componentModel = "spring", uses = {MessageMapper.class, PolicyMapper.class, MessageContentMapper.class})
+@Mapper(componentModel = "spring", uses = {MessageMapper.class, MessageContentMapper.class, GroupMapper.class})
 public abstract class ServerMapper {
 
     @Autowired
@@ -36,50 +37,45 @@ public abstract class ServerMapper {
 
     @Mapping(target = "chatId", source = "chat.id")
     public abstract ChannelExtendedDTO mapToDTOExtended(Channel channel);
+
     public abstract SectionExtendedDTO mapToDTOExtended(Section section);
 
 
     @Mapping(target = "publicKey", source = "keys")
     public abstract ServerDTO mapToDTO(Server server);
 
-    public abstract Server update(@MappingTarget Server server, ServerWriteDTO dto);
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "description", ignore = true)
+    @Mapping(target = "icon", ignore = true)
+    public abstract Server update(@MappingTarget Server server, ServerDTO dto);
 
     /**
      * SECTIONS
      */
-    public abstract Section mapFromDTO(SectionDTO channel);
-
-    public abstract Section mapFromDTO(SectionWriteDTO channel);
-
-    public abstract Section update(@MappingTarget Section section, SectionWriteDTO dto);
+    public abstract Section mapFromDTO(SectionDTO sectionDTO);
+    public abstract Section mapFromDTO(SectionCreateDTO sectionCreateDTO);
 
     public abstract SectionDTO mapToDTO(Section section);
+
+    @Mapping(target = "id", ignore = true)
+    public abstract Section update(@MappingTarget Section section, SectionDTO dto);
 
     @Mapping(target = "chatId", source = "chat.id")
     public abstract ChannelDTO mapToDTO(Channel channel);
 
     public abstract Channel mapFromDTO(ChannelDTO channel);
 
-    public abstract Channel mapFromDTO(ChannelWriteDTO channel);
+    public abstract Channel update(@MappingTarget Channel channel, ChannelDTO channelDTO);
 
-    public abstract Channel update(@MappingTarget Channel channel, ChannelWriteDTO channelDTO);
-
-    @Mapping(target = "avatarId",source = "avatar.id")
+    @Mapping(target = "avatarId", source = "avatar.id")
     public abstract UserSimpleDTO mapToDTO(User user);
 
-    @Mapping(target = "channelId",source = "channel.id")
+    @Mapping(target = "channelId", source = "channel.id")
     public abstract UserOnlineDTO mapToDTO(WebClient client);
 
     public abstract List<UserSimpleDTO> mapToDTOList(List<User> user);
 
     public abstract UserExtendedDTO mapToDTOExtended(User user);
-
-
-    public abstract Group mapFromDTO(GroupWriteDTO policyWriteDTO);
-
-    public abstract GroupDTO mapToDTO(Group group);
-
-    public abstract Group update(@MappingTarget Group group, GroupWriteDTO groupWriteDTO);
 
     public abstract IceServer mapToDTO(WebRTConfig.IceConfig iceConfig);
 
@@ -90,7 +86,7 @@ public abstract class ServerMapper {
      */
     public abstract FileDTO mapToDTO(File file);
 
-    Map<String,Object> mapKeyToJWKString(OctetKeyPair keyPair){
+    Map<String, Object> mapKeyToJWKString(OctetKeyPair keyPair) {
         return keyPair.toJSONObject();
     }
 }

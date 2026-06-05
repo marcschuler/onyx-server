@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize("@permissionService.hasPermission(authentication.name, #permission)")
+@PreAuthorize("@permissionService.checkAccessForSinglePermission(authentication.name, #permission)")
 public @interface Permission {
     String value();
 }

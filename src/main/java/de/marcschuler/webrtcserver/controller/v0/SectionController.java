@@ -1,8 +1,10 @@
 package de.marcschuler.webrtcserver.controller.v0;
 
+import de.marcschuler.webrtcserver.data.permission.PermissionType;
+import de.marcschuler.webrtcserver.dto.SectionCreateDTO;
 import de.marcschuler.webrtcserver.dto.data.SectionDTO;
-import de.marcschuler.webrtcserver.dto.data.SectionWriteDTO;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
+import de.marcschuler.webrtcserver.service.PermissionService;
 import de.marcschuler.webrtcserver.service.SectionService;
 import de.marcschuler.webrtcserver.service.ServerService;
 import lombok.RequiredArgsConstructor;
@@ -18,31 +20,40 @@ public class SectionController implements OrderableController {
 
     private final ServerService serverService;
     private final SectionService sectionService;
+    private final PermissionService permissionService;
 
     private final ServerMapper serverMapper;
 
     @PostMapping
-    public SectionDTO create(@RequestBody SectionWriteDTO sectionDto) {
+    public SectionDTO create(@RequestBody SectionCreateDTO sectionCreateDTO) {
+        permissionService.checkControllerAccess(null,null, PermissionType.SERVER_SECTION_CREATE);
+
         var server = serverService.defaultServer();
-        return serverMapper.mapToDTO(sectionService.create(server, sectionDto));
+        return serverMapper.mapToDTO(sectionService.create(server, sectionCreateDTO));
     }
 
     @PutMapping("{sectionId}")
-    public SectionDTO edit(@RequestBody SectionWriteDTO sectionDto, @PathVariable UUID sectionId) {
+    public SectionDTO edit(@RequestBody SectionDTO sectionDto, @PathVariable UUID sectionId) {
         var section = sectionService.findById(sectionId).orElseThrow();
+        permissionService.checkControllerAccess(section,null, PermissionType.SECTION_EDIT);
         sectionService.update(section, sectionDto);
         return serverMapper.mapToDTO(section);
     }
 
     @Override
     public void order(UUID id, int newOrder) {
-        var channel = sectionService.get(id).orElseThrow();
-        sectionService.order(channel, newOrder);
+        permissionService.checkControllerAccess(null,null, PermissionType.SERVER_SECTION_MOVE);
+
+        var section = sectionService.get(id).orElseThrow();
+        sectionService.order(section, newOrder);
     }
 
     @DeleteMapping("{sectionId}")
     public void delete(@PathVariable UUID sectionId) {
         var section = sectionService.get(sectionId).orElseThrow();
+
+        permissionService.checkControllerAccess(section,null, PermissionType.SECTION_DELETE);
+
         sectionService.delete(section);
     }
 

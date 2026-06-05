@@ -1,20 +1,19 @@
 package de.marcschuler.webrtcserver.service;
 
 import de.marcschuler.webrtcserver.Util;
-import de.marcschuler.webrtcserver.config.WebRTConfig;
 import de.marcschuler.webrtcserver.data.*;
+import de.marcschuler.webrtcserver.data.file.File;
 import de.marcschuler.webrtcserver.data.message.MarkdownMessageContent;
 import de.marcschuler.webrtcserver.data.message.MessageContent;
-import de.marcschuler.webrtcserver.data.policy.RolePolicy;
-import de.marcschuler.webrtcserver.dto.data.GroupWriteDTO;
-import de.marcschuler.webrtcserver.dto.data.ServerWriteDTO;
+import de.marcschuler.webrtcserver.data.Channel;
+import de.marcschuler.webrtcserver.data.permission.Permission;
+import de.marcschuler.webrtcserver.data.permission.PermissionType;
+import de.marcschuler.webrtcserver.dto.GroupCreateDTO;
+import de.marcschuler.webrtcserver.dto.data.ServerDTO;
 import de.marcschuler.webrtcserver.dto.data.message.MessageContentDTO;
-import de.marcschuler.webrtcserver.dto.data.policy.RolePolicyDTO;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.repository.*;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
-import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
-import de.marcschuler.webrtcserver.webclient.messages.section.SectionMoveEvent;
 import de.marcschuler.webrtcserver.webclient.messages.server.ServerChangeEvent;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -36,7 +36,6 @@ public class ServerService {
     private WebSocketConnectionService webSocketConnectionService;
 
     private final GroupService groupService;
-    private final PolicyService policyService;
     private final ChatService chatService;
 
     private final ServerRepository serverRepository;
@@ -56,43 +55,35 @@ public class ServerService {
     }
 
 
+    //TODO replace with SQL script once the start configuration is stable
     @Transactional
     public Server generateDefault() {
+        /**
+         * BASIC SERVER
+         */
         var keys = cryptoService.generateKeyPair();
-
         var server = new Server();
         server.setName("Onyx Server");
-        server.setKeys(keys); // assuming keys is already defined
-        server.setDescription(List.of(new MarkdownMessageContent("This is the default server description.")));
+        server.setKeys(keys);
+        server.setDescription(List.of(
+                new MarkdownMessageContent("""
+                        # ONYX
+                        You're running your own self-hosted ONYX server instance \uD83E\uDEA8"""),
+                new MarkdownMessageContent("""
+                        ## Admin Access
+                        An invite code was printed to the server log on first startup.
+                        
+                        To redeem it, open your **user settings** (bottom-left corner), go to **account settings** and enter the code there.
+                        
+                        > The code is single-use and expires after 14 days."""),
+                new MarkdownMessageContent("""
+                        ## Documentation
+                        
+                        - Administrator docs coming soon""")));
 
-        //TODO create default AccessPowerPolicies for the channels
-
-
-        var group1 = groupService.create(new GroupWriteDTO("Admin", "A Administrator is allowed to to anything", null, null, Map.of(), true));
-        var group2 = groupService.create(new GroupWriteDTO("Mod", "A Moderator is allowed to moderate users", null, null, Map.of(), true));
-        var group3 = groupService.create(new GroupWriteDTO("User", "Default group for known users", null, null, Map.of(), false));
-
-        server.setGroups(List.of(group1, group2, group3));
-
-        var policy1 = policyService.create(RolePolicyDTO.builder()
-                .operator(RolePolicy.SimplePolicyOperator.IN)
-                .operand(RolePolicy.SimplePolicyOperand.GROUP)
-                .ids(Set.of(group1.getId()))
-                .name("Only Admins")
-                .build());
-        var policy2 = policyService.create(RolePolicyDTO.builder()
-                .operator(RolePolicy.SimplePolicyOperator.IN)
-                .operand(RolePolicy.SimplePolicyOperand.GROUP)
-                .ids(Set.of(group1.getId(), group2.getId()))
-                .name("Admins + Mods")
-                .build());
-        var policy3 = policyService.create(RolePolicyDTO.builder()
-                .operator(RolePolicy.SimplePolicyOperator.NOT_IN)
-                .operand(RolePolicy.SimplePolicyOperand.GROUP)
-                .ids(Set.of())
-                .name("Everyone")
-                .build());
-
+        /**
+         * SECTIONS & CHANNELS
+         */
         var section1 = new Section();
         section1.setName("Lobby");
         section1.setServer(server);
@@ -141,6 +132,50 @@ public class ServerService {
         section2.setChannels(List.of(channel2, channel3));
         section3.setChannels(List.of(channel4, channel5, channel6));
 
+
+        /**
+         * GROUPS & PERMISSIONS
+         */
+        var permissionsAdmin = new Permission();
+        permissionsAdmin.setPermissions(Set.of(PermissionType.SERVER, PermissionType.SECTION, PermissionType.CHANNEL, PermissionType.USER, PermissionType.SELF));
+
+        var permissionsMod = new Permission();
+        permissionsMod.setPermissions(Set.of(PermissionType.SECTION, PermissionType.CHANNEL, PermissionType.USER_KICK, PermissionType.USER_ACTIVATE, PermissionType.SELF));
+
+        var permissionsUser = new Permission();
+        permissionsUser.setPermissions(Set.of(PermissionType.SELF, PermissionType.CHANNEL_JOIN));
+        var permissionsUserTeamChannel = new Permission();
+        permissionsUserTeamChannel.setPermissions(Set.of(PermissionType.CHANNEL, PermissionType.SELF));
+        permissionsUserTeamChannel.setInverted(true);
+        permissionsUserTeamChannel.setPriority(100);
+        permissionsUserTeamChannel.setLimitedToChannel(Set.of(channel6));
+
+        var groupAdmin = groupService.create(new GroupCreateDTO("Admin", "You can do anything \uD83D\uDE0E", false, true));
+        var groupMod = groupService.create(new GroupCreateDTO("Mod", "Manage your server and your user", false, true));
+        var groupUser = groupService.create(new GroupCreateDTO("User", "Default group for known users", true, false));
+
+        groupAdmin.setPermissions(List.of(permissionsAdmin));
+        groupMod.setPermissions(List.of(permissionsMod));
+        groupUser.setPermissions(List.of(permissionsUser, permissionsUserTeamChannel));
+
+        server.setGroups(List.of(groupAdmin, groupMod, groupUser));
+
+        var adminInvite = new Invite();
+        adminInvite.setCode(Util.randomCode(16));
+        adminInvite.setTitle("Admin Invite");
+        adminInvite.setUsages(1);
+        adminInvite.setEndDate(LocalDateTime.now().plusDays(14));
+        adminInvite.setGroups(List.of(groupAdmin));
+
+        server.setInvites(List.of(adminInvite));
+        log.info(" ---------- ADMIN CODE ----------");
+        log.info("Your Admin Invite Code is: {}", adminInvite.getCode());
+        log.info("Enter it in your app. Do not share it with anyone");
+        log.info(" ---------- ADMIN CODE ----------");
+
+        /**
+         * SAVE
+         */
         return serverRepository.save(server);
 
     }
@@ -149,8 +184,9 @@ public class ServerService {
         return serverRepository.findById(serverId);
     }
 
-    public Server update(Server server, ServerWriteDTO serverDto) {
-        server = serverMapper.update(server, serverDto);
+    public Server update(Server server, ServerDTO serverDto) {
+        server.setName(serverDto.getName());
+        serverRepository.save(server);
         sendUpdate(server);
         return server;
     }
@@ -191,7 +227,13 @@ public class ServerService {
         sendUpdate(server);
     }
 
-    private void sendUpdate(Server server){
+    public void setIcon(Server server, File f) {
+        server.setIcon(f);
+        serverRepository.save(server);
+        sendUpdate(server);
+    }
+
+    private void sendUpdate(Server server) {
         webSocketConnectionService.sendToAll(
                 new ServerChangeEvent(serverMapper.mapToDTO(server))
         );

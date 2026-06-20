@@ -25,19 +25,19 @@ public class ClientHandler {
     @EventListener
     @Transactional
     public void onChannelJoinRequest(ClientMessage<ClientChannelJoinRequest> event) {
-        log.info("User {} wants to join channel {}", event.getClient().getUser().getUsername(), event.getBody().getChannelId());
-        var wantedChannel = channelService.get(event.getBody().getChannelId()).orElseThrow();
+        log.info("User {} wants to join channel {}", event.client().getUser().getUsername(), event.body().getChannelId());
+        var wantedChannel = channelService.get(event.body().getChannelId()).orElseThrow();
         
-        permissionService.checkClientAccess(event.getClient(), wantedChannel, PermissionType.CHANNEL_JOIN);
+        permissionService.checkClientAccess(event.client(), wantedChannel, PermissionType.CHANNEL_JOIN);
 
-        webSocketConnectionService.joinChannel(event.getClient(), wantedChannel);
+        webSocketConnectionService.joinChannel(event.client(), wantedChannel);
     }
 
     @EventListener
     @Transactional
     public void onChannelLeaveRequest(ClientMessage<ClientChannelLeaveRequest> event) {
-        log.info("User {} wants to leave the channel", event.getClient().getUser().getUsername());
-        webSocketConnectionService.leaveChannel(event.getClient());
+        log.info("User {} wants to leave the channel", event.client().getUser().getUsername());
+        webSocketConnectionService.leaveChannel(event.client());
     }
 
 }

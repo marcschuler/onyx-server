@@ -27,13 +27,13 @@ public class PeerEventHandler {
 
     @EventListener
     public void onOffer(ClientMessage<PeerOffer> event) {
-        var clientFrom = event.getClient().getUser().getUsername();
-        log.info("Forwarding peer offer from {} to {}", clientFrom, event.getBody().getClientTo());
-        var clientTo = webSocketConnectionService.clientFromKeyId(event.getBody().getClientTo()).get();
-        var forwardEvent = new PeerOfferForward(event.getClient().getUser().getId(), event.getBody().getOffer());
+        var clientFrom = event.client().getUser().getUsername();
+        log.info("Forwarding peer offer from {} to {}", clientFrom, event.body().getClientTo());
+        var clientTo = webSocketConnectionService.clientFromKeyId(event.body().getClientTo()).get();
+        var forwardEvent = new PeerOfferForward(event.client().getUser().getId(), event.body().getOffer());
 
 
-        var clientFromChannel = event.getClient().getChannel();
+        var clientFromChannel = event.client().getChannel();
         var clientToChannel = clientTo.getChannel();
         if (clientToChannel == null || !clientToChannel.equals(clientFromChannel)) {
             log.warn("Client tried to connect without being in the same channel {}<->{}", clientFromChannel, clientToChannel);
@@ -43,12 +43,12 @@ public class PeerEventHandler {
 
     @EventListener
     public void onAnswer(ClientMessage<PeerAnswer> event) throws IOException {
-        var clientFrom = event.getClient().getUser().getUsername();
-        log.info("Forwarding peer answer from {} to {}", clientFrom, event.getBody().getClientTo());
-        var clientTo = webSocketConnectionService.clientFromKeyId(event.getBody().getClientTo()).get();
-        var forwardEvent = new PeerAnswerForward(event.getClient().getUser().getId(), event.getBody().getAnswer());
+        var clientFrom = event.client().getUser().getUsername();
+        log.info("Forwarding peer answer from {} to {}", clientFrom, event.body().getClientTo());
+        var clientTo = webSocketConnectionService.clientFromKeyId(event.body().getClientTo()).get();
+        var forwardEvent = new PeerAnswerForward(event.client().getUser().getId(), event.body().getAnswer());
 
-        var clientFromChannel = event.getClient().getChannel();
+        var clientFromChannel = event.client().getChannel();
         var clientToChannel = clientTo.getChannel();
         if (clientToChannel == null || !clientToChannel.equals(clientFromChannel)) {
             log.warn("Client tried to answer without being in the same channel {}<->{}", clientFromChannel, clientToChannel);

@@ -12,7 +12,7 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 @ConfigurationPropertiesScan
 public class WebrtcServerApplication {
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         SpringApplication.run(WebrtcServerApplication.class, args);
     }
 

@@ -1,4 +1,4 @@
-package de.marcschuler.webrtcserver.config;
+package de.marcschuler.webrtcserver.config.starter;
 
 import de.marcschuler.webrtcserver.repository.ServerRepository;
 import de.marcschuler.webrtcserver.service.ServerService;

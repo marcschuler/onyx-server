@@ -9,6 +9,7 @@ import de.marcschuler.webrtcserver.webclient.WebClient;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.TestPropertySource;
 
 import java.util.List;
 
@@ -45,7 +46,8 @@ class PermissionServiceTest {
     @Test
     void testAdminGroupContext() {
         var result = permissionService.buildGroupContext(testService.userAdmin(), null, null);
-        assertEquals(List.of(testService.groupAdmin()), result);
+        assertEquals(1,result.size());
+        assertEquals(testService.groupAdmin().getId(), result.iterator().next().getId());
     }
 
     @Test

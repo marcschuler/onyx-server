@@ -30,7 +30,7 @@ public class PermissionService {
     }
 
     public void checkControllerAccess(@Nullable Section section, @Nullable Channel channel, @NonNull PermissionType type) {
-        if (SecurityContextHolder.getContext().getAuthentication() == null &&
+        if (SecurityContextHolder.getContext().getAuthentication() == null ||
                 SecurityContextHolder.getContext().getAuthentication().getPrincipal() == null)
             throw new PermissionDeniedException("Client is not authenticated", type);
 
@@ -61,7 +61,7 @@ public class PermissionService {
      * @param channel the channel of the section, may be null
      * @param type
      */
-    private void checkAccess(@NonNull User user, @Nullable Section section, @Nullable Channel channel, @NonNull PermissionType type) {
+    public void checkAccess(@NonNull User user, @Nullable Section section, @Nullable Channel channel, @NonNull PermissionType type) {
         if (user.getState() == ClientState.BANNED) {
             log.warn("User {} has been banned", user.getUsername());
             throw new PermissionDeniedException("User is banned", null);

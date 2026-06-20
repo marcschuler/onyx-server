@@ -1,8 +1,11 @@
 package de.marcschuler.webrtcserver.service;
 
 import de.marcschuler.webrtcserver.data.ClientState;
+import de.marcschuler.webrtcserver.data.Invite;
 import de.marcschuler.webrtcserver.data.User;
+import de.marcschuler.webrtcserver.dto.data.InviteDTO;
 import de.marcschuler.webrtcserver.error.InviteException;
+import de.marcschuler.webrtcserver.mapper.InviteMapper;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.repository.InviteRepository;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
@@ -13,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +30,18 @@ public class InviteService {
     private final WebSocketConnectionService webSocketConnectionService;
 
     private final ServerMapper serverMapper;
+    private final InviteMapper inviteMapper;
+
+    public Invite create(InviteDTO inviteDto) {
+        var invite = inviteMapper.mapFromDTO(inviteDto);
+        if (inviteRepository.existsById(invite.getCode()))
+            throw new IllegalStateException("An invite with code " + invite.getCode() + " already exists");
+
+        if (invite.getEndDate().isBefore(LocalDateTime.now()))
+            throw new InviteException("The invite has already expired");
+
+        return inviteRepository.save(invite);
+    }
 
 
     public synchronized void enterInviteCode(User user, String code) {

@@ -63,6 +63,9 @@ public class SimpleConnectionIntegrationTest {
         //login
         client.recv(IceServerMessage.class);
         var tree = client.recv(ServerTreeChangeMessage.class);
+
+
+
         var firstChannel = tree.getSections().get(0).getChannels().get(0);
         client.sendMessage(new ClientChannelJoinRequest(firstChannel.getId()));
 

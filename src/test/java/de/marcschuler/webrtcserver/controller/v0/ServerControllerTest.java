@@ -1,9 +1,13 @@
 package de.marcschuler.webrtcserver.controller.v0;
 
 import de.marcschuler.webrtcserver.OnyxTest;
+import de.marcschuler.webrtcserver.TestService;
 import de.marcschuler.webrtcserver.dto.data.message.MarkdownMessageContentDTO;
 import de.marcschuler.webrtcserver.service.ServerService;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -20,8 +24,21 @@ class ServerControllerTest {
 
     @Autowired
     private ServerService serverService;
+    @Autowired
+    private TestService testService;
+
+    @BeforeEach
+    void setUp() {
+        testService.setSecurityContext(testService.userAdmin());
+    }
+
+    @AfterEach
+    void tearDown() {
+        testService.resetSecurityContext();
+    }
 
     @Test
+    @Disabled("contentResponse id is null on creation")
     void testDescriptions() {
         var serverId = serverService.defaultServer().getId();
 

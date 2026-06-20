@@ -3,22 +3,19 @@ package de.marcschuler.webrtcserver.controller.v0;
 import de.marcschuler.webrtcserver.OnyxTest;
 import de.marcschuler.webrtcserver.TestService;
 import de.marcschuler.webrtcserver.dto.ChannelCreateDTO;
-import de.marcschuler.webrtcserver.dto.data.ChannelDTO;
-import de.marcschuler.webrtcserver.dto.data.SectionDTO;
-import de.marcschuler.webrtcserver.service.SectionService;
-import de.marcschuler.webrtcserver.service.ServerService;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
 import de.marcschuler.webrtcserver.webclient.messages.channel.ChannelCreateEvent;
 import de.marcschuler.webrtcserver.webclient.messages.channel.ChannelDeleteEvent;
 import de.marcschuler.webrtcserver.webclient.messages.channel.ChannelMoveEvent;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import tools.jackson.databind.ObjectMapper;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.verify;
 
@@ -30,16 +27,23 @@ class ChannelControllerTest {
     @Autowired
     private ChannelController channelController;
     @Autowired
-    private SectionService sectionService;
-    @Autowired
-    private ServerService serverService;
-    @Autowired
     private ObjectMapper mapper;
     @Autowired
     private TestService testService;
 
     @MockitoBean
     private WebSocketConnectionService webSocketConnectionService;
+
+    @BeforeEach
+    void setUp() {
+        testService.setSecurityContext(testService.userAdmin());
+    }
+
+    @AfterEach
+    void tearDown() {
+        testService.resetSecurityContext();
+    }
+
 
     @Test
     void testCreate(){

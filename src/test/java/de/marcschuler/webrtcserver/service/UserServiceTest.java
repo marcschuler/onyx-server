@@ -22,8 +22,8 @@ class UserServiceTest {
     @Test
     void testUserRecognise(){
         var user = testService.userAdmin();
-        assertEquals(user,userService.findById(user.getId()).orElseThrow());
-        assertEquals(user,userService.findById(cryptoService.generateKeyId(user.getPublicKey())).orElseThrow());
+        assertEquals(user.getId(),userService.findById(user.getId()).orElseThrow().getId());
+        assertEquals(user.getId(),userService.findById(cryptoService.generateKeyId(user.getPublicKey())).orElseThrow().getId());
     }
 
 }

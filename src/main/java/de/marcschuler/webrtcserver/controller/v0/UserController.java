@@ -3,6 +3,7 @@ package de.marcschuler.webrtcserver.controller.v0;
 import de.marcschuler.webrtcserver.config.SecurityConfig;
 import de.marcschuler.webrtcserver.data.ClientState;
 import de.marcschuler.webrtcserver.data.permission.PermissionType;
+import de.marcschuler.webrtcserver.dto.InviteResponseDto;
 import de.marcschuler.webrtcserver.dto.data.FileDTO;
 import de.marcschuler.webrtcserver.dto.data.GroupDTO;
 import de.marcschuler.webrtcserver.dto.data.UserExtendedDTO;
@@ -48,13 +49,13 @@ public class UserController {
     }
 
     @PutMapping("{id}/invite")
-    public void invite(@PathVariable String id, @RequestBody String inviteCode, @AuthenticationPrincipal SecurityConfig.AuthenticatedUser authUser) {
+    public InviteResponseDto invite(@PathVariable String id, @RequestBody String inviteCode, @AuthenticationPrincipal SecurityConfig.AuthenticatedUser authUser) {
         if (!authUser.user().getId().equals(id))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot enter an invite code for another user");
 
-        inviteService.enterInviteCode(authUser.user(), inviteCode);
+        var invite = inviteService.enterInviteCode(authUser.user(), inviteCode);
+        return new InviteResponseDto(invite.getTitle());
     }
-
 
     @PutMapping("{id}/state/ban")
     public UserExtendedDTO ban(@PathVariable String id, @RequestBody(required = false) @Nullable String message) {

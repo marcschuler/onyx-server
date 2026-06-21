@@ -84,12 +84,12 @@ public class PermissionService {
                 }
                 if (state == DENY) {
                     log.debug("Permission {} denied by group {} for  access for section {} and channel {}", group, permission, section, channel);
-                    throw new PermissionDeniedException("Permission denied", type);
+                    throw new PermissionDeniedException("Permission denied for Group '" + group.getName() + "'", type);
                 }
             }
         }
         log.debug("Permissions have nothing defined for section {} and channel {}", section, channel);
-        throw new PermissionDeniedException("Permission denied. Not in Group.", type);
+        throw new PermissionDeniedException("Permission denied", type);
     }
 
     public PermissionState checkAccessForSinglePermission(Permission permission, Section section, Channel channel, PermissionType type) {
@@ -103,11 +103,11 @@ public class PermissionService {
                 type = root;
             }
         }
-        log.trace("Checking for type {}",type);
+        log.trace("Checking for type {}", type);
 
         // Check if we are limited to channel
         if (permission.getLimitedToChannel() != null && !permission.getLimitedToChannel().isEmpty() &&
-                !permission.getLimitedToChannel().contains(channel)){
+                !permission.getLimitedToChannel().contains(channel)) {
             log.trace("Limited to channel, but channel {} is not in list", channel);
             return UNKNOWN;
         }
@@ -121,8 +121,10 @@ public class PermissionService {
 
         // check if inverted
         if (permission.isInverted()) {
+            log.trace("Permission denied");
             return DENY;
         } else {
+            log.trace("Permission allowed");
             return ALLOW;
         }
     }

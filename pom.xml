@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>de.marcschuler</groupId>
-    <artifactId>webrtc-server</artifactId>
+    <artifactId>onyx-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>webrtc-server</name>
-    <description>webrtc-server</description>
+    <name>onyx-server</name>
+    <description>onyx-server</description>
     <url/>
     <licenses>
         <license>

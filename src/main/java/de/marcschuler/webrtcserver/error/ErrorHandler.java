@@ -55,7 +55,7 @@ public class ErrorHandler {
     @ExceptionHandler(PermissionDeniedException.class)
     public ResponseEntity<ProblemDetail> handlePermissionDenied(PermissionDeniedException ex) {
         log.error("Permission denied for user request", ex);
-        return buildResponse(HttpStatus.FORBIDDEN, ex.getMessage());
+        return buildResponse(HttpStatus.FORBIDDEN, ex.getMessage(),"Could not execute action '" + ex.getPermissionType() + "'");
     }
 
 
@@ -97,8 +97,14 @@ public class ErrorHandler {
     }
 
     private ResponseEntity<ProblemDetail> buildResponse(HttpStatus status, String title) {
+        return buildResponse(status, title, null);
+    }
+
+    private ResponseEntity<ProblemDetail> buildResponse(HttpStatus status, String title, String detail) {
         var problemDetail = ProblemDetail.forStatus(status);
         problemDetail.setTitle(title);
+        if (detail != null)
+            problemDetail.setDetail(detail);
         return ResponseEntity.status(status)
                 .body(problemDetail);
     }

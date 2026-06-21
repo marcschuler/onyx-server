@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @OnyxTest
@@ -19,9 +21,6 @@ class ServerControllerTest {
 
     @Autowired
     private ServerController serverController;
-    @Autowired
-    private ServerController.ServerDescriptionController serverDescriptionController;
-
     @Autowired
     private ServerService serverService;
     @Autowired
@@ -45,7 +44,10 @@ class ServerControllerTest {
         var server = serverController.get(serverId);
         assertEquals(1, server.getDescription().size());
 
-        serverDescriptionController.delete(serverId, server.getDescription().get(0).getId());
+        server.setDescription(List.of());
+        server = serverController.edit(server.getId(),server);
+        assertEquals(0, server.getDescription().size());
+
         server = serverController.get(serverId);
         assertEquals(0, server.getDescription().size());
 

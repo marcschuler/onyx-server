@@ -1,11 +1,13 @@
 package de.marcschuler.webrtcserver.service;
 
 import de.marcschuler.webrtcserver.data.Group;
+import de.marcschuler.webrtcserver.data.Server;
 import de.marcschuler.webrtcserver.dto.GroupCreateDTO;
 import de.marcschuler.webrtcserver.dto.data.GroupDTO;
 import de.marcschuler.webrtcserver.mapper.GroupMapper;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.repository.GroupRepository;
+import de.marcschuler.webrtcserver.repository.ServerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ public class GroupService {
     private final GroupRepository groupRepository;
 
     private final GroupMapper groupMapper;
+    private final ServerRepository serverRepository;
 
     public Group create(GroupCreateDTO groupCreateDTO) {
         var group = groupMapper.mapFromDTO(groupCreateDTO);
@@ -36,8 +39,9 @@ public class GroupService {
         groupRepository.save(group);
     }
 
-    public void delete(Group group) {
-        groupRepository.delete(group);
+    public void delete(Server server,Group group) {
+        server.getGroups().remove(group);
+        serverRepository.save(server);
     }
 
     public List<Group> all() {

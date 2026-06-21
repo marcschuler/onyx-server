@@ -13,12 +13,14 @@ import de.marcschuler.webrtcserver.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -35,17 +37,23 @@ public class AdminResetStartupRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        log.debug("Command line is {}", Arrays.toString(args));
         var options = new Options();
-        options.addOption(OPTION_EMERGENCY_GRANT_ADMIN_POWER, false, "Creates an emergency administrator group you can use to regain access to the server");
+        options.addOption(Option.builder()
+                .longOpt(OPTION_EMERGENCY_GRANT_ADMIN_POWER)
+                .hasArg(false)
+                .desc("Creates an emergency administrator group you can use to regain access to the server")
+                .get());
 
         var parser = new DefaultParser();
-        var line = parser.parse(options, args);
+        ;
+        var line = parser.parse(options, args, false);
 
         if (line.hasOption(OPTION_EMERGENCY_GRANT_ADMIN_POWER)) {
             log.info("Creating an emergency admin group to recover your admin rights");
 
             var permission = new Permission();
-            permission.setPermissions(Set.of(PermissionType.SERVER, PermissionType.CHANNEL, PermissionType.USER, PermissionType.SELF));
+            permission.setPermissions(Set.of(PermissionType.SERVER, PermissionType.SECTION, PermissionType.CHANNEL, PermissionType.USER, PermissionType.SELF));
             permission.setPriority(Integer.MAX_VALUE);
 
             var groupDto = new GroupCreateDTO();
@@ -64,6 +72,7 @@ public class AdminResetStartupRunner implements CommandLineRunner {
             inviteDto.setTitle("Emergency Admin Group");
             inviteDto.setUsages(1);
             inviteDto.setEndDate(LocalDateTime.now().plusDays(14));
+            inviteDto.setGroups(List.of(group.getId()));
 
             var invite = inviteService.create(inviteDto);
 
@@ -72,8 +81,6 @@ public class AdminResetStartupRunner implements CommandLineRunner {
             log.info("Your recovery code is: {}", invite.getCode());
             log.info("Enter it in your app. Do not share it with anyone");
             log.info(" ---------- END RECOVERY CODE ----------");
-            log.info("waiting 30 seconds for startup...");
-            Thread.sleep(30_000);
         }
     }
 }

@@ -2,6 +2,7 @@ package de.marcschuler.webrtcserver.controller.v0;
 
 import de.marcschuler.webrtcserver.data.permission.PermissionType;
 import de.marcschuler.webrtcserver.dto.SectionCreateDTO;
+import de.marcschuler.webrtcserver.dto.data.ChannelDTO;
 import de.marcschuler.webrtcserver.dto.data.SectionDTO;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.PermissionService;
@@ -23,6 +24,12 @@ public class SectionController implements OrderableController {
     private final PermissionService permissionService;
 
     private final ServerMapper serverMapper;
+
+    @GetMapping("{id}")
+    public SectionDTO section(@PathVariable UUID id) {
+        return sectionService.get(id).map(serverMapper::mapToDTO)
+                .orElseThrow();
+    }
 
     @PostMapping
     public SectionDTO create(@RequestBody SectionCreateDTO sectionCreateDTO) {

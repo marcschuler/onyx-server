@@ -1,7 +1,18 @@
 services:
   onyx-server:
     build: .
+    #image: ghcr.io/marcschuler/onyx-server:main
+    command: ["--emergency-grant-admin-power"]
     ports:
       - "8080:8080"
+    environment:
+      - LOGGING_LEVEL_DE_MARCSCHULER=TRACE
     volumes:
-      - ./onyx/data:/data
+      - onyx-data:/data/data
+      - onyx-database:/data/database
+      - onyx-cache:/data/cache
+
+volumes:
+  onyx-database:
+  onyx-data:
+  onyx-cache:

@@ -44,7 +44,7 @@ public class InviteService {
     }
 
 
-    public synchronized void enterInviteCode(User user, String code) {
+    public synchronized Invite enterInviteCode(User user, String code) {
         log.info("Entering invite code for user {}", user);
         if (user.getState() == ClientState.BANNED)
             throw new InviteException("You are banned from this server and cannot use invite codes.");
@@ -94,6 +94,7 @@ public class InviteService {
                     .ifPresent(u -> webSocketConnectionService.sendToAll(
                             new ClientChangeEvent(serverMapper.mapToDTO(u))
                     ));
+            return invite;
         } else {
             throw new InviteException("Invite not applicable: you are already a member with all associated groups.");
         }

@@ -11,6 +11,7 @@ import de.marcschuler.webrtcserver.data.permission.PermissionType;
 import de.marcschuler.webrtcserver.dto.GroupCreateDTO;
 import de.marcschuler.webrtcserver.dto.data.ServerDTO;
 import de.marcschuler.webrtcserver.dto.data.message.MessageContentDTO;
+import de.marcschuler.webrtcserver.mapper.MessageMapper;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.repository.*;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
@@ -42,6 +43,8 @@ public class ServerService {
     private final GroupRepository groupRepository;
 
     private final ServerMapper serverMapper;
+    @Autowired
+    private MessageMapper messageMapper;
 
     public Server defaultServer() {
         var servers = serverRepository.findAll();
@@ -79,7 +82,7 @@ public class ServerService {
                 new MarkdownMessageContent("""
                         ## Documentation
                         
-                        - Administrator docs coming soon""")));
+                        - Administrator docs coming soon"""))); //TODO replace with link once available
 
         /**
          * SECTIONS & CHANNELS
@@ -186,6 +189,13 @@ public class ServerService {
 
     public Server update(Server server, ServerDTO serverDto) {
         server.setName(serverDto.getName());
+        if (serverDto.getDescription() != null) {
+            server.setDescription(serverDto.getDescription().stream()
+                    .map(chatService::createMessageContent)
+                    .toList());
+        } else {
+            server.setDescription(null);
+        }
         serverRepository.save(server);
         sendUpdate(server);
         return server;
@@ -193,38 +203,6 @@ public class ServerService {
 
     public void save(Server server) {
         this.serverRepository.save(server);
-    }
-
-    public void deleteDescription(Server server, UUID descriptionId) {
-        server.getDescription().removeIf(s -> s.getId().equals(descriptionId));
-        serverRepository.save(server);
-    }
-
-    public MessageContent createDescription(Server server, MessageContentDTO messageDto) {
-        var content = chatService.createMessageContent(messageDto);
-        server.getDescription().add(content);
-        serverRepository.save(server);
-        sendUpdate(server);
-        return content;
-    }
-
-    public MessageContent updateDescription(Server server, MessageContent messageContent, MessageContentDTO messageDto) {
-        messageContent = chatService.updateMessageContent(messageContent, messageDto);
-        serverRepository.save(server);
-        sendUpdate(server);
-        return messageContent;
-    }
-
-    public Optional<MessageContent> descriptionFromId(Server server, UUID id) {
-        return server.getDescription().stream()
-                .filter(d -> d.getId().equals(id))
-                .findFirst();
-    }
-
-    public void orderDescription(Server server, MessageContent content, int newOrder) {
-        Util.reorder(server.getDescription(), content, newOrder);
-        serverRepository.save(server);
-        sendUpdate(server);
     }
 
     public void setIcon(Server server, File f) {

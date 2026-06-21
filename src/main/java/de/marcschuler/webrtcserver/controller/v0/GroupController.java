@@ -6,6 +6,7 @@ import de.marcschuler.webrtcserver.dto.data.GroupDTO;
 import de.marcschuler.webrtcserver.mapper.GroupMapper;
 import de.marcschuler.webrtcserver.service.GroupService;
 import de.marcschuler.webrtcserver.service.PermissionService;
+import de.marcschuler.webrtcserver.service.ServerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,7 @@ public class GroupController {
     private final PermissionService permissionService;
 
     private final GroupMapper groupMapper;
+    private final ServerService serverService;
 
     @GetMapping
     public List<GroupDTO> all() {
@@ -53,6 +55,6 @@ public class GroupController {
         permissionService.checkControllerAccess(null, PermissionType.SERVER_GROUP_DELETE);
 
         var group = groupService.get(id).orElseThrow();
-        groupService.delete(group);
+        groupService.delete(serverService.defaultServer(), group);
     }
 }

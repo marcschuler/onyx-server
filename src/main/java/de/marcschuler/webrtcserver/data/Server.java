@@ -38,6 +38,9 @@ public class Server {
     @OrderColumn(name = "section_order")
     private List<Section> sections = new ArrayList<>();
 
+    @OneToOne(cascade = CascadeType.ALL, optional = false)
+    private ServerSettings settings;
+
 
     @OneToMany(
             cascade = CascadeType.ALL,

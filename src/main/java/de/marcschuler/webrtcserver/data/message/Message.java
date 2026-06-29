@@ -30,4 +30,7 @@ public class Message {
     @JoinColumn(name="chat_id")
     @NotNull
     private Chat chat;
+
+    @ManyToOne
+    private Message repliesTo;
 }

@@ -4,12 +4,15 @@ import de.marcschuler.webrtcserver.config.SecurityConfig;
 import de.marcschuler.webrtcserver.data.ClientState;
 import de.marcschuler.webrtcserver.data.permission.PermissionType;
 import de.marcschuler.webrtcserver.dto.InviteResponseDto;
+import de.marcschuler.webrtcserver.dto.KickRequestDTO;
 import de.marcschuler.webrtcserver.dto.data.FileDTO;
 import de.marcschuler.webrtcserver.dto.data.GroupDTO;
 import de.marcschuler.webrtcserver.dto.data.UserExtendedDTO;
 import de.marcschuler.webrtcserver.mapper.GroupMapper;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.*;
+import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
+import de.marcschuler.webrtcserver.webclient.messages.connection.KickedEvent;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
@@ -40,6 +43,7 @@ public class UserController {
 
     private final ServerMapper serverMapper;
     private final GroupMapper groupMapper;
+    private final WebSocketConnectionService webSocketConnectionService;
 
     @GetMapping
     public List<UserExtendedDTO> users() {
@@ -55,6 +59,21 @@ public class UserController {
 
         var invite = inviteService.enterInviteCode(authUser.user(), inviteCode);
         return new InviteResponseDto(invite.getTitle());
+    }
+
+    @PutMapping("{id}/kick/channel")
+    public void kickFromChannel(@PathVariable String id, @RequestBody KickRequestDTO kickRequestDTO, @AuthenticationPrincipal SecurityConfig.AuthenticatedUser authUser) {
+        var client = webSocketConnectionService.clientFromKeyId(id).orElseThrow();
+        permissionService.checkClientAccess(client, client.getChannel(), PermissionType.CHANNEL_USER_KICK);
+        webSocketConnectionService.kickClient(client, kickRequestDTO.getReason(), kickRequestDTO.getMessage());
+    }
+
+
+    @PutMapping("{id}/kick/server")
+    public void kickFromServer(@PathVariable String id, @RequestBody KickRequestDTO kickRequestDTO, @AuthenticationPrincipal SecurityConfig.AuthenticatedUser authUser) {
+        var client = webSocketConnectionService.clientFromKeyId(id).orElseThrow();
+        permissionService.checkClientAccess(client, client.getChannel(), PermissionType.USER_KICK);
+        webSocketConnectionService.kickClient(client, kickRequestDTO.getReason(), kickRequestDTO.getMessage());
     }
 
     @PutMapping("{id}/state/ban")

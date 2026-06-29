@@ -10,6 +10,7 @@ import de.marcschuler.webrtcserver.webclient.messages.client.ClientServerLeaveEv
 import de.marcschuler.webrtcserver.webclient.messages.connection.ClientKickEvent;
 import de.marcschuler.webrtcserver.webclient.messages.error.NoPermissionMessage;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import tools.jackson.databind.ObjectMapper;
@@ -132,8 +133,10 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
      * @param client the client to kick
      * @param reason the reason. May be null
      */
-    public void kickClient(WebClient client, KickReason reason, String message) {
+    public void kickClient(WebClient client, @Nullable KickReason reason, @Nullable String message) {
         client.setState(WebClientState.INVALID);
+        if (reason == null)
+            reason = KickReason.OTHER;
         log.info("Kicking client {} for reason: {}", client, reason);
         try {
             send(client, new KickedEvent(reason, message));

@@ -38,7 +38,7 @@ public class Server {
     @OrderColumn(name = "section_order")
     private List<Section> sections = new ArrayList<>();
 
-    @OneToOne(cascade = CascadeType.ALL, optional = false)
+    @OneToOne(cascade = CascadeType.ALL, optional = false, mappedBy = "server")
     private ServerSettings settings;
 
 

@@ -4,7 +4,6 @@ import de.marcschuler.webrtcserver.dto.data.message.MessageContentDTO;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import org.jspecify.annotations.NonNull;
 
 import java.time.Instant;
 import java.util.List;
@@ -19,7 +18,7 @@ public class MessageDTO {
     @NotNull
     private UserSimpleDTO user;
 
-    @NonNull
+    @NotNull
     private List<MessageContentDTO> content;
 
     @Nullable

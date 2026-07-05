@@ -6,9 +6,11 @@ import de.marcschuler.webrtcserver.data.User;
 import de.marcschuler.webrtcserver.data.message.FileMessageContent;
 import de.marcschuler.webrtcserver.data.message.MarkdownMessageContent;
 import de.marcschuler.webrtcserver.data.message.MessageContent;
+import de.marcschuler.webrtcserver.dto.data.MessageDTO;
 import de.marcschuler.webrtcserver.dto.data.message.FileMessageContentDTO;
 import de.marcschuler.webrtcserver.dto.data.message.MarkdownMessageContentDTO;
 import de.marcschuler.webrtcserver.dto.data.message.MessageContentDTO;
+import de.marcschuler.webrtcserver.dto.data.message.MessageCreationDTO;
 import de.marcschuler.webrtcserver.error.InvalidMessageException;
 import de.marcschuler.webrtcserver.mapper.MessageContentMapper;
 import de.marcschuler.webrtcserver.mapper.MessageMapper;
@@ -27,6 +29,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -54,15 +57,18 @@ public class ChatService {
         return messageRepository.getMessagesByChatIs(chat);
     }
 
-    public Message createMessage(Chat chat, User user, MessageContentDTO messageContent) {
-        var content = createMessageContent(messageContent);
-
+    public Message createMessage(Chat chat, User user, MessageCreationDTO messageDto) {
         var message = new Message();
         message.setChat(chat);
         message.setId(UUID.randomUUID());
         message.setUser(user);
-        message.setContent(List.of(content));
+        message.setContent(
+                messageDto.getContent().stream()
+                        .map(this::createMessageContent).toList());
         message.setTimestamp(Instant.now());
+        if (messageDto.getRepliesTo() != null)
+            message.setRepliesTo(messageById(messageDto.getRepliesTo()).orElseThrow());
+
         messageRepository.save(message);
 
         log.info("New message in chat {}", chat.getId());
@@ -102,5 +108,9 @@ public class ChatService {
 
     public MessageContent updateMessageContent(MessageContent messageContent, MessageContentDTO messageDto) {
         return messageContentMapper.updateFromDTO(messageDto, messageContent);
+    }
+
+    public Optional<Message> messageById(UUID id) {
+        return messageRepository.findById(id);
     }
 }

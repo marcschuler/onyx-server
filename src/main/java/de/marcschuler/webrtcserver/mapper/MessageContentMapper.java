@@ -6,13 +6,17 @@ import de.marcschuler.webrtcserver.data.message.MessageContent;
 import de.marcschuler.webrtcserver.dto.data.message.FileMessageContentDTO;
 import de.marcschuler.webrtcserver.dto.data.message.MarkdownMessageContentDTO;
 import de.marcschuler.webrtcserver.dto.data.message.MessageContentDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.*;
 
-import java.util.List;
+import java.util.*;
 
 @Mapper(componentModel = "spring",
         subclassExhaustiveStrategy = SubclassExhaustiveStrategy.RUNTIME_EXCEPTION)
+@Slf4j
 public abstract class MessageContentMapper {
+
+
     /*
         dto to entity
      */
@@ -55,4 +59,6 @@ public abstract class MessageContentMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
     public abstract void updateFromDTO(FileMessageContentDTO dto, @MappingTarget FileMessageContent entity);
+
+
 }

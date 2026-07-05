@@ -63,7 +63,7 @@ public class ChatController {
     }
 
     @PostMapping("{id}/message")
-    public MessageDTO message(@PathVariable UUID id, @RequestBody MessageContentDTO message, @AuthenticationPrincipal SecurityConfig.AuthenticatedUser authUser) {
+    public MessageDTO message(@PathVariable UUID id, @RequestBody MessageCreationDTO message, @AuthenticationPrincipal SecurityConfig.AuthenticatedUser authUser) {
         var chat = chatService.chatById(id).orElseThrow();
 
         var channel = channelService.getByChat(chat);

@@ -5,14 +5,15 @@ import de.marcschuler.webrtcserver.data.Server;
 import de.marcschuler.webrtcserver.dto.GroupCreateDTO;
 import de.marcschuler.webrtcserver.dto.data.GroupDTO;
 import de.marcschuler.webrtcserver.mapper.GroupMapper;
-import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.repository.GroupRepository;
 import de.marcschuler.webrtcserver.repository.ServerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor

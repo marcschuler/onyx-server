@@ -1,16 +1,17 @@
 package de.marcschuler.webrtcserver;
 
 import com.nimbusds.jose.jwk.OctetKeyPair;
-import lombok.Getter;
-import tools.jackson.databind.ObjectMapper;
 import de.marcschuler.webrtcserver.webclient.messages.MessageBody;
-import de.marcschuler.webrtcserver.webclient.messages.auth.AuthChallengeResponse;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.socket.*;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.List;
@@ -35,7 +36,7 @@ public class WebSocketMock {
 
         WebSocketHandler handler = new TextWebSocketHandler() {
             @Override
-            public void afterConnectionEstablished(WebSocketSession s) throws Exception {
+            public void afterConnectionEstablished(WebSocketSession s) {
                 log.info("connected to server");
                 responseFuture.complete(s);
             }
@@ -75,6 +76,7 @@ public class WebSocketMock {
     }
 
     // Receive the next message, ignoring this ones
+    @SuppressWarnings("unchecked")
     public <T extends MessageBody> T recv(List<Class<? extends MessageBody>> ignoredMessages) throws InterruptedException, JacksonException {
         while (true) {
             if (!session.isOpen())
@@ -100,6 +102,7 @@ public class WebSocketMock {
     }
 
     // Receive the next message of a special type
+    @SuppressWarnings("unchecked")
     public <T extends MessageBody> T recv(Class<T> wantedMessage, int maxTries) throws InterruptedException, JacksonException {
         var i = 0;
         while (i < maxTries) {

@@ -2,8 +2,6 @@ package de.marcschuler.webrtcserver;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.OctetKeyPair;
-import lombok.Getter;
-import tools.jackson.databind.ObjectMapper;
 import de.marcschuler.webrtcserver.service.AuthService;
 import de.marcschuler.webrtcserver.service.CryptoService;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
@@ -14,10 +12,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
-import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 import java.util.concurrent.ExecutionException;
@@ -41,7 +39,7 @@ public class IntegrationHelper {
         return quickConnect(cryptoService.generateKeyPair(),username);
     }
 
-    public WebSocketMock quickConnect(OctetKeyPair keyPair, String username) throws ExecutionException, InterruptedException, TimeoutException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException, JOSEException {
+    public WebSocketMock quickConnect(OctetKeyPair keyPair, String username) throws ExecutionException, InterruptedException, TimeoutException, SignatureException, NoSuchAlgorithmException, InvalidKeyException, JOSEException {
         var mock = new WebSocketMock(objectMapper,keyPair);
         mock.connect();
 

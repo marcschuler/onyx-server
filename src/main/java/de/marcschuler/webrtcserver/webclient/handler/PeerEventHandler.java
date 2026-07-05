@@ -11,8 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-
 /**
  * Forwards SDP data.
  * We are only a proxy that allows clients to forward the data and connect
@@ -42,7 +40,7 @@ public class PeerEventHandler {
     }
 
     @EventListener
-    public void onAnswer(ClientMessage<PeerAnswer> event) throws IOException {
+    public void onAnswer(ClientMessage<PeerAnswer> event) {
         var clientFrom = event.client().getUser().getUsername();
         log.info("Forwarding peer answer from {} to {}", clientFrom, event.body().getClientTo());
         var clientTo = webSocketConnectionService.clientFromKeyId(event.body().getClientTo()).get();

@@ -1,46 +1,47 @@
 package de.marcschuler.webrtcserver.service.websocket;
 
-import de.marcschuler.webrtcserver.data.User;
-import de.marcschuler.webrtcserver.data.permission.PermissionType;
-import de.marcschuler.webrtcserver.error.webclient.ClientKickException;
-import de.marcschuler.webrtcserver.error.webclient.PermissionDeniedException;
-import de.marcschuler.webrtcserver.service.PermissionService;
-import de.marcschuler.webrtcserver.webclient.messages.error.ErrorMessage;
-import de.marcschuler.webrtcserver.webclient.messages.client.ClientServerLeaveEvent;
-import de.marcschuler.webrtcserver.webclient.messages.connection.ClientKickEvent;
-import de.marcschuler.webrtcserver.webclient.messages.error.NoPermissionMessage;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import tools.jackson.databind.ObjectMapper;
 import de.marcschuler.webrtcserver.data.Channel;
+import de.marcschuler.webrtcserver.data.User;
+import de.marcschuler.webrtcserver.error.webclient.ClientKickException;
 import de.marcschuler.webrtcserver.error.webclient.NoClientException;
+import de.marcschuler.webrtcserver.error.webclient.PermissionDeniedException;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.AuthService;
+import de.marcschuler.webrtcserver.service.PermissionService;
+import de.marcschuler.webrtcserver.webclient.ClientMessage;
 import de.marcschuler.webrtcserver.webclient.KickReason;
 import de.marcschuler.webrtcserver.webclient.WebClient;
 import de.marcschuler.webrtcserver.webclient.WebClientState;
-import de.marcschuler.webrtcserver.webclient.ClientMessage;
 import de.marcschuler.webrtcserver.webclient.messages.MessageBody;
 import de.marcschuler.webrtcserver.webclient.messages.auth.AuthChallengeRequest;
 import de.marcschuler.webrtcserver.webclient.messages.auth.AuthChallengeResponse;
 import de.marcschuler.webrtcserver.webclient.messages.client.ClientChannelJoinEvent;
 import de.marcschuler.webrtcserver.webclient.messages.client.ClientChannelLeaveEvent;
+import de.marcschuler.webrtcserver.webclient.messages.client.ClientServerLeaveEvent;
+import de.marcschuler.webrtcserver.webclient.messages.connection.ClientKickEvent;
 import de.marcschuler.webrtcserver.webclient.messages.connection.KickedEvent;
+import de.marcschuler.webrtcserver.webclient.messages.error.NoPermissionMessage;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Vector;
 import java.util.function.Predicate;
 
 @Service
@@ -66,7 +67,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
 
 
     @Override
-    public synchronized void afterConnectionEstablished(WebSocketSession session) throws IOException {
+    public synchronized void afterConnectionEstablished(WebSocketSession session) {
         log.info("Added websocket {} from {}", session.getId(), session.getRemoteAddress());
         var client = new WebClient(session);
         client.setState(WebClientState.NOT_AUTHORIZED);
@@ -75,7 +76,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
     }
 
     @Override
-    public synchronized void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+    public synchronized void handleTextMessage(WebSocketSession session, TextMessage message) {
         log.debug("Received message {} from {}", new String(message.asBytes()), session);
         var event = objectMapper.readValue(message.asBytes(), MessageBody.class);
         var client = clientFromSession(session).orElseThrow(() -> new NoClientException("Client for session " + session.getId() + " not found"));

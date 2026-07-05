@@ -8,7 +8,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 //TODO somehow openapi has recursion errors on code generation of we extend from ErrorMessage (make errormessage abstract and take it out of openapi code in config package?)
 @AllArgsConstructor

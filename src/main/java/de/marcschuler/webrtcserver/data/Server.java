@@ -3,7 +3,6 @@ package de.marcschuler.webrtcserver.data;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import de.marcschuler.webrtcserver.data.file.File;
-import de.marcschuler.webrtcserver.data.message.MarkdownMessageContent;
 import de.marcschuler.webrtcserver.data.message.MessageContent;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -11,7 +10,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.ToString;
 
-import java.security.KeyPair;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

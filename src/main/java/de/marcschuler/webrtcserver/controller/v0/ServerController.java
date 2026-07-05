@@ -3,7 +3,6 @@ package de.marcschuler.webrtcserver.controller.v0;
 import de.marcschuler.webrtcserver.data.permission.PermissionType;
 import de.marcschuler.webrtcserver.dto.data.FileDTO;
 import de.marcschuler.webrtcserver.dto.data.ServerDTO;
-import de.marcschuler.webrtcserver.dto.data.message.MessageContentDTO;
 import de.marcschuler.webrtcserver.mapper.MessageContentMapper;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.PermissionService;
@@ -63,8 +62,7 @@ public class ServerController {
 
     @GetMapping("{id}")
     public ServerDTO get(@PathVariable UUID id) {
-        ServerDTO serverDTO = serverMapper.mapToDTO(serverService.get(id).orElseThrow());
-        return serverDTO;
+        return serverMapper.mapToDTO(serverService.get(id).orElseThrow());
     }
 
 }

@@ -2,13 +2,11 @@ package de.marcschuler.webrtcserver.service;
 
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import de.marcschuler.webrtcserver.data.ClientState;
-import de.marcschuler.webrtcserver.data.Group;
-import de.marcschuler.webrtcserver.data.file.File;
 import de.marcschuler.webrtcserver.data.User;
+import de.marcschuler.webrtcserver.data.file.File;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.repository.UserRepository;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
-import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
 import de.marcschuler.webrtcserver.webclient.KickReason;
 import de.marcschuler.webrtcserver.webclient.messages.client.ClientChangeEvent;
 import jakarta.annotation.Nullable;
@@ -20,8 +18,6 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

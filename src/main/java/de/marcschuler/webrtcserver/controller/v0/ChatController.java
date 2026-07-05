@@ -3,14 +3,12 @@ package de.marcschuler.webrtcserver.controller.v0;
 import de.marcschuler.webrtcserver.config.SecurityConfig;
 import de.marcschuler.webrtcserver.data.permission.PermissionType;
 import de.marcschuler.webrtcserver.dto.data.MessageDTO;
-import de.marcschuler.webrtcserver.dto.data.message.MessageContentDTO;
 import de.marcschuler.webrtcserver.dto.data.message.MessageCreationDTO;
 import de.marcschuler.webrtcserver.mapper.MessageMapper;
-import de.marcschuler.webrtcserver.mapper.ServerMapper;
+
 import de.marcschuler.webrtcserver.service.ChannelService;
 import de.marcschuler.webrtcserver.service.ChatService;
 import de.marcschuler.webrtcserver.service.PermissionService;
-import de.marcschuler.webrtcserver.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,8 +18,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
-import java.util.List;
 import java.util.UUID;
 
 @RestController

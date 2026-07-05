@@ -1,12 +1,11 @@
 package de.marcschuler.webrtcserver.service;
 
 import de.marcschuler.webrtcserver.data.Chat;
-import de.marcschuler.webrtcserver.data.message.Message;
 import de.marcschuler.webrtcserver.data.User;
 import de.marcschuler.webrtcserver.data.message.FileMessageContent;
 import de.marcschuler.webrtcserver.data.message.MarkdownMessageContent;
+import de.marcschuler.webrtcserver.data.message.Message;
 import de.marcschuler.webrtcserver.data.message.MessageContent;
-import de.marcschuler.webrtcserver.dto.data.MessageDTO;
 import de.marcschuler.webrtcserver.dto.data.message.FileMessageContentDTO;
 import de.marcschuler.webrtcserver.dto.data.message.MarkdownMessageContentDTO;
 import de.marcschuler.webrtcserver.dto.data.message.MessageContentDTO;
@@ -14,11 +13,9 @@ import de.marcschuler.webrtcserver.dto.data.message.MessageCreationDTO;
 import de.marcschuler.webrtcserver.error.InvalidMessageException;
 import de.marcschuler.webrtcserver.mapper.MessageContentMapper;
 import de.marcschuler.webrtcserver.mapper.MessageMapper;
-import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.repository.ChatRepository;
 import de.marcschuler.webrtcserver.repository.MessageRepository;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
-import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
 import de.marcschuler.webrtcserver.webclient.messages.chat.ChatMessageEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,9 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 

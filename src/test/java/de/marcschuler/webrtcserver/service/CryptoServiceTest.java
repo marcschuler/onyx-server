@@ -1,25 +1,22 @@
 package de.marcschuler.webrtcserver.service;
 
-import de.marcschuler.webrtcserver.OnyxTest;
-import tools.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.jwk.JWK;
+import de.marcschuler.webrtcserver.OnyxTest;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
-import java.security.spec.InvalidKeySpecException;
 import java.text.ParseException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 @OnyxTest
@@ -48,7 +45,7 @@ class CryptoServiceTest {
     }
 
     @Test
-    void testKeyId() throws IOException, ParseException, InvalidKeySpecException, JOSEException {
+    void testKeyId() throws IOException, ParseException {
 
         ClassPathResource resource = new ClassPathResource("crypto/publickey-1.txt");
         String content = Files.readString(resource.getFile().toPath());
@@ -66,7 +63,7 @@ class CryptoServiceTest {
     }
 
     @Test
-    void testJWKExportImport() throws JacksonException, ParseException, InvalidKeySpecException, JOSEException, SignatureException, NoSuchAlgorithmException, InvalidKeyException {
+    void testJWKExportImport() throws JacksonException, ParseException, JOSEException, SignatureException, NoSuchAlgorithmException, InvalidKeyException {
         var keyPair = cryptoService.generateKeyPair();
         var publicJWK = keyPair.toPublicJWK().toJSONString();
         var importedKey = cryptoService.importPublicKey(publicJWK);

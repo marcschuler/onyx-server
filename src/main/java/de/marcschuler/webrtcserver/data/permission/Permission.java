@@ -2,7 +2,6 @@ package de.marcschuler.webrtcserver.data.permission;
 
 import de.marcschuler.webrtcserver.data.Channel;
 import de.marcschuler.webrtcserver.data.Section;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Data;
 

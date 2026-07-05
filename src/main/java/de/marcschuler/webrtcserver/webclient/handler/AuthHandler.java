@@ -4,6 +4,7 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import de.marcschuler.webrtcserver.config.WebRTConfig;
 import de.marcschuler.webrtcserver.data.ClientState;
+import de.marcschuler.webrtcserver.dto.AuthChallenge;
 import de.marcschuler.webrtcserver.error.webclient.ClientKickException;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.AuthService;
@@ -11,10 +12,9 @@ import de.marcschuler.webrtcserver.service.CryptoService;
 import de.marcschuler.webrtcserver.service.UserService;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
+import de.marcschuler.webrtcserver.webclient.ClientMessage;
 import de.marcschuler.webrtcserver.webclient.KickReason;
 import de.marcschuler.webrtcserver.webclient.WebClientState;
-import de.marcschuler.webrtcserver.webclient.ClientMessage;
-import de.marcschuler.webrtcserver.dto.AuthChallenge;
 import de.marcschuler.webrtcserver.webclient.messages.auth.AuthChallengeResponse;
 import de.marcschuler.webrtcserver.webclient.messages.auth.AuthSuccessMessage;
 import de.marcschuler.webrtcserver.webclient.messages.client.ClientServerJoinEvent;
@@ -26,8 +26,6 @@ import org.springframework.stereotype.Component;
 import tools.jackson.core.JacksonException;
 
 import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 import java.text.ParseException;
 import java.time.Instant;
@@ -56,17 +54,13 @@ public class AuthHandler {
         OctetKeyPair publicKey;
         try {
             publicKey = cryptoService.importPublicKey(event.body().getPublicKey());
-        } catch (JOSEException e) {
-            log.warn("Invalid public key from client {}", event.client());
-            throw new RuntimeException("Could not parse public key", e);
         } catch (ParseException e) {
             throw new RuntimeException("Could not parse JWK", e);
         }
         AuthChallenge challenge;
         try {
             challenge = cryptoService.verifyContent(content, AuthChallenge.class, publicKey);
-        } catch (InvalidKeyException | JacksonException | SignatureException | NoSuchAlgorithmException |
-                 ParseException e) {
+        } catch (JacksonException | SignatureException | ParseException e) {
             log.warn("Client signature could not be verified {}", event.client());
             throw new RuntimeException("Could not verify signature", e);
         }

@@ -1,9 +1,7 @@
 package de.marcschuler.webrtcserver.service.websocket;
 
 import com.nimbusds.jose.JOSEException;
-import de.marcschuler.webrtcserver.IntegrationHelper;
 import de.marcschuler.webrtcserver.OnyxTest;
-import tools.jackson.databind.ObjectMapper;
 import de.marcschuler.webrtcserver.WebSocketMock;
 import de.marcschuler.webrtcserver.dto.SignedContent;
 import de.marcschuler.webrtcserver.service.AuthService;
@@ -17,7 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -69,7 +67,7 @@ class WebSocketConnectionServiceTest {
 
         assertEquals(1, webSocketConnectionService.clients().size(),"client found");
         assertEquals(0, webSocketConnectionService.clientsInteractable().size(),"client not interactab.e");
-        var me =webSocketConnectionService.clients().get(0);
+        var me =webSocketConnectionService.clients().getFirst();
         assertEquals(WebClientState.NOT_AUTHORIZED,me.getState(),"client not authorized");
 
         //Authenticate
@@ -87,7 +85,7 @@ class WebSocketConnectionServiceTest {
 
         assertEquals(1, webSocketConnectionService.clients().size(),"client found");
         assertEquals(1, webSocketConnectionService.clientsInteractable().size(),"client interactable");
-        me = webSocketConnectionService.clients().get(0);
+        me = webSocketConnectionService.clients().getFirst();
         assertEquals("marc",me.getUser().getUsername(),"user is right");
         assertEquals(cryptoService.generateKeyId(key),me.getUser().getId(),"is is derived from key");
         assertEquals(WebClientState.LOGGED_IN,me.getState(),"state is logged in");
@@ -100,13 +98,13 @@ class WebSocketConnectionServiceTest {
     }
 
     @Test
-    void testLoginWrongKeys() throws InterruptedException, IOException {
+    void testLoginWrongKeys() throws InterruptedException {
         var key = cryptoService.generateKeyPair();
         webSocketMock.recv();
 
         assertEquals(1, webSocketConnectionService.clients().size(),"client found");
         assertEquals(0, webSocketConnectionService.clientsInteractable().size(),"client not interactab.e");
-        var me =webSocketConnectionService.clients().get(0);
+        var me =webSocketConnectionService.clients().getFirst();
         assertEquals(WebClientState.NOT_AUTHORIZED,me.getState(),"client not authorized");
 
         //Authenticate

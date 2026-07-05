@@ -4,16 +4,14 @@ import de.marcschuler.webrtcserver.Util;
 import de.marcschuler.webrtcserver.data.*;
 import de.marcschuler.webrtcserver.data.file.File;
 import de.marcschuler.webrtcserver.data.message.MarkdownMessageContent;
-import de.marcschuler.webrtcserver.data.message.MessageContent;
-import de.marcschuler.webrtcserver.data.Channel;
 import de.marcschuler.webrtcserver.data.permission.Permission;
 import de.marcschuler.webrtcserver.data.permission.PermissionType;
 import de.marcschuler.webrtcserver.dto.GroupCreateDTO;
 import de.marcschuler.webrtcserver.dto.data.ServerDTO;
-import de.marcschuler.webrtcserver.dto.data.message.MessageContentDTO;
 import de.marcschuler.webrtcserver.mapper.MessageMapper;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
-import de.marcschuler.webrtcserver.repository.*;
+import de.marcschuler.webrtcserver.repository.GroupRepository;
+import de.marcschuler.webrtcserver.repository.ServerRepository;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
 import de.marcschuler.webrtcserver.webclient.messages.server.ServerChangeEvent;
 import jakarta.transaction.Transactional;
@@ -24,7 +22,10 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -50,7 +51,7 @@ public class ServerService {
         var servers = serverRepository.findAll();
         if (servers.size() != 1)
             log.error("More than one server active!");
-        return servers.get(0);//one should exist at any time
+        return servers.getFirst();//one should exist at any time
     }
 
     public List<Server> all() {
@@ -61,7 +62,7 @@ public class ServerService {
     //TODO replace with SQL script once the start configuration is stable
     @Transactional
     public Server generateDefault() {
-        /**
+        /*
          * BASIC SERVER
          */
         var keys = cryptoService.generateKeyPair();
@@ -84,7 +85,7 @@ public class ServerService {
                         
                         - Administrator docs coming soon"""))); //TODO replace with link once available
 
-        /**
+        /*
          * SECTIONS & CHANNELS
          */
         var section1 = new Section();
@@ -136,7 +137,7 @@ public class ServerService {
         section3.setChannels(List.of(channel4, channel5, channel6));
 
 
-        /**
+        /*
          * GROUPS & PERMISSIONS
          */
         var permissionsAdmin = new Permission();
@@ -176,7 +177,7 @@ public class ServerService {
         log.info("Enter it in your app. Do not share it with anyone");
         log.info(" ---------- ADMIN CODE ----------");
 
-        /**
+        /*
          * SAVE
          */
         return serverRepository.save(server);

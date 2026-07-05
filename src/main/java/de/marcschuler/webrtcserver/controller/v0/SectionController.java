@@ -2,7 +2,6 @@ package de.marcschuler.webrtcserver.controller.v0;
 
 import de.marcschuler.webrtcserver.data.permission.PermissionType;
 import de.marcschuler.webrtcserver.dto.SectionCreateDTO;
-import de.marcschuler.webrtcserver.dto.data.ChannelDTO;
 import de.marcschuler.webrtcserver.dto.data.SectionDTO;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.PermissionService;

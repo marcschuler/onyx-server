@@ -5,7 +5,10 @@ import de.marcschuler.webrtcserver.IntegrationHelper;
 import de.marcschuler.webrtcserver.OnyxTest;
 import de.marcschuler.webrtcserver.WebSocketMock;
 import de.marcschuler.webrtcserver.service.CryptoService;
-import de.marcschuler.webrtcserver.webclient.messages.client.*;
+import de.marcschuler.webrtcserver.webclient.messages.client.ClientChannelJoinEvent;
+import de.marcschuler.webrtcserver.webclient.messages.client.ClientChannelJoinRequest;
+import de.marcschuler.webrtcserver.webclient.messages.client.ClientChannelLeaveEvent;
+import de.marcschuler.webrtcserver.webclient.messages.client.ClientChannelLeaveRequest;
 import de.marcschuler.webrtcserver.webclient.messages.peer.IceServerMessage;
 import de.marcschuler.webrtcserver.webclient.messages.server.ServerTreeChangeMessage;
 import org.junit.jupiter.api.AfterEach;
@@ -13,7 +16,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import tools.jackson.core.JacksonException;
 
 import java.io.IOException;
@@ -66,7 +68,7 @@ public class SimpleConnectionIntegrationTest {
 
 
 
-        var firstChannel = tree.getSections().get(0).getChannels().get(0);
+        var firstChannel = tree.getSections().getFirst().getChannels().getFirst();
         client.sendMessage(new ClientChannelJoinRequest(firstChannel.getId()));
 
         //join channel

@@ -15,7 +15,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,8 +28,6 @@ class StorageServiceTest {
     @Mock
     private FileRepository fileRepository;
 
-    private Path basePath;
-
     private StorageService storageService;
 
     @BeforeEach
@@ -39,7 +36,7 @@ class StorageServiceTest {
         storageService = new StorageService(fileRepository);
 
         // Create a temporary directory that will be used as the basePath
-        basePath = Files.createTempDirectory("storage-test");
+        var basePath = Files.createTempDirectory("storage-test");
         // Inject the Path into the service via reflection
         setField(storageService, "basePath", basePath);
     }

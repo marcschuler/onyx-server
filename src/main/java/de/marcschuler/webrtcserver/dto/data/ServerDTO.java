@@ -2,8 +2,6 @@ package de.marcschuler.webrtcserver.dto.data;
 
 import de.marcschuler.webrtcserver.dto.data.message.MessageContentDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
-import tools.jackson.databind.JsonNode;
-import de.marcschuler.webrtcserver.dto.data.message.MarkdownMessageContentDTO;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 

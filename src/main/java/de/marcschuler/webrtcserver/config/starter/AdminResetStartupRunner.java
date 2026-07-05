@@ -5,11 +5,9 @@ import de.marcschuler.webrtcserver.data.permission.Permission;
 import de.marcschuler.webrtcserver.data.permission.PermissionType;
 import de.marcschuler.webrtcserver.dto.GroupCreateDTO;
 import de.marcschuler.webrtcserver.dto.data.InviteDTO;
-import de.marcschuler.webrtcserver.error.webclient.NoClientException;
 import de.marcschuler.webrtcserver.service.GroupService;
 import de.marcschuler.webrtcserver.service.InviteService;
 import de.marcschuler.webrtcserver.service.ServerService;
-import de.marcschuler.webrtcserver.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.DefaultParser;
@@ -46,7 +44,6 @@ public class AdminResetStartupRunner implements CommandLineRunner {
                 .get());
 
         var parser = new DefaultParser();
-        ;
         var line = parser.parse(options, args, false);
 
         if (line.hasOption(OPTION_EMERGENCY_GRANT_ADMIN_POWER)) {

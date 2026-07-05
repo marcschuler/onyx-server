@@ -1,17 +1,23 @@
 package de.marcschuler.webrtcserver.mapper;
 
 import com.nimbusds.jose.jwk.OctetKeyPair;
-import de.marcschuler.webrtcserver.data.file.File;
-import de.marcschuler.webrtcserver.data.Channel;
-import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
-import de.marcschuler.webrtcserver.webclient.WebClient;
-import org.mapstruct.*;
 import de.marcschuler.webrtcserver.config.WebRTConfig;
-import de.marcschuler.webrtcserver.data.*;
-import de.marcschuler.webrtcserver.dto.*;
+import de.marcschuler.webrtcserver.data.Channel;
+import de.marcschuler.webrtcserver.data.Section;
+import de.marcschuler.webrtcserver.data.Server;
+import de.marcschuler.webrtcserver.data.User;
+import de.marcschuler.webrtcserver.data.file.File;
+import de.marcschuler.webrtcserver.dto.IceServer;
+import de.marcschuler.webrtcserver.dto.SectionCreateDTO;
 import de.marcschuler.webrtcserver.dto.data.*;
 import de.marcschuler.webrtcserver.service.CryptoService;
+import de.marcschuler.webrtcserver.service.websocket.WebSocketService;
+import de.marcschuler.webrtcserver.webclient.WebClient;
 import de.marcschuler.webrtcserver.webclient.messages.server.ServerTreeChangeMessage;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -23,9 +29,10 @@ public abstract class ServerMapper {
     @Autowired
     private CryptoService cryptoService;
 
-    /**
+    /*
      * SERVER
      */
+
     /**
      *
      * @param server the server

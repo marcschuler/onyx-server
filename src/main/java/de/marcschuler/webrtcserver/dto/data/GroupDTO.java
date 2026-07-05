@@ -1,7 +1,5 @@
 package de.marcschuler.webrtcserver.dto.data;
 
-import de.marcschuler.webrtcserver.data.file.File;
-import de.marcschuler.webrtcserver.data.permission.Permission;
 import de.marcschuler.webrtcserver.dto.PermissionDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;

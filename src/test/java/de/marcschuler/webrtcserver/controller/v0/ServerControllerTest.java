@@ -57,13 +57,13 @@ class ServerControllerTest {
         server = serverController.edit(server.getId(),server);
         assertNotNull(server.getDescription());
         assertEquals(1,server.getDescription().size());
-        assertInstanceOf(MarkdownMessageContentDTO.class, server.getDescription().get(0));
-        assertEquals("example", ((MarkdownMessageContentDTO) server.getDescription().get(0)).getText());
+        assertInstanceOf(MarkdownMessageContentDTO.class, server.getDescription().getFirst());
+        assertEquals("example", ((MarkdownMessageContentDTO) server.getDescription().getFirst()).getText());
 
-        ((MarkdownMessageContentDTO) server.getDescription().get(0)).setText("kohlekohlekohle");
+        ((MarkdownMessageContentDTO) server.getDescription().getFirst()).setText("kohlekohlekohle");
         server = serverController.edit(server.getId(),server);
-        assertInstanceOf(MarkdownMessageContentDTO.class, server.getDescription().get(0));
-        assertEquals("kohlekohlekohle", ((MarkdownMessageContentDTO) server.getDescription().get(0)).getText());
+        assertInstanceOf(MarkdownMessageContentDTO.class, server.getDescription().getFirst());
+        assertEquals("kohlekohlekohle", ((MarkdownMessageContentDTO) server.getDescription().getFirst()).getText());
     }
 
 

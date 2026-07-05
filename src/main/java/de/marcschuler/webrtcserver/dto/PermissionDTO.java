@@ -2,7 +2,6 @@ package de.marcschuler.webrtcserver.dto;
 
 import de.marcschuler.webrtcserver.data.permission.PermissionType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;

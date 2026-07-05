@@ -1,6 +1,5 @@
 package de.marcschuler.webrtcserver.webclient.messages.server;
 
-import de.marcschuler.webrtcserver.dto.data.SectionDTO;
 import de.marcschuler.webrtcserver.dto.data.SectionExtendedDTO;
 import de.marcschuler.webrtcserver.dto.data.ServerDTO;
 import de.marcschuler.webrtcserver.dto.data.UserSimpleDTO;

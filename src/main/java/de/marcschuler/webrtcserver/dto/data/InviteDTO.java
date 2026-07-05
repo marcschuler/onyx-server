@@ -1,6 +1,5 @@
 package de.marcschuler.webrtcserver.dto.data;
 
-import de.marcschuler.webrtcserver.data.Group;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.ManyToMany;
 import jakarta.validation.constraints.NotNull;

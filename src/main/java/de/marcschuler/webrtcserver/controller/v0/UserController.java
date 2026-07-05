@@ -12,7 +12,6 @@ import de.marcschuler.webrtcserver.mapper.GroupMapper;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.*;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
-import de.marcschuler.webrtcserver.webclient.messages.connection.KickedEvent;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;

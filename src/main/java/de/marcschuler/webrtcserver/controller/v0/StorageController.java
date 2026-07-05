@@ -31,7 +31,7 @@ public class StorageController {
     }
 
     @GetMapping("{fileId}/preview/{format}")
-    public ResponseEntity<byte[]> filePreview(@PathVariable UUID fileId, @PathVariable PreviewFormat format) throws IOException {
+    public ResponseEntity<byte[]> filePreview(@PathVariable UUID fileId, @PathVariable PreviewFormat format) {
         var file = storageService.get(fileId).orElseThrow();
         return storageService.buildPreviewResponse(file, format);
     }

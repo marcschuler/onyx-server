@@ -1,11 +1,10 @@
 package de.marcschuler.webrtcserver.webclient.messages.peer;
 
-import tools.jackson.databind.JsonNode;
 import de.marcschuler.webrtcserver.webclient.messages.MessageBody;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import tools.jackson.databind.JsonNode;
 
 @Data
 @AllArgsConstructor

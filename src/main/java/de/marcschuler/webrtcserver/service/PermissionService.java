@@ -13,7 +13,9 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.Set;
+import java.util.TreeSet;
 
 import static de.marcschuler.webrtcserver.service.PermissionService.PermissionState.*;
 
@@ -130,9 +132,8 @@ public class PermissionService {
     }
 
     public Set<Group> buildGroupContext(@NonNull User user, @Nullable Section section, @Nullable Channel channel) {
-        var groups = new TreeSet<Group>();
 
-        groups.addAll(user.getGroups());
+        var groups = new TreeSet<>(user.getGroups());
 
         if (section != null && user.getSectionGroups() != null) {
             var sectionGroups = user.getSectionGroups().stream()

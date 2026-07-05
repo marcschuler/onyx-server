@@ -56,7 +56,7 @@ public class WebSocketService {
                     .flatMap(s -> s.getChannels().stream())
                     .forEach(c ->{
                         var u = getClientsInChannel(c.getId())
-                                .stream().map(wc -> wc.getUser()).toList();
+                                .stream().map(WebClient::getUser).toList();
                         c.setUsers(serverMapper.mapToDTOList(u));
                     });
 

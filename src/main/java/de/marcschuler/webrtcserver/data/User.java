@@ -5,11 +5,13 @@ import de.marcschuler.webrtcserver.data.file.File;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import jdk.jfr.Experimental;
 import lombok.Data;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity(name = "SERVER_USERS")
 @Data

@@ -3,24 +3,22 @@ package de.marcschuler.webrtcserver.service;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.Ed25519Signer;
 import com.nimbusds.jose.crypto.Ed25519Verifier;
-import com.nimbusds.jose.jwk.gen.OctetKeyPairGenerator;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.jwk.Curve;
-import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.OctetKeyPair;
-import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jose.jwk.gen.OctetKeyPairGenerator;
 import de.marcschuler.webrtcserver.dto.SignedContent;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
-import java.nio.charset.StandardCharsets;
-import java.security.*;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.SignatureException;
 import java.text.ParseException;
 import java.util.Base64;
 import java.util.Map;
@@ -74,7 +72,7 @@ public class CryptoService {
         return OctetKeyPair.parse(data);
     }
 
-    public OctetKeyPair importPublicKey(Map<String,Object> data) throws JOSEException, ParseException {
+    public OctetKeyPair importPublicKey(Map<String,Object> data) throws ParseException {
         return OctetKeyPair.parse(data);
     }
 
@@ -86,7 +84,7 @@ public class CryptoService {
     /**
      * Signs content with the given key
      */
-    public <T> SignedContent signContent(T content, OctetKeyPair privateKey) throws SignatureException, NoSuchAlgorithmException, InvalidKeyException, JacksonException, JOSEException {
+    public <T> SignedContent signContent(T content, OctetKeyPair privateKey) throws JacksonException, JOSEException {
         var contentString = objectMapper.writeValueAsBytes(content);
         var jwsHeader = new JWSHeader.Builder(JWSAlgorithm.Ed25519)
                 .type(JOSEObjectType.JOSE)
@@ -104,7 +102,7 @@ public class CryptoService {
      * @param key the key to verify against. Can be a public key only
      * @param <T>       the type of T.
      */
-    public <T> T verifyContent(SignedContent content, Class<T> clazz, OctetKeyPair key) throws InvalidKeyException, JacksonException, SignatureException, NoSuchAlgorithmException, JOSEException, ParseException {
+    public <T> T verifyContent(SignedContent content, Class<T> clazz, OctetKeyPair key) throws JacksonException, SignatureException, JOSEException, ParseException {
         if (content == null)
             throw new SignatureException("SignedContent is null");
         if (content.getJws()==null)

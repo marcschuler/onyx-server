@@ -3,22 +3,22 @@ package de.marcschuler.webrtcserver.controller.v0;
 import de.marcschuler.webrtcserver.OnyxTest;
 import de.marcschuler.webrtcserver.TestService;
 import de.marcschuler.webrtcserver.dto.data.ServerDTO;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.client.RestClient;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @OnyxTest
-@Slf4j
-class ServerControllerTest {
+class InfoControllerTest {
 
     @LocalServerPort
     private int port;
@@ -32,28 +32,40 @@ class ServerControllerTest {
     void setUp() {
         restClient = RestClient.builder()
                 .baseUrl("http://localhost:" + port)
-                .defaultHeader("Authorization", testService.bearerToken(testService.userAdmin()))
+                .defaultHeader("Authorization", testService.bearerToken(testService.userUser()))
                 .build();
     }
 
     @Test
-    void testGet() {
+    void testAllServers() {
+        var servers = restClient.get()
+                .uri("/v0/info/server")
+                .retrieve()
+                .body(new ParameterizedTypeReference<List<ServerDTO>>() {});
+        assertNotNull(servers);
+        assertFalse(servers.isEmpty());
+        assertEquals("Onyx Server", servers.getFirst().getName());
+    }
+
+    @Test
+    void testServerById() {
         var server = restClient.get()
-                .uri("/v0/server/{id}", TestService.SERVER_ID)
+                .uri("/v0/info/server/{id}", TestService.SERVER_ID)
                 .retrieve()
                 .body(ServerDTO.class);
         assertNotNull(server);
         assertEquals(TestService.SERVER_ID, server.getId());
         assertEquals("Onyx Server", server.getName());
-        assertFalse(server.getDescription().isEmpty());
     }
 
     @Test
-    void testGetNotFound() {
-        assertThrows(Exception.class, () ->
+    void testServerByIdNotFound() {
+        var unknownId = UUID.randomUUID();
+        var ex = assertThrows(Exception.class, () ->
                 restClient.get()
-                        .uri("/v0/server/{id}", UUID.randomUUID())
+                        .uri("/v0/info/server/{id}", unknownId)
                         .retrieve()
                         .body(ServerDTO.class));
+        assertNotNull(ex);
     }
 }

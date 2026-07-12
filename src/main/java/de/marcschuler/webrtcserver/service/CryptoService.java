@@ -15,8 +15,6 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.SignatureException;
 import java.text.ParseException;
@@ -118,7 +116,7 @@ public class CryptoService {
         return objectMapper.readValue(jwsObject.getPayload().toBytes(), clazz);
     }
 
-    public <T> JsonNode verifyContent(SignedContent content, OctetKeyPair publicKey) throws InvalidKeyException, JacksonException, SignatureException, NoSuchAlgorithmException, JOSEException, ParseException {
+    public <T> JsonNode verifyContent(SignedContent content, OctetKeyPair publicKey) throws JacksonException, SignatureException, JOSEException, ParseException {
         return verifyContent(content, JsonNode.class, publicKey);
     }
 

@@ -35,11 +35,11 @@ public class IntegrationHelper {
         return quickConnect(RandomStringUtils.randomAlphanumeric(8));
     }
 
-    public WebSocketMock quickConnect(String username) throws IOException, SignatureException, NoSuchAlgorithmException, ExecutionException, InvalidKeyException, InterruptedException, TimeoutException, JOSEException {
+    public WebSocketMock quickConnect(String username) throws SignatureException, NoSuchAlgorithmException, ExecutionException, InvalidKeyException, InterruptedException, TimeoutException, JOSEException {
         return quickConnect(cryptoService.generateKeyPair(),username);
     }
 
-    public WebSocketMock quickConnect(OctetKeyPair keyPair, String username) throws ExecutionException, InterruptedException, TimeoutException, SignatureException, NoSuchAlgorithmException, InvalidKeyException, JOSEException {
+    public WebSocketMock quickConnect(OctetKeyPair keyPair, String username) throws ExecutionException, InterruptedException, TimeoutException, JOSEException {
         var mock = new WebSocketMock(objectMapper,keyPair);
         mock.connect();
 

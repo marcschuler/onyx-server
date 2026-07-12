@@ -18,9 +18,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
 import java.text.ParseException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
@@ -57,7 +54,7 @@ class WebSocketConnectionServiceTest {
     }
 
     @Test
-    void testFullLogin() throws InterruptedException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException, JOSEException, ParseException {
+    void testFullLogin() throws InterruptedException, IOException, JOSEException, ParseException {
         var key = cryptoService.generateKeyPair();
         var authChallengeRequest = (AuthChallengeRequest) webSocketMock.recv();
 

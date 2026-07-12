@@ -8,9 +8,7 @@ import de.marcschuler.webrtcserver.data.permission.Permission;
 import de.marcschuler.webrtcserver.data.permission.PermissionType;
 import de.marcschuler.webrtcserver.dto.GroupCreateDTO;
 import de.marcschuler.webrtcserver.dto.data.ServerDTO;
-import de.marcschuler.webrtcserver.mapper.MessageMapper;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
-import de.marcschuler.webrtcserver.repository.GroupRepository;
 import de.marcschuler.webrtcserver.repository.ServerRepository;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
 import de.marcschuler.webrtcserver.webclient.messages.server.ServerChangeEvent;
@@ -22,10 +20,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -41,11 +36,8 @@ public class ServerService {
     private final ChatService chatService;
 
     private final ServerRepository serverRepository;
-    private final GroupRepository groupRepository;
 
     private final ServerMapper serverMapper;
-    @Autowired
-    private MessageMapper messageMapper;
 
     public Server defaultServer() {
         var servers = serverRepository.findAll();
@@ -191,9 +183,9 @@ public class ServerService {
     public Server update(Server server, ServerDTO serverDto) {
         server.setName(serverDto.getName());
         if (serverDto.getDescription() != null) {
-            server.setDescription(serverDto.getDescription().stream()
+            server.setDescription(new ArrayList<>(serverDto.getDescription().stream()
                     .map(chatService::createMessageContent)
-                    .toList());
+                    .toList()));
         } else {
             server.setDescription(null);
         }

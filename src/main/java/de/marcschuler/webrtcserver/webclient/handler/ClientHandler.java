@@ -25,8 +25,8 @@ public class ClientHandler {
     @EventListener
     @Transactional
     public void onChannelJoinRequest(ClientMessage<ClientChannelJoinRequest> event) {
-        log.info("User {} wants to join channel {}", event.client().getUser().getUsername(), event.body().getChannelId());
-        var wantedChannel = channelService.get(event.body().getChannelId()).orElseThrow();
+        log.info("User {} wants to join channel {}", event.client().getUser().getUsername(),event.body().channelId());
+        var wantedChannel = channelService.get(event.body().channelId()).orElseThrow();
         
         permissionService.checkClientAccess(event.client(), wantedChannel, PermissionType.CHANNEL_JOIN);
 

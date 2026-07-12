@@ -98,7 +98,7 @@ public class BeanConfig {
                         Class<?> superclass = c.getSuperclass();
                         List<Schema<?>> allOfSchemas = new ArrayList<>();
 
-                        while (superclass != null && superclass != Object.class) {
+                        while (superclass != null && superclass != Object.class && superclass != Record.class) {
                             var baseSchema = polymorphySchemas.computeIfAbsent(superclass, cls -> {
                                 var resolvedBase = ModelConverters.getInstance()
                                         .resolveAsResolvedSchema(new AnnotatedType(cls));

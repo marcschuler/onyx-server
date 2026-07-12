@@ -55,7 +55,7 @@ public class SimpleConnectionIntegrationTest {
         client.recv(IceServerMessage.class);
         var tree = client.recv(ServerTreeChangeMessage.class);
         assertNotNull(tree, "tree exists");
-        assertEquals(3, tree.getSections().size(), "three sections");
+        assertEquals(3, tree.sections().size(), "three sections");
     }
 
     @Test
@@ -67,15 +67,14 @@ public class SimpleConnectionIntegrationTest {
         var tree = client.recv(ServerTreeChangeMessage.class);
 
 
-
-        var firstChannel = tree.getSections().getFirst().getChannels().getFirst();
+        var firstChannel = tree.sections().getFirst().getChannels().getFirst();
         client.sendMessage(new ClientChannelJoinRequest(firstChannel.getId()));
 
         //join channel
         var joinEvent = client.recv(ClientChannelJoinEvent.class);
-        assertNotNull(joinEvent.getUser());
-        assertEquals(keyId, joinEvent.getUser().getId());
-        assertEquals(firstChannel.getId(), joinEvent.getChannelId());
+        assertNotNull(joinEvent.userId());
+        assertEquals(keyId, joinEvent.userId());
+        assertEquals(firstChannel.getId(), joinEvent.channelId());
 
         //joining the same channel should do nothing
         client.sendMessage(new ClientChannelJoinRequest(firstChannel.getId()));
@@ -84,8 +83,8 @@ public class SimpleConnectionIntegrationTest {
         //leave the channel
         client.sendMessage(new ClientChannelLeaveRequest());
         var leaveEvent = client.recv(ClientChannelLeaveEvent.class);
-        assertNotNull(leaveEvent.getUser());
-        assertEquals(keyId, leaveEvent.getUser().getId());
+        assertNotNull(leaveEvent.userId());
+        assertEquals(keyId, leaveEvent.userId());
 
         //try to leave channel again
         client.sendMessage(new ClientChannelLeaveRequest());

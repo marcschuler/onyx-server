@@ -2,14 +2,10 @@ package de.marcschuler.webrtcserver.webclient.messages.client;
 
 import de.marcschuler.webrtcserver.webclient.messages.MessageBody;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
-public class ClientServerLeaveEvent extends MessageBody {
-    @NotNull
-    private String userId;
+/**
+ * This event fires when a user leaves the server gracefully
+ * @param userId the id of the user
+ */
+public record ClientServerLeaveEvent(@NotNull String userId) implements MessageBody {
 }

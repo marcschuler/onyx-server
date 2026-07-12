@@ -3,14 +3,11 @@ package de.marcschuler.webrtcserver.webclient.messages.peer;
 import tools.jackson.databind.JsonNode;
 import de.marcschuler.webrtcserver.webclient.messages.MessageBody;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 
-@Data
-@AllArgsConstructor
-public class PeerOfferForward extends MessageBody {
-    @NotNull
-    private String clientFrom;
-    @NotNull
-    private JsonNode offer; //TODO specify what kind of data is expected
+/**
+ * A peer offer from another client (that send it via @{@link PeerOffer}
+ * @param clientFrom the client that sent the offer
+ * @param offer the offer //TODO define format
+ */
+public record PeerOfferForward(@NotNull String clientFrom, @NotNull JsonNode offer) implements MessageBody {
 }

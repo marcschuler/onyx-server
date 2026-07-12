@@ -39,8 +39,10 @@ public abstract class ServerMapper {
      * @return the tree WITHOUT populated user lists. See {@link WebSocketService#createServerTreeChangeEvent(WebClient)} ()} for a fully populated list
      */
     @Mapping(target = "server", source = "server")
+    @Mapping(target = "users", source = "users")
+    @Mapping(target = "usersNotInChannel", source = "usersNotInChannel")
     @Named("mapToChangeEvent")
-    public abstract ServerTreeChangeMessage mapToChangeEvent(Server server);
+    public abstract ServerTreeChangeMessage mapToChangeEvent(Server server, List<UserSimpleDTO> users, List<UserSimpleDTO> usersNotInChannel);
 
     @Mapping(target = "chatId", source = "chat.id")
     public abstract ChannelExtendedDTO mapToDTOExtended(Channel channel);
@@ -60,6 +62,7 @@ public abstract class ServerMapper {
      * SECTIONS
      */
     public abstract Section mapFromDTO(SectionDTO sectionDTO);
+
     public abstract Section mapFromDTO(SectionCreateDTO sectionCreateDTO);
 
     public abstract SectionDTO mapToDTO(Section section);

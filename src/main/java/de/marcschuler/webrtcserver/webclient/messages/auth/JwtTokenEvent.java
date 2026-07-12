@@ -2,12 +2,10 @@ package de.marcschuler.webrtcserver.webclient.messages.auth;
 
 import de.marcschuler.webrtcserver.webclient.messages.MessageBody;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 
-@Data
-@AllArgsConstructor
-public class JwtTokenEvent extends MessageBody {
-    @NotNull
-    private String jwt;
+/**
+ * A scheduled event to replace the jwt token with a new one.
+ * @param jwt a fresh jwt token the client should use from now on
+ */
+public record JwtTokenEvent(@NotNull String jwt) implements MessageBody {
 }

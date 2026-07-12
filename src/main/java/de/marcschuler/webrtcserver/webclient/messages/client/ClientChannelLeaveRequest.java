@@ -3,8 +3,9 @@ package de.marcschuler.webrtcserver.webclient.messages.client;
 import de.marcschuler.webrtcserver.webclient.messages.MessageBody;
 
 /**
- * A request from a user leave the channel
- * It should always be successfull. In this case a ClientChannelLeaveMessage is sent
+ * A request from a user leave the current channel.
+ * You may assume that this should always be successfull.
+ * In this case a @{@link ClientChannelLeaveEvent} with your user id is sent
  */
-public class ClientChannelLeaveRequest extends MessageBody {
+public record ClientChannelLeaveRequest() implements MessageBody {
 }

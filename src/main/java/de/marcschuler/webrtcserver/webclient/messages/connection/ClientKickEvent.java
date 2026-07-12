@@ -1,25 +1,17 @@
 package de.marcschuler.webrtcserver.webclient.messages.connection;
 
-import de.marcschuler.webrtcserver.dto.data.UserSimpleDTO;
 import de.marcschuler.webrtcserver.webclient.KickReason;
 import de.marcschuler.webrtcserver.webclient.messages.MessageBody;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
- * Fires when a client that is not you was kicked from the server
+ * Fires when a client is kicked from the server.
+ * Should internally handled the same as a @{@link de.marcschuler.webrtcserver.webclient.messages.client.ClientServerLeaveEvent}
+ * @param userId the user that has been kicked
+ * @param reason the reason for the kick
+ * @param message a admin-defined message related to the kick. might be null
  */
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
-public class ClientKickEvent extends MessageBody {
+public record ClientKickEvent(@NotNull String userId, @NotNull KickReason reason,
+                              String message) implements MessageBody {
 
-    @NotNull
-    private UserSimpleDTO user;
-
-    @NotNull
-    private KickReason reason;
-    private String message;
 }

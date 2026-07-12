@@ -5,30 +5,21 @@ import de.marcschuler.webrtcserver.dto.data.ServerDTO;
 import de.marcschuler.webrtcserver.dto.data.UserSimpleDTO;
 import de.marcschuler.webrtcserver.webclient.messages.MessageBody;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
 
 import java.util.List;
 
 /**
  * Sends the whole section tree (sections, channels, clients)
- * when a change is made, e.g. new channels or a client switched channels.
+ * when a change is made.
  * Clients should figure out what changed if there are interested at all.
  * This represents a change that is visible from the client.
- * In future this event should fire less or no more because every change
- * should have it's own event
+ * Is deprected because small events (like @{@link de.marcschuler.webrtcserver.webclient.messages.channel.ChannelCreateEvent}
+ * deliver only the changed parts and a client should figure out how it's affecting the internal server model
+ * //TODO remove ServerTreeChangeMessage
  */
-@Data
 @Deprecated
-public class ServerTreeChangeMessage extends MessageBody {
-
-    @NotNull
-    private ServerDTO server;
-
-    @NotNull
-    private List<SectionExtendedDTO> sections;
-    @NotNull
-    private  List<UserSimpleDTO> users;
-    @NotNull
-    private  List<UserSimpleDTO> usersNotInChannel;
+public record ServerTreeChangeMessage(@NotNull ServerDTO server, @NotNull List<SectionExtendedDTO> sections,
+                                      @NotNull List<UserSimpleDTO> users,
+                                      @NotNull List<UserSimpleDTO> usersNotInChannel) implements MessageBody {
 
 }

@@ -26,9 +26,9 @@ public class PeerEventHandler {
     @EventListener
     public void onOffer(ClientMessage<PeerOffer> event) {
         var clientFrom = event.client().getUser().getUsername();
-        log.info("Forwarding peer offer from {} to {}", clientFrom, event.body().getClientTo());
-        var clientTo = webSocketConnectionService.clientFromKeyId(event.body().getClientTo()).get();
-        var forwardEvent = new PeerOfferForward(event.client().getUser().getId(), event.body().getOffer());
+        log.info("Forwarding peer offer from {} to {}", clientFrom, event.body().clientTo());
+        var clientTo = webSocketConnectionService.clientFromKeyId(event.body().clientTo()).get();
+        var forwardEvent = new PeerOfferForward(event.client().getUser().getId(), event.body().offer());
 
 
         var clientFromChannel = event.client().getChannel();
@@ -42,9 +42,9 @@ public class PeerEventHandler {
     @EventListener
     public void onAnswer(ClientMessage<PeerAnswer> event) {
         var clientFrom = event.client().getUser().getUsername();
-        log.info("Forwarding peer answer from {} to {}", clientFrom, event.body().getClientTo());
-        var clientTo = webSocketConnectionService.clientFromKeyId(event.body().getClientTo()).get();
-        var forwardEvent = new PeerAnswerForward(event.client().getUser().getId(), event.body().getAnswer());
+        log.info("Forwarding peer answer from {} to {}", clientFrom, event.body().clientTo());
+        var clientTo = webSocketConnectionService.clientFromKeyId(event.body().clientTo()).get();
+        var forwardEvent = new PeerAnswerForward(event.client().getUser().getId(), event.body().answer());
 
         var clientFromChannel = event.client().getChannel();
         var clientToChannel = clientTo.getChannel();

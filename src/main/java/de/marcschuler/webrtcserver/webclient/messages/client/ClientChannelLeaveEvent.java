@@ -1,19 +1,11 @@
 package de.marcschuler.webrtcserver.webclient.messages.client;
 
-import de.marcschuler.webrtcserver.dto.data.UserSimpleDTO;
 import de.marcschuler.webrtcserver.webclient.messages.MessageBody;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
- * Signals that a client did leave a channel
+ * This event fires when a client leaves a channel
+ * @param userId the id of the user
  */
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class ClientChannelLeaveEvent extends MessageBody {
-    @NotNull
-    private UserSimpleDTO user;
+public record ClientChannelLeaveEvent(@NotNull String userId) implements MessageBody {
 }

@@ -49,11 +49,11 @@ public class AuthHandler {
     @EventListener
     public void onLogin(ClientMessage<AuthChallengeResponse> event) throws IOException, JOSEException {
         log.info("Responding to auth challenge");
-        var content = event.body().getChallenge();
-        var username = event.body().getUsername();
+        var content = event.body().challenge();
+        var username = event.body().username();
         OctetKeyPair publicKey;
         try {
-            publicKey = cryptoService.importPublicKey(event.body().getPublicKey());
+            publicKey = cryptoService.importPublicKey(event.body().publicKey());
         } catch (ParseException e) {
             throw new RuntimeException("Could not parse JWK", e);
         }
@@ -72,12 +72,12 @@ public class AuthHandler {
         var keyId = cryptoService.generateKeyId(publicKey);
         if (webSocketConnectionService.clientFromKeyId(keyId).isPresent()) {
             var existingUsername = webSocketConnectionService.clientFromKeyId(keyId).get().getUser().getUsername();
-            log.info("Client {} is already connected as {}. Kicking new instance", event.body().getUsername(), existingUsername);
+            log.info("Client {} is already connected as {}. Kicking new instance", event.body().username(), existingUsername);
             webSocketConnectionService.kickClient(event.client(), KickReason.ALREADY_CONNECTED, null);
             return;
         }
         var user = userService.findById(keyId)
-                .orElseGet(() -> userService.registerUser(username,publicKey));
+                .orElseGet(() -> userService.registerUser(username, publicKey));
         log.info("User connected: {} ({} formerly known as {})", keyId, username, user.getUsername());
         if (user.getState() == ClientState.BANNED) {
             throw new ClientKickException("User is already banned", KickReason.BANNED);
@@ -89,10 +89,9 @@ public class AuthHandler {
         event.client().setState(WebClientState.LOGGED_IN);
         userService.save(user);
 
-        var authSuccessEvent = new AuthSuccessMessage();
-        authSuccessEvent.setJwt(authService.createJWT(user));
-        authSuccessEvent.setMe(serverMapper.mapToDTO(user));
-        authSuccessEvent.setClients(
+        var authSuccessEvent = new AuthSuccessMessage(null,
+                authService.createJWT(user),
+                serverMapper.mapToDTO(user),
                 webSocketConnectionService.clientsInteractable().stream()
                         .filter(c -> !user.getId().equals(c.getUser().getId()))
                         .map(serverMapper::mapToDTO)
@@ -101,8 +100,7 @@ public class AuthHandler {
         event.client().sendMessage(authSuccessEvent);
 
         //Send ICE config
-        var iceServerData = new IceServerMessage();
-        iceServerData.setIceServers(serverMapper.mapToDTO(webRTConfig.getConfig().getIce()));
+        var iceServerData = new IceServerMessage(serverMapper.mapToDTO(webRTConfig.getConfig().getIce()));
         event.client().sendMessage(iceServerData);
 
         // send join messages to all old clients

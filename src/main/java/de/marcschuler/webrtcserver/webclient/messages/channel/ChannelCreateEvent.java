@@ -3,20 +3,15 @@ package de.marcschuler.webrtcserver.webclient.messages.channel;
 import de.marcschuler.webrtcserver.dto.data.ChannelDTO;
 import de.marcschuler.webrtcserver.webclient.messages.MessageBody;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class ChannelCreateEvent extends MessageBody {
-    @NotNull
-    private UUID sectionId;
-    @NotNull
-    private int order;
-    @NotNull
-    private ChannelDTO channel;
+/**
+ * A event that fires when a new channel has been created
+ * @param sectionId the id of the section the channel is in
+ * @param order the order of the channel within the section
+ * @param channel the channel data
+ */
+public record ChannelCreateEvent(@NotNull UUID sectionId, @NotNull int order,
+                                 @NotNull ChannelDTO channel) implements MessageBody {
 }

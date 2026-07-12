@@ -5,21 +5,16 @@ import de.marcschuler.webrtcserver.dto.data.UserSimpleDTO;
 import de.marcschuler.webrtcserver.webclient.messages.MessageBody;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
 
 import java.util.List;
 
-@Data
-public class AuthSuccessMessage extends MessageBody {
-    @Nullable
-    private String message;
-
-    @NotNull
-    private String jwt;
-
-    @NotNull
-    private UserSimpleDTO me;
-
-    @NotNull
-    private List<UserOnlineDTO> clients;
+/**
+ * The server response for a @{@link AuthChallengeResponse}
+ * @param message a admin-defined greeting or notification the client may show
+ * @param jwt a jwt to allow access to server resources via REST
+ * @param me the description of you
+ * @param clients a list of clients which are currently online
+ */
+public record AuthSuccessMessage(@Nullable String message, @NotNull String jwt, @NotNull UserSimpleDTO me,
+                                 @NotNull List<UserOnlineDTO> clients) implements MessageBody {
 }

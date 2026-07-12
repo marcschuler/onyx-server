@@ -44,10 +44,10 @@ public class IntegrationHelper {
         mock.connect();
 
         var authChallengeRequest = (AuthChallengeRequest) mock.recv();
-        var authChallengeResponse = new AuthChallengeResponse();
-        authChallengeResponse.setChallenge(cryptoService.signContent(authChallengeRequest.getChallenge(),keyPair));
-        authChallengeResponse.setUsername(username);
-        authChallengeResponse.setPublicKey(keyPair.toPublicJWK().toJSONObject());
+        var authChallengeResponse = new AuthChallengeResponse(keyPair.toPublicJWK().toJSONObject(),
+                cryptoService.signContent(authChallengeRequest.challenge(),keyPair),
+                username
+                );
         mock.sendMessage(authChallengeResponse);
         mock.recv(AuthSuccessMessage.class);
         return mock;

@@ -1,16 +1,13 @@
 package de.marcschuler.webrtcserver.webclient.messages.peer;
 
 import de.marcschuler.webrtcserver.webclient.messages.MessageBody;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotNull;
 import tools.jackson.databind.JsonNode;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class PeerAnswer extends MessageBody {
-    private String clientTo;
-
-    private JsonNode answer;
+/**
+ * An answer for a received @{@link PeerOfferForward}
+ * @param clientTo the client to send to
+ * @param answer the anser //TODO define format
+ */
+public record PeerAnswer(@NotNull String clientTo, @NotNull JsonNode answer) implements MessageBody {
 }

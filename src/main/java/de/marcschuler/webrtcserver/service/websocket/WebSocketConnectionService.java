@@ -94,7 +94,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
         } catch (PermissionDeniedException e) {
             log.info("User did not have permission to {}: {}", e.getMessage(), e.getMessage());
             log.debug("Exception was", e);
-            send(client, new NoPermissionMessage(e.getPermissionType()));
+            send(client, new NoPermissionMessage(e.getPermissionType(),null));
         } catch (ClientKickException e) {
             log.info("Kicking client. Reason: {}", e.getMessage());
             log.debug("Exception was", e);
@@ -113,7 +113,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
         }
         client.setChannel(channel);
         sendToAll(new ClientChannelJoinEvent(
-                serverMapper.mapToDTO(client.getUser()),
+                client.getUser().getId(),
                 channel.getId()
         ));
     }
@@ -124,7 +124,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
             return;
         }
         client.setChannel(null);
-        sendToAll(new ClientChannelLeaveEvent(serverMapper.mapToDTO(client.getUser())));
+        sendToAll(new ClientChannelLeaveEvent(client.getUser().getId()));
     }
 
 
@@ -146,7 +146,7 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
         }
         sessions.remove(client);
         if (client.getUser() != null) {
-            sendToAll(new ClientKickEvent(serverMapper.mapToDTO(client.getUser()), reason, message));
+            sendToAll(new ClientKickEvent(client.getUser().getId(), reason, message));
         }
         try {
             client.getSession().close(); //TODO check if we can ignore the IOException

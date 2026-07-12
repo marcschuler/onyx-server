@@ -1,25 +1,15 @@
 package de.marcschuler.webrtcserver.webclient.messages.client;
 
-import de.marcschuler.webrtcserver.dto.data.UserSimpleDTO;
 import de.marcschuler.webrtcserver.webclient.messages.MessageBody;
-import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
 /**
- * Signals that a client that previously may or may not was in another channel
- * joins a (new) channel
+ *  Signals that a client that previously may or may not was in another channel
+ *  joins a (new) channel
+ * @param userId the id of the user that did join a channel
+ * @param channelId the id of the channel
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class ClientChannelJoinEvent extends MessageBody {
-    @NotNull
-    private UserSimpleDTO user;
-    @Nullable
-    private UUID channelId;
+public record ClientChannelJoinEvent(@NotNull String userId, @NotNull UUID channelId) implements MessageBody {
 }

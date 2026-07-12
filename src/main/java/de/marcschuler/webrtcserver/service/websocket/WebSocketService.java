@@ -30,13 +30,13 @@ public class WebSocketService {
 
     public List<WebClient> getClientsInChannel(UUID id) {
         return webSocketConnectionService.clientsInteractable()
-                .stream().filter(client -> client.getChannel()!=null && client.getChannel().getId().equals(id))
+                .stream().filter(client -> client.getChannel() != null && client.getChannel().getId().equals(id))
                 .toList();
     }
 
-    public List<WebClient> getClientsInNoChannel(){
+    public List<WebClient> getClientsInNoChannel() {
         return webSocketConnectionService.clientsInteractable()
-                .stream().filter(client -> client.getChannel()==null)
+                .stream().filter(client -> client.getChannel() == null)
                 .toList();
     }
 
@@ -51,19 +51,17 @@ public class WebSocketService {
     @Transactional
     public ServerTreeChangeMessage createServerTreeChangeEvent(WebClient webClient) {
         var users = webSocketConnectionService.users();
-        var message = serverMapper.mapToChangeEvent(serverService.defaultServer());
-            message.getSections().stream()
-                    .flatMap(s -> s.getChannels().stream())
-                    .forEach(c ->{
-                        var u = getClientsInChannel(c.getId())
-                                .stream().map(WebClient::getUser).toList();
-                        c.setUsers(serverMapper.mapToDTOList(u));
-                    });
-
-            message.setUsers(serverMapper.mapToDTOList(users));
-            message.setUsersNotInChannel(serverMapper.mapToDTOList(getClientsInNoChannel().stream().map(WebClient::getUser).toList()));
-            return message;
-
+        var message = serverMapper.mapToChangeEvent(serverService.defaultServer(),
+                serverMapper.mapToDTOList(users),
+                serverMapper.mapToDTOList(getClientsInNoChannel().stream().map(WebClient::getUser).toList()));
+        message.sections().stream()
+                .flatMap(s -> s.getChannels().stream())
+                .forEach(c -> {
+                    var u = getClientsInChannel(c.getId())
+                            .stream().map(WebClient::getUser).toList();
+                    c.setUsers(serverMapper.mapToDTOList(u));
+                });
+        return message;
     }
 
     @Deprecated

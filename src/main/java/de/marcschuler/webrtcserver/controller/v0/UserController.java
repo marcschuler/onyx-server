@@ -64,7 +64,7 @@ public class UserController {
     public void kickFromChannel(@PathVariable String id, @RequestBody KickRequestDTO kickRequestDTO, @AuthenticationPrincipal SecurityConfig.AuthenticatedUser authUser) {
         var client = webSocketConnectionService.clientFromKeyId(id).orElseThrow();
         permissionService.checkClientAccess(client, client.getChannel(), PermissionType.CHANNEL_USER_KICK);
-        webSocketConnectionService.kickClient(client, kickRequestDTO.getReason(), kickRequestDTO.getMessage());
+        webSocketConnectionService.leaveChannel(client);
     }
 
 

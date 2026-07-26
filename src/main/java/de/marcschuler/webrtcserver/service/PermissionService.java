@@ -13,9 +13,9 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.List;
 
 import static de.marcschuler.webrtcserver.service.PermissionService.PermissionState.*;
 
@@ -75,10 +75,12 @@ public class PermissionService {
         var groups = buildGroupContext(user, section, channel);
 
         for (var group : groups) {
+            log.trace("Checking permission for group {}", group.getName());
             var permissions = group.getPermissions().stream()
-                    .sorted(Comparator.comparingInt(Permission::getPriority))
+                    .sorted(Comparator.comparingInt(Permission::getPriority).reversed())
                     .toList();
             for (var permission : permissions) {
+                log.trace("Checking permission {}", permission);
                 var state = checkAccessForSinglePermission(permission, section, channel, type);
                 if (state == ALLOW) {
                     log.debug("Permission {} has access for section {} and channel {}", permission, section, channel);
@@ -100,6 +102,7 @@ public class PermissionService {
         while (!permission.getPermissions().contains(type)) {
             var root = type.root();
             if (root == type) { //reached end of tree
+                log.trace("Could not determine reachable type for {}", type);
                 return UNKNOWN;
             } else {
                 type = root;
@@ -110,20 +113,20 @@ public class PermissionService {
         // Check if we are limited to channel
         if (permission.getLimitedToChannel() != null && !permission.getLimitedToChannel().isEmpty() &&
                 !permission.getLimitedToChannel().contains(channel)) {
-            log.trace("Limited to channel, but channel {} is not in list", channel);
+            log.trace("Permission is limited to channel, but channel {} is not in list", channel);
             return UNKNOWN;
         }
 
         // Check if we are limited to sections
         if (permission.getLimitedToSection() != null && !permission.getLimitedToSection().isEmpty() &&
                 !permission.getLimitedToSection().contains(section)) {
-            log.trace("Limited to section, but section {} is not in list", section);
+            log.trace("Permission is limited to section, but section {} is not in list", section);
             return UNKNOWN;
         }
 
         // check if inverted
         if (permission.isInverted()) {
-            log.trace("Permission denied");
+            log.trace("Permission denied (inverted)");
             return DENY;
         } else {
             log.trace("Permission allowed");
@@ -131,15 +134,16 @@ public class PermissionService {
         }
     }
 
-    public Set<Group> buildGroupContext(@NonNull User user, @Nullable Section section, @Nullable Channel channel) {
-
-        var groups = new TreeSet<>(user.getGroups());
-
+    public List<Group> buildGroupContext(@NonNull User user, @Nullable Section section, @Nullable Channel channel) {
+        log.trace("Building group context");
+        var groups = new ArrayList<>(user.getGroups());
+        log.trace("Using groups {}", user.getGroups());
         if (section != null && user.getSectionGroups() != null) {
             var sectionGroups = user.getSectionGroups().stream()
                     .filter(s -> s.getSection().equals(section))
                     .flatMap(s -> s.getGroups().stream())
                     .toList();
+            log.trace("Using section groups {}", sectionGroups);
             groups.addAll(sectionGroups);
         }
         if (channel != null && user.getChannelGroups() != null) {
@@ -147,8 +151,10 @@ public class PermissionService {
                     .filter(s -> s.getChannel().equals(channel))
                     .flatMap(s -> s.getGroups().stream())
                     .toList();
+            log.trace("Using channel groups {}", channelGroups);
             groups.addAll(channelGroups);
         }
+        groups.sort(Comparator.comparingInt(Group::getPriority).reversed());
         return groups;
     }
 

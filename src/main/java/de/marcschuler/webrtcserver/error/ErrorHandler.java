@@ -33,6 +33,12 @@ public class ErrorHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
+    @ExceptionHandler(ServerNotFoundException.class)
+    public ResponseEntity<ProblemDetail> handleInvalidMessageException(ServerNotFoundException ex) {
+        log.error("Could not handle message", ex);
+        return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
     @ExceptionHandler(FilePreviewException.class)
     public ResponseEntity<ProblemDetail> handleFilePreviewException(FilePreviewException ex) {
         log.error("Could not generate preview", ex);

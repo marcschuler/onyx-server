@@ -3,6 +3,7 @@ package de.marcschuler.webrtcserver.controller.v0;
 import de.marcschuler.webrtcserver.data.permission.PermissionType;
 import de.marcschuler.webrtcserver.dto.data.FileDTO;
 import de.marcschuler.webrtcserver.dto.data.ServerDTO;
+import de.marcschuler.webrtcserver.error.ServerNotFoundException;
 import de.marcschuler.webrtcserver.mapper.MessageContentMapper;
 import de.marcschuler.webrtcserver.mapper.ServerMapper;
 import de.marcschuler.webrtcserver.service.PermissionService;
@@ -35,7 +36,7 @@ public class ServerController {
     public ServerDTO edit(@PathVariable UUID serverId, @RequestBody ServerDTO serverDto) {
         permissionService.checkControllerAccess(null, null, PermissionType.SERVER_EDIT);
 
-        var server = serverService.get(serverId).orElseThrow();
+        var server = serverService.get(serverId).orElseThrow(()->new ServerNotFoundException(serverId));
         server = serverService.update(server, serverDto);
         return serverMapper.mapToDTO(server);
     }
@@ -60,9 +61,9 @@ public class ServerController {
         serverService.setIcon(server,null);
     }
 
-    @GetMapping("{id}")
-    public ServerDTO get(@PathVariable UUID id) {
-        return serverMapper.mapToDTO(serverService.get(id).orElseThrow());
+    @GetMapping("{serverId}")
+    public ServerDTO get(@PathVariable UUID serverId) {
+        return serverMapper.mapToDTO(serverService.get(serverId).orElseThrow(() -> new ServerNotFoundException(serverId)));
     }
 
 }

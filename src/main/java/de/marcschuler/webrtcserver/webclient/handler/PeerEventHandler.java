@@ -1,5 +1,6 @@
 package de.marcschuler.webrtcserver.webclient.handler;
 
+import de.marcschuler.webrtcserver.data.Channel;
 import de.marcschuler.webrtcserver.service.websocket.WebSocketConnectionService;
 import de.marcschuler.webrtcserver.webclient.ClientMessage;
 import de.marcschuler.webrtcserver.webclient.messages.peer.PeerAnswer;
@@ -33,7 +34,7 @@ public class PeerEventHandler {
 
         var clientFromChannel = event.client().getChannel();
         var clientToChannel = clientTo.getChannel();
-        if (clientToChannel == null || !clientToChannel.equals(clientFromChannel)) {
+        if (!inSameChannel(clientFromChannel, clientToChannel)) {
             log.warn("Client tried to connect without being in the same channel {}<->{}", clientFromChannel, clientToChannel);
         }
         webSocketConnectionService.send(clientTo, forwardEvent);
@@ -48,9 +49,14 @@ public class PeerEventHandler {
 
         var clientFromChannel = event.client().getChannel();
         var clientToChannel = clientTo.getChannel();
-        if (clientToChannel == null || !clientToChannel.equals(clientFromChannel)) {
+        if (!inSameChannel(clientFromChannel, clientToChannel)) {
             log.warn("Client tried to answer without being in the same channel {}<->{}", clientFromChannel, clientToChannel);
         }
         webSocketConnectionService.send(clientTo, forwardEvent);
+    }
+
+    private boolean inSameChannel(Channel c1, Channel c2) {
+        if (c1 == null || c2 == null) return false;
+        return c1.getId().equals(c2.getId());
     }
 }

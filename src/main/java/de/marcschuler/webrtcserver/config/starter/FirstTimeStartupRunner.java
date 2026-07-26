@@ -28,5 +28,8 @@ public class FirstTimeStartupRunner implements CommandLineRunner {
             var server = serverService.generateDefault();
             log.info("Server with id '{}' and public key '{}' generated", server.getId(), server.getKeys().toPublicJWK().toJSONString());
         }
+        serverRepository.findAll().stream().forEach(server -> {
+            log.info("Starting server {} ({})",server.getName(),server.getId());
+        });
     }
 }

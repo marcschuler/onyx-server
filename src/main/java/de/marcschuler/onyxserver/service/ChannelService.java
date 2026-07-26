@@ -1,0 +1,119 @@
+package de.marcschuler.onyxserver.service;
+
+import de.marcschuler.onyxserver.Util;
+import de.marcschuler.onyxserver.data.Channel;
+import de.marcschuler.onyxserver.data.Chat;
+import de.marcschuler.onyxserver.data.Section;
+import de.marcschuler.onyxserver.dto.data.ChannelDTO;
+import de.marcschuler.onyxserver.mapper.ServerMapper;
+import de.marcschuler.onyxserver.repository.ChannelRepository;
+import de.marcschuler.onyxserver.repository.SectionRepository;
+import de.marcschuler.onyxserver.service.websocket.WebSocketConnectionService;
+import de.marcschuler.onyxserver.service.websocket.WebSocketService;
+import de.marcschuler.onyxserver.webclient.messages.channel.ChannelChangeEvent;
+import de.marcschuler.onyxserver.webclient.messages.channel.ChannelCreateEvent;
+import de.marcschuler.onyxserver.webclient.messages.channel.ChannelDeleteEvent;
+import de.marcschuler.onyxserver.webclient.messages.channel.ChannelMoveEvent;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class ChannelService {
+
+    private final WebSocketService webSocketService;
+    private final WebSocketConnectionService webSocketConnectionService;
+
+    private final SectionRepository sectionRepository;
+    private final ChannelRepository channelRepository;
+
+    private final ServerMapper serverMapper;
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    public Channel create(String name, Section section) {
+        var channel = new Channel();
+        channel.setName(name);
+        channel.setChat(new Chat());
+        section.getChannels().add(channel);
+        channel = channelRepository.save(channel);
+        sectionRepository.save(section);
+        webSocketConnectionService.sendToAll(new ChannelCreateEvent(
+                section.getId(), section.getChannels().indexOf(channel),
+                serverMapper.mapToDTO(channel)
+        ));
+        log.info("Creating channel {} ({})", channel.getName(), channel.getId());
+        return channel;
+    }
+
+    public Optional<Channel> get(UUID channelId) {
+        return channelRepository.findById(channelId);
+    }
+
+    public void order(Channel channel, int newOrder) {
+        log.info("Reordering channel {} to order {}", channel.getName(), newOrder);
+        var section = channel.getSection();
+        Util.reorder(section.getChannels(), channel, newOrder);
+        sectionRepository.save(section);
+        webSocketConnectionService.sendToAll(new ChannelMoveEvent(
+                channel.getId(), newOrder, null
+        ));
+    }
+
+    public void move(Channel channel, Section newSection, int newOrder) {
+        if (channel.getSection().getId().equals(newSection.getId())) {
+            log.warn("Tried to move channel {} ({}) to the same section {} ({})", channel.getName(), channel.getId(), newSection.getName(), newSection.getId());
+            return;
+        }
+        log.info("Moving channel {} to section {} and order {}", channel.getName(), newSection.getName(), newOrder);
+        var oldSection = channel.getSection();
+
+        newSection.getChannels().add(newOrder, channel);
+        sectionRepository.save(newSection);
+        channelRepository.save(channel);
+
+        oldSection.getChannels().remove(channel);
+        sectionRepository.save(oldSection);
+
+        webSocketConnectionService.sendToAll(
+                new ChannelMoveEvent(channel.getId(), newOrder, newSection.getId())
+        );
+    }
+
+    public void delete(Channel channel) {
+        var section = channel.getSection();
+
+        webSocketService.getClientsInChannel(channel)
+                .forEach(webSocketConnectionService::leaveChannel);
+
+        section.getChannels().removeIf(c -> c.equals(channel));
+        sectionRepository.save(section);
+
+        webSocketConnectionService.sendToAll(new ChannelDeleteEvent(channel.getId()));
+        log.info("Removed channel {}:{}", channel.getId(), channel.getName());
+    }
+
+    public void edit(Channel channel, ChannelDTO channelDTO) {
+        serverMapper.update(channel, channelDTO);
+        channelRepository.save(channel);
+        webSocketConnectionService.sendToAll(new ChannelChangeEvent(serverMapper.mapToDTO(channel)));
+    }
+
+    /**
+     * Returns the channel for a chat.
+     * May return nothing if a chat is not within a channel (future feature)
+     * @param chat the chat
+     * @return the channel if connected
+     */
+    public Optional<Channel> getByChat(Chat chat) {
+        return channelRepository.findById(chat.getId());
+    }
+}

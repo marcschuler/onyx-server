@@ -1,9 +1,7 @@
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-data/
+/data/
 htmlReport/
 
 ### STS ###
@@ -35,3 +33,4 @@ build/
 .vscode/
 /data/database.mv.db
 /data/database.trace.db
+

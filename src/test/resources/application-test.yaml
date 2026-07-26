@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:webrtc
+    url: jdbc:h2:mem:onyx
   jpa:
     show-sql: true
 

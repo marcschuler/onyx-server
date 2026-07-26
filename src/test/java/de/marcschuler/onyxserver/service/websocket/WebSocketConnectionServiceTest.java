@@ -1,0 +1,117 @@
+package de.marcschuler.onyxserver.service.websocket;
+
+import com.nimbusds.jose.JOSEException;
+import de.marcschuler.onyxserver.OnyxTest;
+import de.marcschuler.onyxserver.WebSocketMock;
+import de.marcschuler.onyxserver.dto.SignedContent;
+import de.marcschuler.onyxserver.service.AuthService;
+import de.marcschuler.onyxserver.service.CryptoService;
+import de.marcschuler.onyxserver.webclient.WebClientState;
+import de.marcschuler.onyxserver.webclient.messages.auth.AuthChallengeRequest;
+import de.marcschuler.onyxserver.webclient.messages.auth.AuthChallengeResponse;
+import de.marcschuler.onyxserver.webclient.messages.auth.AuthSuccessMessage;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import tools.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+// Low level connection tests
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@OnyxTest
+class WebSocketConnectionServiceTest {
+
+    private WebSocketMock webSocketMock;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+
+    @Autowired
+    private CryptoService cryptoService;
+    @Autowired
+    private AuthService authService;
+    @Autowired
+    private WebSocketConnectionService webSocketConnectionService;
+
+    @BeforeEach
+    void setUp() throws ExecutionException, InterruptedException, TimeoutException {
+        webSocketMock = new WebSocketMock(objectMapper, null);
+        webSocketMock.connect();
+    }
+
+    @AfterEach
+    void tearDown() throws IOException {
+        webSocketMock.close();
+    }
+
+    @Test
+    void testFullLogin() throws InterruptedException, IOException, JOSEException, ParseException {
+        var key = cryptoService.generateKeyPair();
+        var authChallengeRequest = (AuthChallengeRequest) webSocketMock.recv();
+
+        //Connected
+        assertEquals(AuthChallengeRequest.class, authChallengeRequest.getClass(), "Got a challenge");
+        assertNotNull(authChallengeRequest.challenge(), "Challenge exists");
+
+        assertEquals(1, webSocketConnectionService.clients().size(), "client found");
+        assertEquals(0, webSocketConnectionService.clientsInteractable().size(), "client not interactab.e");
+        var me = webSocketConnectionService.clients().getFirst();
+        assertEquals(WebClientState.NOT_AUTHORIZED, me.getState(), "client not authorized");
+
+        //Authenticate
+        var authChallengeResponse = new AuthChallengeResponse(key.toPublicJWK().toJSONObject(),
+                cryptoService.signContent(authChallengeRequest.challenge(), key),
+                "marc"
+        );
+        webSocketMock.sendMessage(authChallengeResponse);
+
+        //Success
+        var authSuccessMessage = (AuthSuccessMessage) webSocketMock.recv();
+        assertEquals(AuthSuccessMessage.class, authSuccessMessage.getClass(), "Got a success message");
+        assertNotNull(authSuccessMessage.jwt(), "jwt exists");
+        assertEquals(cryptoService.generateKeyId(key), authService.verifyJWT(authSuccessMessage.jwt()), "jwt is valid");
+
+        assertEquals(1, webSocketConnectionService.clients().size(), "client found");
+        assertEquals(1, webSocketConnectionService.clientsInteractable().size(), "client interactable");
+        me = webSocketConnectionService.clients().getFirst();
+        assertEquals("marc", me.getUser().getUsername(), "user is right");
+        assertEquals(cryptoService.generateKeyId(key), me.getUser().getId(), "is is derived from key");
+        assertEquals(WebClientState.LOGGED_IN, me.getState(), "state is logged in");
+        assertNull(me.getChannel(), "no channel is set");
+        assertNotNull(me.getSession(), "session is available");
+
+        webSocketMock.close();
+        Thread.sleep(500);
+        assertEquals(0, webSocketConnectionService.clients().size(), "no one connected");
+    }
+
+    @Test
+    void testLoginWrongKeys() throws InterruptedException {
+        var key = cryptoService.generateKeyPair();
+        webSocketMock.recv();
+
+        assertEquals(1, webSocketConnectionService.clients().size(), "client found");
+        assertEquals(0, webSocketConnectionService.clientsInteractable().size(), "client not interactab.e");
+        var me = webSocketConnectionService.clients().getFirst();
+        assertEquals(WebClientState.NOT_AUTHORIZED, me.getState(), "client not authorized");
+
+        //Authenticate
+        var authChallengeResponse = new AuthChallengeResponse(key.toPublicJWK().toJSONObject(),
+                new SignedContent(null),
+                "marc"
+        );
+        webSocketMock.sendMessage(authChallengeResponse);
+        Thread.sleep(1000);
+        assertFalse(webSocketMock.isOpen());
+    }
+
+}

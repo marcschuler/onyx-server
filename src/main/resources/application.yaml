@@ -9,8 +9,8 @@ spring:
   datasource:
     url: jdbc:h2:file:${onyx.storage.database}/onyx
     driver-class-name: org.h2.Driver
-    username: webrtc
-    password: webrtc
+    username: onyx
+    password: onyx
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     show-sql: false

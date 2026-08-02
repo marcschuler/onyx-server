@@ -130,6 +130,7 @@ public class BeanConfig {
                         }
                     });
 
+            messageTypes.sort(String::compareTo);
             Schema<String> enumSchema = new Schema<>();
             enumSchema.setType("string");
             enumSchema.setDescription("A list of all message types");

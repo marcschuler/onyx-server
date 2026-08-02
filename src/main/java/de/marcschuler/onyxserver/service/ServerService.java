@@ -78,6 +78,13 @@ public class ServerService {
                         - Administrator docs coming soon"""))); //TODO replace with link once available
 
         /*
+            SETTINGS
+         */
+        var settings = new ServerSettings();
+        settings.setNewUsersNeedInvite(false);
+        settings.setServer(server);
+        server.setSettings(settings);
+        /*
          * SECTIONS & CHANNELS
          */
         var section1 = new Section();

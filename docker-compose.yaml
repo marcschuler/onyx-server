@@ -1,12 +1,9 @@
 services:
   onyx-server:
-    build: .
-    #image: ghcr.io/marcschuler/onyx-server:main
-    command: ["--emergency-grant-admin-power"]
+    image: ghcr.io/marcschuler/onyx-server:main
+    # command: ["--emergency-grant-admin-power"] for resetting admin groups after you locked yoruself out
     ports:
       - "8080:8080"
-    environment:
-      - LOGGING_LEVEL_DE_MARCSCHULER=TRACE
     volumes:
       - onyx-data:/data/data
       - onyx-database:/data/database

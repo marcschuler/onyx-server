@@ -63,7 +63,7 @@ public class AuthService {
         //Remove old challenges
         executorService.scheduleAtFixedRate(() -> {
             synchronized (challenges) {
-                this.challenges.removeIf(challenge -> challenge.getValidUntil().isAfter(Instant.now()));
+                this.challenges.removeIf(challenge -> challenge.validUntil().isAfter(Instant.now()));
             }
         }, 1, 1, TimeUnit.MINUTES);
     }
@@ -103,8 +103,8 @@ public class AuthService {
     public boolean isValidChallenge(@NotNull String challenge) {
         synchronized (challenges) {
             return challenges.stream()
-                    .filter(c -> c.getChallenge().equals(challenge))
-                    .anyMatch(c -> c.getValidUntil().isAfter(Instant.now()));
+                    .filter(c -> c.challenge().equals(challenge))
+                    .anyMatch(c -> c.validUntil().isAfter(Instant.now()));
         }
     }
 

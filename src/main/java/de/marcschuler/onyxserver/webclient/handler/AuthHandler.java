@@ -64,7 +64,7 @@ public class AuthHandler {
             log.warn("Client signature could not be verified {}", event.client());
             throw new RuntimeException("Could not verify signature", e);
         }
-        if (!authService.isValidChallenge(challenge.getChallenge())) {
+        if (!authService.isValidChallenge(challenge.challenge())) {
             log.warn("Client did not send a valid challenge to authenticate");
             return;
         }

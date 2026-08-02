@@ -42,6 +42,7 @@ public class GroupService {
 
     public void delete(Server server,Group group) {
         server.getGroups().remove(group);
+        groupRepository.delete(group);
         serverRepository.save(server);
     }
 

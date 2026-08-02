@@ -8,6 +8,7 @@ import lombok.Data;
 public class ServerSettings {
     @Id
     @OneToOne
+    @MapsId
     @JoinColumn(name = "server_id")
     private Server server;
 

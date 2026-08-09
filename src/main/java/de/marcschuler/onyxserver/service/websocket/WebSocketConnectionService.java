@@ -159,7 +159,9 @@ public class WebSocketConnectionService extends TextWebSocketHandler {
         var data = objectMapper.writeValueAsBytes(messageBody);
         log.debug("Sending to client {}: {}", client, new String(data));
         try {
-            client.getSession().sendMessage(new TextMessage(data));
+            synchronized ( client.getSession() ) {
+                client.getSession().sendMessage(new TextMessage(data));
+            }
         } catch (IOException e) {
             log.error("Could not send message to client: {}", client, e);
             kickClient(client, KickReason.INTERNAL_ERROR, null);

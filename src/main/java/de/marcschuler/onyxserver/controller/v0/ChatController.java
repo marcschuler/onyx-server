@@ -5,7 +5,6 @@ import de.marcschuler.onyxserver.data.permission.PermissionType;
 import de.marcschuler.onyxserver.dto.data.MessageDTO;
 import de.marcschuler.onyxserver.dto.data.message.MessageCreationDTO;
 import de.marcschuler.onyxserver.mapper.MessageMapper;
-
 import de.marcschuler.onyxserver.service.ChannelService;
 import de.marcschuler.onyxserver.service.ChatService;
 import de.marcschuler.onyxserver.service.PermissionService;
@@ -63,10 +62,21 @@ public class ChatController {
         var chat = chatService.chatById(id).orElseThrow();
 
         var channel = channelService.getByChat(chat);
-        channel.ifPresent(c -> permissionService.checkControllerAccess(c, PermissionType.CHANNEL_CHAT_WRITE));
+        channel.ifPresent(c -> permissionService.checkControllerAccess(c, PermissionType.CHANNEL_CHAT_CREATE));
 
         var user = authUser.user();
         var m = chatService.createMessage(chat, user, message);
         return messageMapper.mapToDTO(m);
+    }
+
+    @DeleteMapping("{id}/message/{messageId}")
+    public void deleteMessage(@PathVariable UUID id, @PathVariable UUID messageId, @AuthenticationPrincipal SecurityConfig.AuthenticatedUser authUser) {
+        var chat = chatService.chatById(id).orElseThrow();
+        var message = chat.getMessages().stream().filter(m -> m.getId().equals(messageId)).findAny().orElseThrow();
+
+        if (!message.getUser().getId().equals(authUser.user().getId())) //when deleting messages from other users we need the permission
+            permissionService.checkControllerAccess(null, PermissionType.CHANNEL_CHAT_DELETE);
+
+        chatService.deleteMessage(chat, message);
     }
 }

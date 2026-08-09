@@ -23,4 +23,7 @@ public class MessageDTO {
 
     @Nullable
     private MessageDTO repliesTo;
+
+    @NotNull
+    private UUID chatId;
 }

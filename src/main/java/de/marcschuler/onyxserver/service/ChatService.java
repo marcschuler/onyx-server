@@ -17,6 +17,7 @@ import de.marcschuler.onyxserver.repository.ChatRepository;
 import de.marcschuler.onyxserver.repository.MessageRepository;
 import de.marcschuler.onyxserver.service.websocket.WebSocketConnectionService;
 import de.marcschuler.onyxserver.webclient.messages.chat.ChatMessageEvent;
+import de.marcschuler.onyxserver.webclient.messages.chat.MessageDeleteEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -107,5 +108,11 @@ public class ChatService {
 
     public Optional<Message> messageById(UUID id) {
         return messageRepository.findById(id);
+    }
+
+    public void deleteMessage(Chat chat, Message message) {
+        chat.getMessages().removeIf(m -> m.getId().equals(message.getId()));
+        chatRepository.save(chat);
+        this.webSocketConnectionService.sendToAll(new MessageDeleteEvent(message.getId()));
     }
 }

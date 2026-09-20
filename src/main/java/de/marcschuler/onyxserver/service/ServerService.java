@@ -20,7 +20,10 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -190,11 +193,12 @@ public class ServerService {
     public Server update(Server server, ServerDTO serverDto) {
         server.setName(serverDto.getName());
         if (serverDto.getDescription() != null) {
-            server.setDescription(new ArrayList<>(serverDto.getDescription().stream()
+            server.getDescription().clear();
+            serverDto.getDescription().stream()
                     .map(chatService::createMessageContent)
-                    .toList()));
+                    .forEach(s -> server.getDescription().add(s));
         } else {
-            server.setDescription(null);
+            server.getDescription().clear();
         }
         serverRepository.save(server);
         sendUpdate(server);

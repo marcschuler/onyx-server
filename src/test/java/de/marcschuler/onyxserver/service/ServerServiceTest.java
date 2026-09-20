@@ -100,7 +100,8 @@ class ServerServiceTest {
         dto.setDescription(null);
 
         var updated = serverService.update(server, dto);
-        assertNull(updated.getDescription());
+        assertNotNull(updated.getDescription());
+        assertTrue(updated.getDescription().isEmpty());
     }
 
     @Test

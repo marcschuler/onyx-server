@@ -9,6 +9,7 @@ import de.marcschuler.onyxserver.data.permission.PermissionType;
 import de.marcschuler.onyxserver.dto.GroupCreateDTO;
 import de.marcschuler.onyxserver.dto.data.ServerDTO;
 import de.marcschuler.onyxserver.mapper.ServerMapper;
+import de.marcschuler.onyxserver.repository.InviteRepository;
 import de.marcschuler.onyxserver.repository.ServerRepository;
 import de.marcschuler.onyxserver.service.websocket.WebSocketConnectionService;
 import de.marcschuler.onyxserver.webclient.messages.server.ServerChangeEvent;
@@ -41,6 +42,8 @@ public class ServerService {
     private final ServerRepository serverRepository;
 
     private final ServerMapper serverMapper;
+    @Autowired
+    private InviteRepository inviteRepository;
 
     public Server defaultServer() {
         var servers = serverRepository.findAll();
@@ -166,23 +169,27 @@ public class ServerService {
 
         server.setGroups(List.of(groupAdmin, groupMod, groupUser));
 
+
+
+        /*
+         * SAVE
+         */
+        server = serverRepository.save(server);
+
         var adminInvite = new Invite();
         adminInvite.setCode(Util.randomCode(16));
         adminInvite.setTitle("Admin Invite");
         adminInvite.setUsages(1);
         adminInvite.setEndDate(LocalDateTime.now().plusDays(14));
         adminInvite.setGroups(List.of(groupAdmin));
+        adminInvite.setServer(server);
 
-        server.setInvites(List.of(adminInvite));
         log.info(" ---------- ADMIN CODE ----------");
         log.info("Your Admin Invite Code is: {}", adminInvite.getCode());
         log.info("Enter it in your app. Do not share it with anyone");
         log.info(" ---------- ADMIN CODE ----------");
-
-        /*
-         * SAVE
-         */
-        return serverRepository.save(server);
+        inviteRepository.save(adminInvite);
+        return server;
 
     }
 

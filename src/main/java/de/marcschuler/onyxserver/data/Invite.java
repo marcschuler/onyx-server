@@ -1,11 +1,10 @@
 package de.marcschuler.onyxserver.data;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,4 +34,10 @@ public class Invite {
     //optional: a list of groups the user has access to
     @ManyToMany
     private List<Group> groups;
+
+    @ManyToOne
+    @ToString.Exclude
+    @JsonIgnore
+    @JoinColumn(name = "server_id", insertable = false, updatable = false)
+    private Server server;
 }

@@ -7,6 +7,7 @@ import de.marcschuler.onyxserver.data.permission.Permission;
 import de.marcschuler.onyxserver.dto.GroupCreateDTO;
 import de.marcschuler.onyxserver.dto.PermissionDTO;
 import de.marcschuler.onyxserver.dto.data.GroupDTO;
+import de.marcschuler.onyxserver.dto.data.SimpleGroupDTO;
 import de.marcschuler.onyxserver.service.ChannelService;
 import de.marcschuler.onyxserver.service.SectionService;
 import org.mapstruct.*;
@@ -52,6 +53,7 @@ public abstract class GroupMapper {
     public abstract PermissionDTO mapToDTO(Permission permission);
 
     public abstract GroupDTO mapToDTO(Group group);
+    public abstract SimpleGroupDTO mapToSimpleDTO(Group group);
 
     // --- helpers ---
 

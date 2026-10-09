@@ -8,6 +8,9 @@ onyx:
   storage:
     path: ./data
 
+
 logging:
   level:
     de.marcschuler: TRACE
+server:
+  port: 8081

@@ -2,6 +2,7 @@ package de.marcschuler.onyxserver.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.UUID;
@@ -17,7 +18,12 @@ public class Channel {
     @Column(nullable = false, length = 32)
     private String name;
 
-    @ManyToOne(cascade = CascadeType.ALL, optional = false,fetch =  FetchType.EAGER)
+    @Size(max = 32)
+    private String password;
+    private VoiceMode voiceMode;
+    private ChatMode chatMode;
+
+    @ManyToOne(cascade = CascadeType.ALL, optional = false, fetch = FetchType.EAGER)
     private Chat chat;
 
     @ManyToOne
@@ -27,4 +33,14 @@ public class Channel {
     @EqualsAndHashCode.Exclude
     private Section section;
 
+    public enum VoiceMode {
+        NONE,
+        ALL
+    }
+
+    public enum ChatMode {
+        NONE,
+        ALL
+    }
 }
+

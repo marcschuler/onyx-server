@@ -3,6 +3,7 @@ package de.marcschuler.onyxserver.mapper;
 import de.marcschuler.onyxserver.data.Group;
 import de.marcschuler.onyxserver.data.Invite;
 import de.marcschuler.onyxserver.dto.data.InviteDTO;
+import de.marcschuler.onyxserver.dto.data.SimpleGroupDTO;
 import de.marcschuler.onyxserver.service.GroupService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -13,26 +14,29 @@ import org.springframework.context.annotation.Lazy;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring",
-        subclassExhaustiveStrategy = SubclassExhaustiveStrategy.RUNTIME_EXCEPTION)
+        subclassExhaustiveStrategy = SubclassExhaustiveStrategy.RUNTIME_EXCEPTION,
+        uses = {GroupMapper.class})
 public abstract class InviteMapper {
 
     @Autowired
     @Lazy
     protected GroupService groupService;
 
-    @Mapping(target = "groups", source = "groups", qualifiedByName = "uuidsToGroups")
+    @Mapping(target = "groups", source = "groups", qualifiedByName = "simpleGroupsToGroups")
     public abstract Invite mapFromDTO(InviteDTO dto);
 
-    @Named("uuidsToGroups")
-    protected List<Group> uuidsToSections(List<UUID> uuids) {
-        if (uuids == null || uuids.isEmpty()) return List.of();
-        return uuids.stream()
-                .map(groupService::get)
+    @Named("simpleGroupsToGroups")
+    protected List<Group> uuidsToSections(List<SimpleGroupDTO> simpleGroups) {
+        if (simpleGroups == null || simpleGroups.isEmpty()) return List.of();
+        return simpleGroups.stream()
+                .map(u -> groupService.get(u.getId()))
                 .map(Optional::orElseThrow)
                 .collect(Collectors.toList());
     }
+
+    public abstract InviteDTO mapToDTO(Invite invite);
+
 }

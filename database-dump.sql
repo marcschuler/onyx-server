@@ -1,0 +1,576 @@
+-- we don't know how to generate database ONYX (class Database) :(
+
+create table PUBLIC.CHAT
+(
+    ID UUID not null
+        primary key
+);
+
+create table INFORMATION_SCHEMA.CONSTANTS
+(
+    CONSTANT_CATALOG           CHARACTER VARYING,
+    CONSTANT_SCHEMA            CHARACTER VARYING,
+    CONSTANT_NAME              CHARACTER VARYING,
+    VALUE_DEFINITION           CHARACTER VARYING,
+    DATA_TYPE                  CHARACTER VARYING,
+    CHARACTER_MAXIMUM_LENGTH   BIGINT,
+    CHARACTER_OCTET_LENGTH     BIGINT,
+    CHARACTER_SET_CATALOG      CHARACTER VARYING,
+    CHARACTER_SET_SCHEMA       CHARACTER VARYING,
+    CHARACTER_SET_NAME         CHARACTER VARYING,
+    COLLATION_CATALOG          CHARACTER VARYING,
+    COLLATION_SCHEMA           CHARACTER VARYING,
+    COLLATION_NAME             CHARACTER VARYING,
+    NUMERIC_PRECISION          INTEGER,
+    NUMERIC_PRECISION_RADIX    INTEGER,
+    NUMERIC_SCALE              INTEGER,
+    DATETIME_PRECISION         INTEGER,
+    INTERVAL_TYPE              CHARACTER VARYING,
+    INTERVAL_PRECISION         INTEGER,
+    MAXIMUM_CARDINALITY        INTEGER,
+    DTD_IDENTIFIER             CHARACTER VARYING,
+    DECLARED_DATA_TYPE         CHARACTER VARYING,
+    DECLARED_NUMERIC_PRECISION INTEGER,
+    DECLARED_NUMERIC_SCALE     INTEGER,
+    GEOMETRY_TYPE              CHARACTER VARYING,
+    GEOMETRY_SRID              INTEGER,
+    REMARKS                    CHARACTER VARYING
+);
+
+create table INFORMATION_SCHEMA.ENUM_VALUES
+(
+    OBJECT_CATALOG  CHARACTER VARYING,
+    OBJECT_SCHEMA   CHARACTER VARYING,
+    OBJECT_NAME     CHARACTER VARYING,
+    OBJECT_TYPE     CHARACTER VARYING,
+    ENUM_IDENTIFIER CHARACTER VARYING,
+    VALUE_NAME      CHARACTER VARYING,
+    VALUE_ORDINAL   CHARACTER VARYING
+);
+
+create table PUBLIC.FILE
+(
+    ID           UUID                     not null
+        primary key,
+    CONTENT_TYPE CHARACTER VARYING(255)   not null,
+    CREATED      TIMESTAMP WITH TIME ZONE not null,
+    FILENAME     CHARACTER VARYING(255)   not null,
+    HASH         CHARACTER VARYING(255)   not null,
+    SIZE         BIGINT,
+    check ("SIZE" >= CAST(1 AS BIGINT))
+);
+
+create table PUBLIC.FILE_MESSAGE_CONTENT
+(
+    ID      UUID not null
+        primary key,
+    FILE_ID UUID,
+    constraint FKFFNKVVWU5Y5W7APQUA69IM4CF
+        foreign key (FILE_ID) references PUBLIC.FILE
+);
+
+create table INFORMATION_SCHEMA.INDEXES
+(
+    INDEX_CATALOG   CHARACTER VARYING,
+    INDEX_SCHEMA    CHARACTER VARYING,
+    INDEX_NAME      CHARACTER VARYING,
+    TABLE_CATALOG   CHARACTER VARYING,
+    TABLE_SCHEMA    CHARACTER VARYING,
+    TABLE_NAME      CHARACTER VARYING,
+    INDEX_TYPE_NAME CHARACTER VARYING,
+    NULLS_DISTINCT  CHARACTER VARYING,
+    IS_GENERATED    BOOLEAN,
+    REMARKS         CHARACTER VARYING,
+    INDEX_CLASS     CHARACTER VARYING
+);
+
+create table INFORMATION_SCHEMA.INDEX_COLUMNS
+(
+    INDEX_CATALOG          CHARACTER VARYING,
+    INDEX_SCHEMA           CHARACTER VARYING,
+    INDEX_NAME             CHARACTER VARYING,
+    TABLE_CATALOG          CHARACTER VARYING,
+    TABLE_SCHEMA           CHARACTER VARYING,
+    TABLE_NAME             CHARACTER VARYING,
+    COLUMN_NAME            CHARACTER VARYING,
+    ORDINAL_POSITION       INTEGER,
+    ORDERING_SPECIFICATION CHARACTER VARYING,
+    NULL_ORDERING          CHARACTER VARYING,
+    IS_UNIQUE              BOOLEAN
+);
+
+create table INFORMATION_SCHEMA.INFORMATION_SCHEMA_CATALOG_NAME
+(
+    CATALOG_NAME CHARACTER VARYING
+);
+
+create table PUBLIC.INVITE
+(
+    CODE        CHARACTER VARYING(32)  not null
+        primary key,
+    DESCRIPTION CHARACTER VARYING(255),
+    END_DATE    TIMESTAMP,
+    MAX_USAGES  INTEGER,
+    START_DATE  TIMESTAMP,
+    TITLE       CHARACTER VARYING(255) not null,
+    USAGES      INTEGER                not null
+);
+
+create table INFORMATION_SCHEMA.IN_DOUBT
+(
+    TRANSACTION_NAME  CHARACTER VARYING,
+    TRANSACTION_STATE CHARACTER VARYING
+);
+
+create table INFORMATION_SCHEMA.LOCKS
+(
+    TABLE_SCHEMA CHARACTER VARYING,
+    TABLE_NAME   CHARACTER VARYING,
+    SESSION_ID   INTEGER,
+    LOCK_TYPE    CHARACTER VARYING
+);
+
+create table PUBLIC.MARKDOWN_MESSAGE_CONTENT
+(
+    ID   UUID not null
+        primary key,
+    TEXT CHARACTER VARYING(65535)
+);
+
+create table PUBLIC.PERMISSION
+(
+    ID       UUID    not null
+        primary key,
+    INVERTED BOOLEAN not null,
+    PRIORITY INTEGER not null
+);
+
+create table PUBLIC.PERMISSION_PERMISSIONS
+(
+    PERMISSION_ID UUID not null,
+    PERMISSIONS   ENUM ('CHANNEL', 'SECTION_CHANNEL_CREATE', 'SECTION_CHANNEL_MOVE', 'SECTION_CHANNEL_ORDER', 'SECTION_DELETE', 'SECTION_EDIT', 'SELF', 'SELF_AVATAR', 'SERVER', 'SERVER_EDIT', 'SERVER_EDIT_DESCRIPTION', 'CHANNEL_CHAT', 'SERVER_GROUP_CREATE', 'SERVER_GROUP_DELETE', 'SERVER_GROUP_EDIT', 'SERVER_INVITE', 'SERVER_JOIN', 'SERVER_SECTION_CREATE', 'SERVER_SECTION_MOVE', 'USER', 'USER_ACTIVATE', 'USER_AVATAR', 'CHANNEL_CHAT_READ', 'USER_BAN', 'USER_GROUP', 'USER_KICK', 'USER_UNBAN', 'CHANNEL_CHAT_WRITE', 'CHANNEL_DELETE', 'CHANNEL_EDIT', 'CHANNEL_JOIN', 'CHANNEL_USER_KICK', 'SECTION'),
+    constraint FKIF7MXPE50VKP2E7XTS6CY7DQ6
+        foreign key (PERMISSION_ID) references PUBLIC.PERMISSION
+);
+
+create table INFORMATION_SCHEMA.QUERY_STATISTICS
+(
+    SQL_STATEMENT             CHARACTER VARYING,
+    EXECUTION_COUNT           INTEGER,
+    MIN_EXECUTION_TIME        DOUBLE PRECISION,
+    MAX_EXECUTION_TIME        DOUBLE PRECISION,
+    CUMULATIVE_EXECUTION_TIME DOUBLE PRECISION,
+    AVERAGE_EXECUTION_TIME    DOUBLE PRECISION,
+    STD_DEV_EXECUTION_TIME    DOUBLE PRECISION,
+    MIN_ROW_COUNT             BIGINT,
+    MAX_ROW_COUNT             BIGINT,
+    CUMULATIVE_ROW_COUNT      BIGINT,
+    AVERAGE_ROW_COUNT         DOUBLE PRECISION,
+    STD_DEV_ROW_COUNT         DOUBLE PRECISION
+);
+
+create table INFORMATION_SCHEMA.RIGHTS
+(
+    GRANTEE      CHARACTER VARYING,
+    GRANTEETYPE  CHARACTER VARYING,
+    GRANTEDROLE  CHARACTER VARYING,
+    RIGHTS       CHARACTER VARYING,
+    TABLE_SCHEMA CHARACTER VARYING,
+    TABLE_NAME   CHARACTER VARYING
+);
+
+create table INFORMATION_SCHEMA.ROLES
+(
+    ROLE_NAME CHARACTER VARYING,
+    REMARKS   CHARACTER VARYING
+);
+
+create table PUBLIC.SERVER
+(
+    ID      UUID not null
+        primary key,
+    KEYS    CHARACTER LARGE OBJECT,
+    NAME    CHARACTER VARYING(64),
+    ICON_ID UUID
+        constraint UKBBKPWUEOQ5TEQ76QLIMO188WB
+            unique,
+    constraint FKFY824VBIARKERD6GQEFO195P6
+        foreign key (ICON_ID) references PUBLIC.FILE
+);
+
+create table PUBLIC.SECTION
+(
+    ID            UUID not null
+        primary key,
+    NAME          CHARACTER VARYING(32),
+    SERVER_ID     UUID,
+    SECTION_ORDER INTEGER,
+    constraint FKK7CGG0VNRAR1K25X8DI3Q5AY2
+        foreign key (SERVER_ID) references PUBLIC.SERVER
+);
+
+create table PUBLIC.CHANNEL
+(
+    ID            UUID                  not null
+        primary key,
+    NAME          CHARACTER VARYING(32) not null,
+    CHAT_ID       UUID                  not null,
+    SECTION_ID    UUID,
+    CHANNEL_ORDER INTEGER,
+    constraint FK37R22IRVC1XS6GT2OKHMXDG98
+        foreign key (SECTION_ID) references PUBLIC.SECTION,
+    constraint FKDM93XTAXT87BQLUAIVS5BG7SM
+        foreign key (CHAT_ID) references PUBLIC.CHAT
+);
+
+create table PUBLIC.CHANNEL_GROUP
+(
+    ID         UUID not null
+        primary key,
+    CHANNEL_ID UUID,
+    constraint FKQ213CEVA6FHW5DNF2K3PQGU14
+        foreign key (CHANNEL_ID) references PUBLIC.CHANNEL
+);
+
+create table PUBLIC.PERMISSION_LIMITED_TO_CHANNEL
+(
+    PERMISSION_ID         UUID not null,
+    LIMITED_TO_CHANNEL_ID UUID not null,
+    primary key (PERMISSION_ID, LIMITED_TO_CHANNEL_ID),
+    constraint FKDMM5WEQE92M5QM7XGUG9SSUTO
+        foreign key (LIMITED_TO_CHANNEL_ID) references PUBLIC.CHANNEL,
+    constraint FKMSTRLXKXF9FO9Y0AN6TLL555Q
+        foreign key (PERMISSION_ID) references PUBLIC.PERMISSION
+);
+
+create table PUBLIC.PERMISSION_LIMITED_TO_SECTION
+(
+    PERMISSION_ID         UUID not null,
+    LIMITED_TO_SECTION_ID UUID not null,
+    primary key (PERMISSION_ID, LIMITED_TO_SECTION_ID),
+    constraint FK14DWSR63BC2NLV88GM20QII8R
+        foreign key (LIMITED_TO_SECTION_ID) references PUBLIC.SECTION,
+    constraint FKDJPA1CIT6N8A6YUMTAU0BD2EF
+        foreign key (PERMISSION_ID) references PUBLIC.PERMISSION
+);
+
+create table PUBLIC.SECTION_GROUP
+(
+    ID         UUID not null
+        primary key,
+    SECTION_ID UUID,
+    constraint FK6FJ39VK6459JWQL7NXTGH45CF
+        foreign key (SECTION_ID) references PUBLIC.SECTION
+);
+
+create table PUBLIC.SERVER_DESCRIPTION
+(
+    SERVER_ID         UUID    not null,
+    DESCRIPTION_ID    UUID    not null
+        constraint UKCLN2I7BK18HY3TP0MHOPEEJRB
+            unique,
+    DESCRIPTION_ORDER INTEGER not null,
+    primary key (SERVER_ID, DESCRIPTION_ORDER),
+    constraint FK717CP7JCVN90L0SC2FJ6MN84P
+        foreign key (SERVER_ID) references PUBLIC.SERVER
+);
+
+create table PUBLIC.SERVER_GROUP
+(
+    ID                    UUID    not null
+        primary key,
+    DEFAULT_FOR_NEW_USERS BOOLEAN not null,
+    DESCRIPTION           CHARACTER VARYING(255),
+    LABEL                 BOOLEAN not null,
+    NAME                  CHARACTER VARYING(255),
+    PRIORITY              INTEGER not null,
+    ICON_ID               UUID
+        constraint UKNJHAXMU2BI6USW1GJJ31S3GU2
+            unique,
+    constraint FKL0E6KT8NT473M15W44BM499J3
+        foreign key (ICON_ID) references PUBLIC.FILE
+);
+
+create table PUBLIC.CHANNEL_GROUP_GROUPS
+(
+    CHANNEL_GROUP_ID UUID not null,
+    GROUPS_ID        UUID not null,
+    primary key (CHANNEL_GROUP_ID, GROUPS_ID),
+    constraint FKHRNESTJLPQOIH0Y1JMIM06RPV
+        foreign key (CHANNEL_GROUP_ID) references PUBLIC.CHANNEL_GROUP,
+    constraint FKOBYHH7OPW0V3XM0496XYCAVUP
+        foreign key (GROUPS_ID) references PUBLIC.SERVER_GROUP
+);
+
+create table PUBLIC.INVITE_GROUPS
+(
+    INVITE_CODE CHARACTER VARYING(255) not null,
+    GROUPS_ID   UUID                   not null,
+    constraint FK3BTCC9LWWAU5YSLFF9CBIG3AN
+        foreign key (GROUPS_ID) references PUBLIC.SERVER_GROUP,
+    constraint FKR2QH2DD3EVTLNHO744US37NAV
+        foreign key (INVITE_CODE) references PUBLIC.INVITE
+);
+
+create table PUBLIC.SECTION_GROUP_GROUPS
+(
+    SECTION_GROUP_ID UUID not null,
+    GROUPS_ID        UUID not null,
+    primary key (SECTION_GROUP_ID, GROUPS_ID),
+    constraint FKDNL8F6SSQ4II9G4TII9CIOGE1
+        foreign key (SECTION_GROUP_ID) references PUBLIC.SECTION_GROUP,
+    constraint FKK1UE24KRO9K40TROFI4NT6OC8
+        foreign key (GROUPS_ID) references PUBLIC.SERVER_GROUP
+);
+
+create table PUBLIC.SERVER_GROUPS
+(
+    SERVER_ID UUID not null,
+    GROUPS_ID UUID not null
+        constraint UKL3YBVXBK1GATL6EIQS5UW9WSY
+            unique,
+    constraint FK69E381GARY93LXHC0KL3B5AVY
+        foreign key (GROUPS_ID) references PUBLIC.SERVER_GROUP,
+    constraint FKB9NTBBEFCYQ9UB9LRD9ECQPOP
+        foreign key (SERVER_ID) references PUBLIC.SERVER
+);
+
+create table PUBLIC.SERVER_GROUP_INHERITS_FROM
+(
+    SERVER_GROUP_ID  UUID not null,
+    INHERITS_FROM_ID UUID not null,
+    constraint FK8RUL1G6X7PLT5S5SJ8WAA22UO
+        foreign key (INHERITS_FROM_ID) references PUBLIC.SERVER_GROUP,
+    constraint FKAU04U3D9J1Y9B5H1SA10DN800
+        foreign key (SERVER_GROUP_ID) references PUBLIC.SERVER_GROUP
+);
+
+create table PUBLIC.SERVER_GROUP_PERMISSIONS
+(
+    SERVER_GROUP_ID UUID not null,
+    PERMISSIONS_ID  UUID not null
+        constraint UK3QIMSI9LUACXCLYC6IHEXS8TX
+            unique,
+    constraint FK48O0PVTEW6H393EN4C372TXW7
+        foreign key (SERVER_GROUP_ID) references PUBLIC.SERVER_GROUP,
+    constraint FKNM6ELUMV2768N70PNQR0BRRFF
+        foreign key (PERMISSIONS_ID) references PUBLIC.PERMISSION
+);
+
+create table PUBLIC.SERVER_INVITES
+(
+    SERVER_ID    UUID                   not null,
+    INVITES_CODE CHARACTER VARYING(255) not null
+        constraint UK7TENG1ND4JVAHMEX2NCUIRY99
+            unique,
+    constraint FKNI0FSU455I9STDT2K9NKSXPRU
+        foreign key (SERVER_ID) references PUBLIC.SERVER,
+    constraint FKR9TKR9CBBQJH4S83SIQO35IVI
+        foreign key (INVITES_CODE) references PUBLIC.INVITE
+);
+
+create table PUBLIC.SERVER_USERS
+(
+    ID          CHARACTER VARYING(255)                      not null
+        primary key,
+    KNOWN_SINCE TIMESTAMP WITH TIME ZONE                    not null,
+    LAST_SEEN   TIMESTAMP WITH TIME ZONE,
+    OWNER       BOOLEAN                                     not null,
+    PUBLIC_KEY  CHARACTER VARYING(1024)                     not null
+        constraint UKMU2BAX8QR8FVY71779AFNSRQ
+            unique,
+    STATE       ENUM ('ACTIVE', 'BANNED', 'PENDING_ACCESS') not null,
+    USERNAME    CHARACTER VARYING(32)                       not null,
+    AVATAR_ID   UUID
+        constraint UKM86J2LLI0MVHMUU29TM1Q5MS6
+            unique,
+    constraint FK43FMY6TL6ABP2FAT25FBWMYG8
+        foreign key (AVATAR_ID) references PUBLIC.FILE
+);
+
+create table PUBLIC.MESSAGE
+(
+    ID        UUID                     not null
+        primary key,
+    TIMESTAMP TIMESTAMP WITH TIME ZONE not null,
+    CHAT_ID   UUID                     not null,
+    USER_ID   CHARACTER VARYING(255),
+    constraint FKMEJD0YKOKRBUEKWWGD5A5XT8A
+        foreign key (CHAT_ID) references PUBLIC.CHAT,
+    constraint FKT0GWWRVU6L3F0G08KITOHOTF4
+        foreign key (USER_ID) references PUBLIC.SERVER_USERS
+);
+
+create table PUBLIC.MESSAGE_CONTENT
+(
+    MESSAGE_ID UUID not null,
+    CONTENT_ID UUID not null
+        constraint UKEQ360MLNMIXHCH7S54M9YPO16
+            unique,
+    constraint FK1MOXXJGSYNBI1K5FKQWQ5AOPO
+        foreign key (MESSAGE_ID) references PUBLIC.MESSAGE
+);
+
+create table PUBLIC.SERVER_USERS_CHANNEL_GROUPS
+(
+    SERVER_USERS_ID   CHARACTER VARYING(255) not null,
+    CHANNEL_GROUPS_ID UUID                   not null
+        constraint UKOBKDIURX8EPVLCKWQ11PRDTHV
+            unique,
+    constraint FKKMY0607PWIDY4R27ALKQ8IPXD
+        foreign key (CHANNEL_GROUPS_ID) references PUBLIC.CHANNEL_GROUP,
+    constraint FKPPOPMUXBFC70MU7IYJ68THI9I
+        foreign key (SERVER_USERS_ID) references PUBLIC.SERVER_USERS
+);
+
+create table PUBLIC.SERVER_USERS_GROUPS
+(
+    SERVER_USERS_ID CHARACTER VARYING(255) not null,
+    GROUPS_ID       UUID                   not null,
+    primary key (SERVER_USERS_ID, GROUPS_ID),
+    constraint FKDQU3KAISHRUYA0HABNP5JDPLO
+        foreign key (SERVER_USERS_ID) references PUBLIC.SERVER_USERS,
+    constraint FKGJG6YLXYKHI0I77B6RLF0B24D
+        foreign key (GROUPS_ID) references PUBLIC.SERVER_GROUP
+);
+
+create table PUBLIC.SERVER_USERS_SECTION_GROUPS
+(
+    SERVER_USERS_ID   CHARACTER VARYING(255) not null,
+    SECTION_GROUPS_ID UUID                   not null
+        constraint UKFVMRWOQWB1J2L7RK7KY2MY6P4
+            unique,
+    constraint FKC799520H5IC8KX6IS7NR6UTT5
+        foreign key (SERVER_USERS_ID) references PUBLIC.SERVER_USERS,
+    constraint FKLUC4TS6JLT15LPJXQS0A19WB4
+        foreign key (SECTION_GROUPS_ID) references PUBLIC.SECTION_GROUP
+);
+
+create table INFORMATION_SCHEMA.SESSIONS
+(
+    SESSION_ID                INTEGER,
+    USER_NAME                 CHARACTER VARYING,
+    SERVER                    CHARACTER VARYING,
+    CLIENT_ADDR               CHARACTER VARYING,
+    CLIENT_INFO               CHARACTER VARYING,
+    SESSION_START             TIMESTAMP(9) WITH TIME ZONE,
+    ISOLATION_LEVEL           CHARACTER VARYING,
+    EXECUTING_STATEMENT       CHARACTER VARYING,
+    EXECUTING_STATEMENT_START TIMESTAMP(9) WITH TIME ZONE,
+    CONTAINS_UNCOMMITTED      BOOLEAN,
+    SESSION_STATE             CHARACTER VARYING,
+    BLOCKER_ID                INTEGER,
+    SLEEP_SINCE               TIMESTAMP(9) WITH TIME ZONE
+);
+
+create table INFORMATION_SCHEMA.SESSION_STATE
+(
+    STATE_KEY     CHARACTER VARYING,
+    STATE_COMMAND CHARACTER VARYING
+);
+
+create table INFORMATION_SCHEMA.SETTINGS
+(
+    SETTING_NAME  CHARACTER VARYING,
+    SETTING_VALUE CHARACTER VARYING
+);
+
+create table INFORMATION_SCHEMA.SYNONYMS
+(
+    SYNONYM_CATALOG    CHARACTER VARYING,
+    SYNONYM_SCHEMA     CHARACTER VARYING,
+    SYNONYM_NAME       CHARACTER VARYING,
+    SYNONYM_FOR        CHARACTER VARYING,
+    SYNONYM_FOR_SCHEMA CHARACTER VARYING,
+    TYPE_NAME          CHARACTER VARYING,
+    STATUS             CHARACTER VARYING,
+    REMARKS            CHARACTER VARYING
+);
+
+create table INFORMATION_SCHEMA.USERS
+(
+    USER_NAME CHARACTER VARYING,
+    IS_ADMIN  BOOLEAN,
+    REMARKS   CHARACTER VARYING
+);
+
+create view INFORMATION_SCHEMA.CHECK_CONSTRAINTS as
+-- missing source code
+;
+
+create view INFORMATION_SCHEMA.COLLATIONS as
+-- missing source code
+;
+
+create view INFORMATION_SCHEMA.COLUMNS as
+-- missing source code
+;
+
+create view INFORMATION_SCHEMA.COLUMN_PRIVILEGES as
+-- missing source code
+;
+
+create view INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE as
+-- missing source code
+;
+
+create view INFORMATION_SCHEMA.DOMAINS as
+-- missing source code
+;
+
+create view INFORMATION_SCHEMA.DOMAIN_CONSTRAINTS as
+-- missing source code
+;
+
+create view INFORMATION_SCHEMA.ELEMENT_TYPES as
+-- missing source code
+;
+
+create view INFORMATION_SCHEMA.FIELDS as
+-- missing source code
+;
+
+create view INFORMATION_SCHEMA.KEY_COLUMN_USAGE as
+-- missing source code
+;
+
+create view INFORMATION_SCHEMA.PARAMETERS as
+-- missing source code
+;
+
+create view INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS as
+-- missing source code
+;
+
+create view INFORMATION_SCHEMA.ROUTINES as
+-- missing source code
+;
+
+create view INFORMATION_SCHEMA.SCHEMATA as
+-- missing source code
+;
+
+create view INFORMATION_SCHEMA.SEQUENCES as
+-- missing source code
+;
+
+create view INFORMATION_SCHEMA.TABLES as
+-- missing source code
+;
+
+create view INFORMATION_SCHEMA.TABLE_CONSTRAINTS as
+-- missing source code
+;
+
+create view INFORMATION_SCHEMA.TABLE_PRIVILEGES as
+-- missing source code
+;
+
+create view INFORMATION_SCHEMA.TRIGGERS as
+-- missing source code
+;
+
+create view INFORMATION_SCHEMA.VIEWS as
+-- missing source code
+;
+

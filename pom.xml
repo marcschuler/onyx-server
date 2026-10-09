@@ -99,6 +99,12 @@
             <version>2.4.240</version>
         </dependency>
         <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+            <version>5.0.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>

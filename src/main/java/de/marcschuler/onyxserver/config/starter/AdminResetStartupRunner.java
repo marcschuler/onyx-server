@@ -5,6 +5,7 @@ import de.marcschuler.onyxserver.data.permission.Permission;
 import de.marcschuler.onyxserver.data.permission.PermissionType;
 import de.marcschuler.onyxserver.dto.GroupCreateDTO;
 import de.marcschuler.onyxserver.dto.data.InviteDTO;
+import de.marcschuler.onyxserver.dto.data.SimpleGroupDTO;
 import de.marcschuler.onyxserver.service.GroupService;
 import de.marcschuler.onyxserver.service.InviteService;
 import de.marcschuler.onyxserver.service.ServerService;
@@ -64,12 +65,15 @@ public class AdminResetStartupRunner implements CommandLineRunner {
             server.getGroups().add(group);
             serverService.save(server);
 
+
+            var adminSimpleDTO = new SimpleGroupDTO();
+            adminSimpleDTO.setId(group.getId());
             var inviteDto = new InviteDTO();
             inviteDto.setCode(Util.randomCode(16));
             inviteDto.setTitle("Emergency Admin Group");
             inviteDto.setUsages(1);
             inviteDto.setEndDate(LocalDateTime.now().plusDays(14));
-            inviteDto.setGroups(List.of(group.getId()));
+            inviteDto.setGroups(List.of(adminSimpleDTO));
 
             var invite = inviteService.create(inviteDto);
 

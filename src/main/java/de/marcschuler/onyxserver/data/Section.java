@@ -2,6 +2,7 @@ package de.marcschuler.onyxserver.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,9 @@ public class Section {
     private UUID id;
     @Column(length = 32)
     private String name;
+
+    @Size(max = 32)
+    private String password;
 
     @OneToMany(
             cascade = CascadeType.ALL,

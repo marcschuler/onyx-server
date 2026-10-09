@@ -2,6 +2,7 @@ package de.marcschuler.onyxserver.service;
 
 import de.marcschuler.onyxserver.data.ClientState;
 import de.marcschuler.onyxserver.data.Invite;
+import de.marcschuler.onyxserver.data.Server;
 import de.marcschuler.onyxserver.data.User;
 import de.marcschuler.onyxserver.dto.data.InviteDTO;
 import de.marcschuler.onyxserver.error.InviteException;
@@ -16,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -98,5 +100,9 @@ public class InviteService {
         } else {
             throw new InviteException("Invite not applicable: you are already a member with all associated groups.");
         }
+    }
+
+    public List<Invite> all(Server server) {
+        return inviteRepository.findAll(); //TODO
     }
 }

@@ -45,6 +45,8 @@ public class CryptoService {
     }
 
     public boolean passwordMatches(String password, String hash){
+        if (password == null || hash == null)
+            return false;
         return passwordEncoder.matches(password,hash);
     }
 

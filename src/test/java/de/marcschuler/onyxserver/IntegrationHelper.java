@@ -32,33 +32,41 @@ public class IntegrationHelper {
 
 
     public WebSocketMock quickConnect() throws IOException, SignatureException, NoSuchAlgorithmException, ExecutionException, InvalidKeyException, InterruptedException, TimeoutException, JOSEException {
-        return quickConnect(RandomStringUtils.randomAlphanumeric(8), 8080);
+        return quickConnect(RandomStringUtils.randomAlphanumeric(8), 8080, null);
     }
 
     public WebSocketMock quickConnect(int port) throws IOException, SignatureException, NoSuchAlgorithmException, ExecutionException, InvalidKeyException, InterruptedException, TimeoutException, JOSEException {
-        return quickConnect(RandomStringUtils.randomAlphanumeric(8), port);
+        return quickConnect(RandomStringUtils.randomAlphanumeric(8), port, null);
     }
 
     public WebSocketMock quickConnect(String username) throws SignatureException, NoSuchAlgorithmException, ExecutionException, InvalidKeyException, InterruptedException, TimeoutException, JOSEException {
-        return quickConnect(cryptoService.generateKeyPair(), username, 8080);
+        return quickConnect(cryptoService.generateKeyPair(), username, 8080, null);
     }
 
     public WebSocketMock quickConnect(String username, int port) throws SignatureException, NoSuchAlgorithmException, ExecutionException, InvalidKeyException, InterruptedException, TimeoutException, JOSEException {
-        return quickConnect(cryptoService.generateKeyPair(), username, port);
+        return quickConnect(cryptoService.generateKeyPair(), username, port, null);
+    }
+
+    public WebSocketMock quickConnect(String username, int port, String serverPassword) throws SignatureException, NoSuchAlgorithmException, ExecutionException, InvalidKeyException, InterruptedException, TimeoutException, JOSEException {
+        return quickConnect(cryptoService.generateKeyPair(), username, port, serverPassword);
     }
 
     public WebSocketMock quickConnect(OctetKeyPair keyPair, String username) throws ExecutionException, InterruptedException, TimeoutException, JOSEException {
-        return quickConnect(keyPair, username, 8080);
+        return quickConnect(keyPair, username, 8080, null);
     }
 
     public WebSocketMock quickConnect(OctetKeyPair keyPair, String username, int port) throws ExecutionException, InterruptedException, TimeoutException, JOSEException {
+        return quickConnect(keyPair, username, port, null);
+    }
+
+    public WebSocketMock quickConnect(OctetKeyPair keyPair, String username, int port, String serverPassword) throws ExecutionException, InterruptedException, TimeoutException, JOSEException {
         var mock = new WebSocketMock(objectMapper, keyPair, port);
         mock.connect();
 
         var authChallengeRequest = (AuthChallengeRequest) mock.recv();
         var authChallengeResponse = new AuthChallengeResponse(keyPair.toPublicJWK().toJSONObject(),
                 cryptoService.signContent(authChallengeRequest.challenge(),keyPair),
-                username,null
+                username,serverPassword
                 );
         mock.sendMessage(authChallengeResponse);
         mock.recv(AuthSuccessMessage.class);

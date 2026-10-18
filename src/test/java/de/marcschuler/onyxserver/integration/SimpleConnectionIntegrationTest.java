@@ -3,12 +3,17 @@ package de.marcschuler.onyxserver.integration;
 import com.nimbusds.jose.JOSEException;
 import de.marcschuler.onyxserver.IntegrationHelper;
 import de.marcschuler.onyxserver.OnyxTest;
+import de.marcschuler.onyxserver.TestService;
 import de.marcschuler.onyxserver.WebSocketMock;
+import de.marcschuler.onyxserver.data.Channel;
+import de.marcschuler.onyxserver.repository.ChannelRepository;
+import de.marcschuler.onyxserver.service.ChannelService;
 import de.marcschuler.onyxserver.service.CryptoService;
 import de.marcschuler.onyxserver.webclient.messages.client.ClientChannelJoinEvent;
 import de.marcschuler.onyxserver.webclient.messages.client.ClientChannelJoinRequest;
 import de.marcschuler.onyxserver.webclient.messages.client.ClientChannelLeaveEvent;
 import de.marcschuler.onyxserver.webclient.messages.client.ClientChannelLeaveRequest;
+import de.marcschuler.onyxserver.webclient.messages.error.NoPermissionMessage;
 import de.marcschuler.onyxserver.webclient.messages.peer.IceServerMessage;
 import de.marcschuler.onyxserver.webclient.messages.server.ServerTreeChangeMessage;
 import org.junit.jupiter.api.AfterEach;
@@ -41,6 +46,12 @@ public class SimpleConnectionIntegrationTest {
 
     @Autowired
     private CryptoService cryptoService;
+
+    @Autowired
+    private ChannelService channelService;
+
+    @Autowired
+    private ChannelRepository channelRepository;
 
     private WebSocketMock client;
 
@@ -93,5 +104,21 @@ public class SimpleConnectionIntegrationTest {
         //try to leave channel again
         client.sendMessage(new ClientChannelLeaveRequest());
         client.recvNothing();
+    }
+
+    @Test
+    void testJoinChannelVoiceModeNone() throws InterruptedException, JacksonException {
+        var channel = channelService.get(TestService.CHANNEL_LOBBY_ID).orElseThrow();
+        channel.setVoiceMode(Channel.VoiceMode.NONE);
+        channelRepository.save(channel);
+
+        client.recv(IceServerMessage.class);
+        var tree = client.recv(ServerTreeChangeMessage.class);
+
+        var firstChannel = tree.sections().getFirst().getChannels().getFirst();
+        client.sendMessage(new ClientChannelJoinRequest(firstChannel.getId()));
+
+        var error = client.recv(NoPermissionMessage.class);
+        assertNotNull(error);
     }
 }

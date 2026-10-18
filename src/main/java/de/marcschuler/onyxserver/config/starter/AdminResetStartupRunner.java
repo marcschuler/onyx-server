@@ -75,7 +75,7 @@ public class AdminResetStartupRunner implements CommandLineRunner {
             inviteDto.setEndDate(LocalDateTime.now().plusDays(14));
             inviteDto.setGroups(List.of(adminSimpleDTO));
 
-            var invite = inviteService.create(inviteDto);
+            var invite = inviteService.create(inviteDto, server);
 
             server.setInvites(List.of(invite));
             log.info(" ---------- START RECOVERY CODE ----------");

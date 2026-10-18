@@ -43,8 +43,12 @@ onyx:
   storage:
     path: /data
     database: ${onyx.storage.path}/database
-    files: ${onyx.storage.path}/files
-    previewFiles: ${onyx.storage.path}/cache/preview
+    files:
+      files: ${onyx.storage.path}/files/files
+      cache: ${onyx.storage.path}/cache/files
+    integration-steam:
+      files: ${onyx.storage.path}/cache/steam
+      cache: ${onyx.storage.path}/cache/files
 
 webrtc:
   config:

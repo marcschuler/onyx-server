@@ -43,6 +43,7 @@ public class UserController {
     private final ServerMapper serverMapper;
     private final GroupMapper groupMapper;
     private final WebSocketConnectionService webSocketConnectionService;
+    private final FileService fileService;
 
     @GetMapping
     public List<UserExtendedDTO> users() {
@@ -149,7 +150,7 @@ public class UserController {
         if (!storageService.isImageType(file))
             throw new FileUploadException("Only image files are allowed (jpg,png)");
         var user = userService.findById(id).orElseThrow();
-        var f = storageService.uploadFile(file);
+        var f = fileService.uploadFile(file);
         userService.setUserAvatar(user, f);
         return serverMapper.mapToDTO(f);
     }

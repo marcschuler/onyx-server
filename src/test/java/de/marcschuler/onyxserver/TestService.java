@@ -39,6 +39,7 @@ public class TestService {
     public static final UUID GROUP_ADMIN_ID = UUID.fromString("a08f02d4-bd84-488c-adca-4dae73cc3f20");
 
     public static final UUID CHAT_LOBBY_ID = UUID.fromString("510f6de6-19c7-4075-93ae-4456da6912ee");
+    public static final UUID CHAT_TALKING_I_ID = UUID.fromString("08e0e74d-6d3c-49e9-94ce-7ccd8b407195");
 
     public static final UUID SECTION_CHAT_ID = UUID.fromString("64d48960-f666-4a34-aea5-a075d80a86f7");
 

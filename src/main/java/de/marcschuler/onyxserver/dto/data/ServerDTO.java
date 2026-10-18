@@ -22,6 +22,9 @@ public class ServerDTO  {
     private FileDTO icon;
 
     @NotNull
+    private ServerSettingsDTO settings;
+
+    @NotNull
     private Map<String,Object> publicKey;
     @NotNull
     private List<MessageContentDTO> description;

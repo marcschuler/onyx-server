@@ -37,6 +37,9 @@ class ChatServiceTest {
     @Autowired
     private StorageService storageService;
 
+    @Autowired
+    private FileService fileService;
+
     private static final class NotExistingMessageContentDTO extends MessageContentDTO {
     }
 
@@ -54,7 +57,7 @@ class ChatServiceTest {
         var multipartFile = new MockMultipartFile(
                 "file", "test.txt", "text/plain",
                 new ByteArrayInputStream("Hello, World!".getBytes()));
-        var file = storageService.uploadFile(multipartFile);
+        var file = fileService.uploadFile(multipartFile);
 
         var hashDto = new HashDTO();
         hashDto.setType(file.getHash().getType());

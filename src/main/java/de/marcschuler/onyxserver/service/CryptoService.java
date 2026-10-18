@@ -10,6 +10,7 @@ import de.marcschuler.onyxserver.dto.SignedContent;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Service;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
@@ -29,9 +30,23 @@ public class CryptoService {
     public static final String CRYPTO_ALGORITHM = "Ed25519";
     public static final String HASHING_ALGORITHM = "SHA-256";
 
+    public static final String PASSWORD_HASH_ARG2_PREFIX = "arg2:";
+
+    private static final Argon2PasswordEncoder passwordEncoder =
+            Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
+
     private final ObjectMapper objectMapper;
 
     private final SecureRandom secureRandom = new SecureRandom();
+
+
+    public String hashPassword(String password){
+        return PASSWORD_HASH_ARG2_PREFIX+ passwordEncoder.encode(password);
+    }
+
+    public boolean passwordMatches(String password, String hash){
+        return passwordEncoder.matches(password,hash);
+    }
 
     /**
      * Generated a secure random, 128 byte strong Base64 string
@@ -63,7 +78,7 @@ public class CryptoService {
      */
     @SneakyThrows
     public String generateKeyId(OctetKeyPair publicKey) {
-        return publicKey.computeThumbprint("SHA-256").toString();
+        return publicKey.computeThumbprint(HASHING_ALGORITHM).toString();
     }
 
     public OctetKeyPair importKeyPair(String data) throws ParseException {

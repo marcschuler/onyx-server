@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -25,9 +26,12 @@ import java.util.concurrent.TimeoutException;
 import static org.junit.jupiter.api.Assertions.*;
 
 // Low level connection tests
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @OnyxTest
 class WebSocketConnectionServiceTest {
+
+    @LocalServerPort
+    private int port;
 
     private WebSocketMock webSocketMock;
 
@@ -44,7 +48,7 @@ class WebSocketConnectionServiceTest {
 
     @BeforeEach
     void setUp() throws ExecutionException, InterruptedException, TimeoutException {
-        webSocketMock = new WebSocketMock(objectMapper, null);
+        webSocketMock = new WebSocketMock(objectMapper, null, port);
         webSocketMock.connect();
     }
 
@@ -70,7 +74,7 @@ class WebSocketConnectionServiceTest {
         //Authenticate
         var authChallengeResponse = new AuthChallengeResponse(key.toPublicJWK().toJSONObject(),
                 cryptoService.signContent(authChallengeRequest.challenge(), key),
-                "marc"
+                "marc",null
         );
         webSocketMock.sendMessage(authChallengeResponse);
 
@@ -107,7 +111,7 @@ class WebSocketConnectionServiceTest {
         //Authenticate
         var authChallengeResponse = new AuthChallengeResponse(key.toPublicJWK().toJSONObject(),
                 new SignedContent(null),
-                "marc"
+                "marc",null
         );
         webSocketMock.sendMessage(authChallengeResponse);
         Thread.sleep(1000);

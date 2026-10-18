@@ -1,11 +1,12 @@
 package de.marcschuler.onyxserver.controller.v0;
 
 import de.marcschuler.onyxserver.data.permission.PermissionType;
+import de.marcschuler.onyxserver.dto.ServerPasswordRequest;
 import de.marcschuler.onyxserver.dto.data.FileDTO;
 import de.marcschuler.onyxserver.dto.data.ServerDTO;
 import de.marcschuler.onyxserver.error.ServerNotFoundException;
-import de.marcschuler.onyxserver.mapper.MessageContentMapper;
 import de.marcschuler.onyxserver.mapper.ServerMapper;
+import de.marcschuler.onyxserver.service.FileService;
 import de.marcschuler.onyxserver.service.PermissionService;
 import de.marcschuler.onyxserver.service.ServerService;
 import de.marcschuler.onyxserver.service.StorageService;
@@ -30,14 +31,23 @@ public class ServerController {
     private final StorageService storageService;
 
     private final ServerMapper serverMapper;
-    private final MessageContentMapper messageContentMapper;
+    private final FileService fileService;
 
     @PutMapping("{serverId}")
     public ServerDTO edit(@PathVariable UUID serverId, @RequestBody ServerDTO serverDto) {
         permissionService.checkControllerAccess(null, null, PermissionType.SERVER_EDIT);
 
-        var server = serverService.get(serverId).orElseThrow(()->new ServerNotFoundException(serverId));
+        var server = serverService.get(serverId).orElseThrow(() -> new ServerNotFoundException(serverId));
         server = serverService.update(server, serverDto);
+        return serverMapper.mapToDTO(server);
+    }
+
+    @PutMapping("{serverId}/password")
+    public ServerDTO setPassword(@PathVariable UUID serverId, @RequestBody ServerPasswordRequest serverPasswordRequest) {
+        permissionService.checkControllerAccess(null, null, PermissionType.SERVER_EDIT);
+
+        var server = serverService.get(serverId).orElseThrow(() -> new ServerNotFoundException(serverId));
+        serverService.setServerPassword(server, serverPasswordRequest.password());
         return serverMapper.mapToDTO(server);
     }
 
@@ -48,8 +58,8 @@ public class ServerController {
 
         if (!storageService.isImageType(file))
             throw new FileUploadException("Only image files are allowed (jpg,png)");
-        var f = storageService.uploadFile(file);
-        serverService.setIcon(server,f);
+        var f = fileService.uploadFile(file);
+        serverService.setIcon(server, f);
         return serverMapper.mapToDTO(f);
     }
 
@@ -58,7 +68,7 @@ public class ServerController {
         permissionService.checkControllerAccess(null, null, PermissionType.SERVER_EDIT);
 
         var server = serverService.get(serverId).orElseThrow();
-        serverService.setIcon(server,null);
+        serverService.setIcon(server, null);
     }
 
     @GetMapping("{serverId}")

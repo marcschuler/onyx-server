@@ -2,10 +2,7 @@ package de.marcschuler.onyxserver.mapper;
 
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import de.marcschuler.onyxserver.config.WebRTConfig;
-import de.marcschuler.onyxserver.data.Channel;
-import de.marcschuler.onyxserver.data.Section;
-import de.marcschuler.onyxserver.data.Server;
-import de.marcschuler.onyxserver.data.User;
+import de.marcschuler.onyxserver.data.*;
 import de.marcschuler.onyxserver.data.file.File;
 import de.marcschuler.onyxserver.dto.IceServer;
 import de.marcschuler.onyxserver.dto.SectionCreateDTO;
@@ -57,6 +54,13 @@ public abstract class ServerMapper {
     @Mapping(target = "description", ignore = true)
     @Mapping(target = "icon", ignore = true)
     public abstract Server update(@MappingTarget Server server, ServerDTO dto);
+
+    @Mapping(target = "password", expression = "java(settings.getPassword() != null)")
+    public abstract ServerSettingsDTO mapToDTO(ServerSettings settings);
+
+    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "server", ignore = true)
+    public abstract ServerSettings mapFromDTO(ServerSettingsDTO dto);
 
     /**
      * SECTIONS

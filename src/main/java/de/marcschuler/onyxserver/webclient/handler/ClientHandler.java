@@ -1,6 +1,8 @@
 package de.marcschuler.onyxserver.webclient.handler;
 
+import de.marcschuler.onyxserver.data.Channel;
 import de.marcschuler.onyxserver.data.permission.PermissionType;
+import de.marcschuler.onyxserver.error.webclient.PermissionDeniedException;
 import de.marcschuler.onyxserver.service.ChannelService;
 import de.marcschuler.onyxserver.service.PermissionService;
 import de.marcschuler.onyxserver.service.websocket.WebSocketConnectionService;
@@ -25,9 +27,11 @@ public class ClientHandler {
     @EventListener
     @Transactional
     public void onChannelJoinRequest(ClientMessage<ClientChannelJoinRequest> event) {
-        log.info("User {} wants to join channel {}", event.client().getUser().getUsername(),event.body().channelId());
+        log.info("User {} wants to join channel {}", event.client().getUser().getUsername(), event.body().channelId());
         var wantedChannel = channelService.get(event.body().channelId()).orElseThrow();
-        
+        if (wantedChannel.getVoiceMode() == Channel.VoiceMode.NONE)
+            throw new PermissionDeniedException("Channel has no voice mode", null);
+
         permissionService.checkClientAccess(event.client(), wantedChannel, PermissionType.CHANNEL_JOIN);
 
         webSocketConnectionService.joinChannel(event.client(), wantedChannel);

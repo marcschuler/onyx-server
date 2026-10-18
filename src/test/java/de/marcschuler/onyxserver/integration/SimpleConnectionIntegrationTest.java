@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import tools.jackson.core.JacksonException;
 
 import java.io.IOException;
@@ -28,9 +29,12 @@ import java.util.concurrent.TimeoutException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @OnyxTest
 public class SimpleConnectionIntegrationTest {
+
+    @LocalServerPort
+    private int port;
 
     @Autowired
     private IntegrationHelper integrationHelper;
@@ -42,7 +46,7 @@ public class SimpleConnectionIntegrationTest {
 
     @BeforeEach
     void setup() throws IOException, SignatureException, NoSuchAlgorithmException, ExecutionException, InvalidKeyException, InterruptedException, TimeoutException, JOSEException {
-        client = integrationHelper.quickConnect("user");
+        client = integrationHelper.quickConnect("user", port);
     }
 
     @AfterEach

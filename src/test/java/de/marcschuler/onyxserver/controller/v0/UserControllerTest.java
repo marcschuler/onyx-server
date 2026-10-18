@@ -3,9 +3,10 @@ package de.marcschuler.onyxserver.controller.v0;
 import de.marcschuler.onyxserver.OnyxTest;
 import de.marcschuler.onyxserver.TestService;
 import de.marcschuler.onyxserver.data.ClientState;
-import de.marcschuler.onyxserver.dto.data.FileDTO;
-import de.marcschuler.onyxserver.dto.data.GroupDTO;
-import de.marcschuler.onyxserver.dto.data.UserExtendedDTO;
+import de.marcschuler.onyxserver.dto.InviteResponseDto;
+import de.marcschuler.onyxserver.dto.KickRequestDTO;
+import de.marcschuler.onyxserver.dto.data.*;
+import de.marcschuler.onyxserver.webclient.KickReason;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -132,6 +134,100 @@ class UserControllerTest {
                 .body(byte[].class);
         assertNotNull(avatar);
         assertTrue(avatar.length > 0);
+    }
+
+    @Test
+    void testAvatarDelete() {
+        var parts = new LinkedMultiValueMap<String, Object>();
+        parts.add("file", new ByteArrayResource("fake-avatar-data".getBytes()) {
+            @Override
+            public String getFilename() {
+                return "avatar.png";
+            }
+        });
+
+        adminClient.post()
+                .uri("/v0/user/{id}/profile/avatar", TestService.USER_ADMIN_ID)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(parts)
+                .retrieve()
+                .toBodilessEntity();
+
+        adminClient.delete()
+                .uri("/v0/user/{id}/avatar", TestService.USER_ADMIN_ID)
+                .retrieve()
+                .toBodilessEntity();
+
+        var ex = assertThrows(HttpClientErrorException.class, () ->
+                adminClient.get()
+                        .uri("/v0/user/{id}/avatar", TestService.USER_ADMIN_ID)
+                        .retrieve()
+                        .toBodilessEntity());
+        assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
+    }
+
+    @Test
+    void testActivateUser() {
+        var user = restClient.get()
+                .uri("/v0/user/")
+                .retrieve()
+                .body(new ParameterizedTypeReference<List<UserExtendedDTO>>() {})
+                .stream()
+                .filter(u -> TestService.USER_USER_ID.equals(u.getId()))
+                .findFirst()
+                .orElseThrow();
+
+        if (user.getState() != ClientState.ACTIVE) {
+            var activated = adminClient.put()
+                    .uri("/v0/user/{id}/state/active", TestService.USER_USER_ID)
+                    .retrieve()
+                    .body(UserExtendedDTO.class);
+            assertNotNull(activated);
+            assertEquals(ClientState.ACTIVE, activated.getState());
+        }
+    }
+
+    @Test
+    void testInviteRedemption() {
+        var group = new SimpleGroupDTO();
+        group.setId(GROUP_MOD_ID);
+        group.setName("Mod");
+
+        var inviteDto = new InviteDTO();
+        inviteDto.setCode("user-invite");
+        inviteDto.setTitle("User Invite");
+        inviteDto.setEndDate(LocalDateTime.now().plusDays(7));
+        inviteDto.setUsages(0);
+        inviteDto.setGroups(List.of(group));
+
+        adminClient.post()
+                .uri("/v0/server/{serverId}/invites", TestService.SERVER_ID)
+                .body(inviteDto)
+                .retrieve()
+                .toBodilessEntity();
+
+        var response = restClient.put()
+                .uri("/v0/user/{id}/invite", TestService.USER_USER_ID)
+                .body("user-invite")
+                .retrieve()
+                .body(InviteResponseDto.class);
+
+        assertNotNull(response);
+        assertEquals("User Invite", response.name());
+    }
+
+    @Test
+    void testKickFromChannelRequiresClientOnline() {
+        var kick = new KickRequestDTO();
+        kick.setReason(KickReason.OTHER);
+        kick.setMessage("test kick");
+
+        assertThrows(Exception.class, () ->
+                adminClient.put()
+                        .uri("/v0/user/{id}/kick/channel", TestService.USER_USER_ID)
+                        .body(kick)
+                        .retrieve()
+                        .toBodilessEntity());
     }
 
 }

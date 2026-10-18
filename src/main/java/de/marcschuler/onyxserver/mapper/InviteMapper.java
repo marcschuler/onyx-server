@@ -2,13 +2,11 @@ package de.marcschuler.onyxserver.mapper;
 
 import de.marcschuler.onyxserver.data.Group;
 import de.marcschuler.onyxserver.data.Invite;
+import de.marcschuler.onyxserver.data.Server;
 import de.marcschuler.onyxserver.dto.data.InviteDTO;
 import de.marcschuler.onyxserver.dto.data.SimpleGroupDTO;
 import de.marcschuler.onyxserver.service.GroupService;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-import org.mapstruct.SubclassExhaustiveStrategy;
+import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
@@ -16,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("SpringAutowiredFieldsWarningInspection")
 @Mapper(componentModel = "spring",
         subclassExhaustiveStrategy = SubclassExhaustiveStrategy.RUNTIME_EXCEPTION,
         uses = {GroupMapper.class})
@@ -25,8 +24,15 @@ public abstract class InviteMapper {
     @Lazy
     protected GroupService groupService;
 
+    @Mapping(target = "groups", source = "dto.groups", qualifiedByName = "simpleGroupsToGroups")
+    @Mapping(target = "description", source = "dto.description")
+    @Mapping(target = "server", source = "server")
+    public abstract Invite mapFromDTO(InviteDTO dto, Server server);
+
+    @Mapping(target = "code", ignore = true)
+    @Mapping(target = "server", ignore = true)
     @Mapping(target = "groups", source = "groups", qualifiedByName = "simpleGroupsToGroups")
-    public abstract Invite mapFromDTO(InviteDTO dto);
+    public abstract Invite update(@MappingTarget Invite invite, InviteDTO dto);
 
     @Named("simpleGroupsToGroups")
     protected List<Group> uuidsToSections(List<SimpleGroupDTO> simpleGroups) {

@@ -29,6 +29,12 @@ public class WebSocketMock {
     private final BlockingQueue<String> messageQueue = new LinkedBlockingQueue<>();
     @Getter
     private final OctetKeyPair keyPair;
+    private int port = 8080;
+
+    public WebSocketMock(ObjectMapper objectMapper, OctetKeyPair keyPair, int port) {
+        this(objectMapper, keyPair);
+        this.port = port;
+    }
 
     public void connect() throws ExecutionException, InterruptedException, TimeoutException {
         StandardWebSocketClient client = new StandardWebSocketClient();
@@ -53,7 +59,7 @@ public class WebSocketMock {
             }
         };
         log.info("waiting for connection");
-        client.execute(handler, "ws://localhost:8080/websocket").get(2, TimeUnit.SECONDS);
+        client.execute(handler, "ws://localhost:" + port + "/websocket").get(2, TimeUnit.SECONDS);
         this.session = responseFuture.get(5, TimeUnit.SECONDS);
     }
 

@@ -14,6 +14,7 @@ import java.util.UUID;
         visible = true
 )
 @JsonSubTypes({
+        @JsonSubTypes.Type(value = TextMessageContentDTO.class, name = "TEXT"),
         @JsonSubTypes.Type(value = MarkdownMessageContentDTO.class, name = "MARKDOWN"),
         @JsonSubTypes.Type(value = FileMessageContentDTO.class, name = "FILE"),
 })

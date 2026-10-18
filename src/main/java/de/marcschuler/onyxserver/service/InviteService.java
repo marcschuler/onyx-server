@@ -9,6 +9,7 @@ import de.marcschuler.onyxserver.error.InviteException;
 import de.marcschuler.onyxserver.mapper.InviteMapper;
 import de.marcschuler.onyxserver.mapper.ServerMapper;
 import de.marcschuler.onyxserver.repository.InviteRepository;
+import de.marcschuler.onyxserver.repository.ServerRepository;
 import de.marcschuler.onyxserver.service.websocket.WebSocketConnectionService;
 import de.marcschuler.onyxserver.webclient.WebClient;
 import de.marcschuler.onyxserver.webclient.messages.client.ClientChangeEvent;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,14 +30,15 @@ public class InviteService {
 
     private final UserService userService;
     private final InviteRepository inviteRepository;
+    private final ServerRepository serverRepository;
 
     private final WebSocketConnectionService webSocketConnectionService;
 
     private final ServerMapper serverMapper;
     private final InviteMapper inviteMapper;
 
-    public Invite create(InviteDTO inviteDto) {
-        var invite = inviteMapper.mapFromDTO(inviteDto);
+    public Invite create(InviteDTO inviteDto, Server server) {
+        var invite = inviteMapper.mapFromDTO(inviteDto, server);
         if (inviteRepository.existsById(invite.getCode()))
             throw new IllegalStateException("An invite with code " + invite.getCode() + " already exists");
 
@@ -104,5 +107,18 @@ public class InviteService {
 
     public List<Invite> all(Server server) {
         return inviteRepository.findAll(); //TODO
+    }
+
+    public Optional<Invite> get(String code){
+        return inviteRepository.findById(code);
+    }
+
+    public Invite edit(Invite invite, InviteDTO inviteDto) {
+        inviteMapper.update(invite, inviteDto);
+        return inviteRepository.save(invite);
+    }
+
+    public void delete(Invite invite) {
+        inviteRepository.delete(invite);
     }
 }

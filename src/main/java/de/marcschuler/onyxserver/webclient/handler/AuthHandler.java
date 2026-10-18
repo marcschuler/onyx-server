@@ -9,6 +9,7 @@ import de.marcschuler.onyxserver.error.webclient.ClientKickException;
 import de.marcschuler.onyxserver.mapper.ServerMapper;
 import de.marcschuler.onyxserver.service.AuthService;
 import de.marcschuler.onyxserver.service.CryptoService;
+import de.marcschuler.onyxserver.service.ServerService;
 import de.marcschuler.onyxserver.service.UserService;
 import de.marcschuler.onyxserver.service.websocket.WebSocketConnectionService;
 import de.marcschuler.onyxserver.service.websocket.WebSocketService;
@@ -45,12 +46,23 @@ public class AuthHandler {
     private final ServerMapper serverMapper;
 
     private final WebRTConfig webRTConfig;
+    private final ServerService serverService;
 
     @EventListener
     public void onLogin(ClientMessage<AuthChallengeResponse> event) throws IOException, JOSEException {
+
+        var server = serverService.defaultServer();
+        if (server.getSettings().getPassword() != null) {
+            log.debug("validating server password");
+            var matches = cryptoService.passwordMatches(event.body().serverPassword(), server.getSettings().getPassword());
+            if (!matches)
+                throw new ClientKickException("Wrong server password", KickReason.UNAUTHORIZED_REQUEST);
+        }
+
         log.info("Responding to auth challenge");
         var content = event.body().challenge();
         var username = event.body().username();
+
         OctetKeyPair publicKey;
         try {
             publicKey = cryptoService.importPublicKey(event.body().publicKey());

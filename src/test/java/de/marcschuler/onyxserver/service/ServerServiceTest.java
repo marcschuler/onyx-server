@@ -30,6 +30,9 @@ class ServerServiceTest {
     @Autowired
     private StorageService storageService;
 
+    @Autowired
+    private FileService fileService;
+
     @Test
     void testDefaultServer() {
         var server = serverService.defaultServer();
@@ -124,7 +127,7 @@ class ServerServiceTest {
         var multipartFile = new MockMultipartFile(
                 "file", "icon.png", "image/png",
                 new ByteArrayInputStream("fake-icon-data".getBytes()));
-        var file = storageService.uploadFile(multipartFile);
+        var file = fileService.uploadFile(multipartFile);
 
         serverService.setIcon(server, file);
 

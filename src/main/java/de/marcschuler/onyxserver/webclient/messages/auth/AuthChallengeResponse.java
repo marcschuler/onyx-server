@@ -14,5 +14,5 @@ import java.util.Map;
  * @param username the preferred username. the server may pick another
  */
 public record AuthChallengeResponse(@NotNull Map<String, Object> publicKey, @NotNull SignedContent challenge,
-                                    @NotNull String username) implements MessageBody {
+                                    @NotNull String username, String serverPassword) implements MessageBody {
 }

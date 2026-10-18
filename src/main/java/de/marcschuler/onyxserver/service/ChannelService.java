@@ -105,11 +105,22 @@ public class ChannelService {
         serverMapper.update(channel, channelDTO);
         channelRepository.save(channel);
         webSocketConnectionService.sendToAll(new ChannelChangeEvent(serverMapper.mapToDTO(channel)));
+
+        //if voice not allowed (anymore), remove all existing users
+        if (channel.getVoiceMode() == Channel.VoiceMode.NONE) {
+            var clients = webSocketService.getClientsInChannel(channel);
+            if (!clients.isEmpty()) {
+                log.info("Removing {} clients from channel because voice mode changed to NONE", clients.size());
+                clients.forEach(webSocketConnectionService::leaveChannel);
+            }
+        }
+
     }
 
     /**
      * Returns the channel for a chat.
      * May return nothing if a chat is not within a channel (future feature)
+     *
      * @param chat the chat
      * @return the channel if connected
      */

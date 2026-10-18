@@ -1,0 +1,1715 @@
+databaseChangeLog:
+- changeSet:
+    id: 1791115290187-1
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_56
+            name: ID
+            type: UUID
+        - column:
+            constraints:
+              nullable: false
+            name: NAME
+            type: VARCHAR(32)
+        - column:
+            constraints:
+              nullable: false
+            name: CHAT_ID
+            type: UUID
+        - column:
+            name: SECTION_ID
+            type: UUID
+        - column:
+            name: CHANNEL_ORDER
+            type: INT
+        tableName: CHANNEL
+- changeSet:
+    id: 1791115290187-2
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_59
+            name: ID
+            type: UUID
+        - column:
+            name: CHANNEL_ID
+            type: UUID
+        tableName: CHANNEL_GROUP
+- changeSet:
+    id: 1791115290187-3
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_7
+            name: CHANNEL_GROUP_ID
+            type: UUID
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_7
+            name: GROUPS_ID
+            type: UUID
+        tableName: CHANNEL_GROUP_GROUPS
+- changeSet:
+    id: 1791115290187-4
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_1
+            name: ID
+            type: UUID
+        tableName: CHAT
+- changeSet:
+    id: 1791115290187-5
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_20
+            name: ID
+            type: UUID
+        - column:
+            constraints:
+              nullable: false
+            name: CONTENT_TYPE
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: CREATED
+            type: TIMESTAMP WITH TIME ZONE
+        - column:
+            constraints:
+              nullable: false
+            name: FILENAME
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: HASH
+            type: VARCHAR(255)
+        - column:
+            name: SIZE
+            type: BIGINT
+        tableName: FILE
+- changeSet:
+    id: 1791115290187-6
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_F9
+            name: ID
+            type: UUID
+        - column:
+            name: FILE_ID
+            type: UUID
+        tableName: FILE_MESSAGE_CONTENT
+- changeSet:
+    id: 1791115290187-7
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_8
+            name: CODE
+            type: VARCHAR(32)
+        - column:
+            name: DESCRIPTION
+            type: VARCHAR(255)
+        - column:
+            name: END_DATE
+            type: TIMESTAMP
+        - column:
+            name: MAX_USAGES
+            type: INT
+        - column:
+            name: START_DATE
+            type: TIMESTAMP
+        - column:
+            constraints:
+              nullable: false
+            name: TITLE
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: USAGES
+            type: INT
+        tableName: INVITE
+- changeSet:
+    id: 1791115290187-8
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: INVITE_CODE
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: GROUPS_ID
+            type: UUID
+        tableName: INVITE_GROUPS
+- changeSet:
+    id: 1791115290187-9
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_AF
+            name: ID
+            type: UUID
+        - column:
+            name: TEXT
+            type: VARCHAR(65535)
+        tableName: MARKDOWN_MESSAGE_CONTENT
+- changeSet:
+    id: 1791115290187-10
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_6
+            name: ID
+            type: UUID
+        - column:
+            constraints:
+              nullable: false
+            name: TIMESTAMP
+            type: TIMESTAMP WITH TIME ZONE
+        - column:
+            constraints:
+              nullable: false
+            name: CHAT_ID
+            type: UUID
+        - column:
+            name: REPLIES_TO_ID
+            type: UUID
+        - column:
+            name: USER_ID
+            type: VARCHAR(255)
+        tableName: MESSAGE
+- changeSet:
+    id: 1791115290187-11
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: MESSAGE_ID
+            type: UUID
+        - column:
+            constraints:
+              nullable: false
+            name: CONTENT_ID
+            type: UUID
+        tableName: MESSAGE_CONTENT
+- changeSet:
+    id: 1791115290187-12
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_FE
+            name: ID
+            type: UUID
+        - column:
+            constraints:
+              nullable: false
+            name: INVERTED
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: PRIORITY
+            type: INT
+        tableName: PERMISSION
+- changeSet:
+    id: 1791115290187-13
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_A7
+            name: PERMISSION_ID
+            type: UUID
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_A7
+            name: LIMITED_TO_CHANNEL_ID
+            type: UUID
+        tableName: PERMISSION_LIMITED_TO_CHANNEL
+- changeSet:
+    id: 1791115290187-14
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_F1
+            name: PERMISSION_ID
+            type: UUID
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_F1
+            name: LIMITED_TO_SECTION_ID
+            type: UUID
+        tableName: PERMISSION_LIMITED_TO_SECTION
+- changeSet:
+    id: 1791115290187-15
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: PERMISSION_ID
+            type: UUID
+        - column:
+            name: PERMISSIONS
+            type: ENUM('CHANNEL', 'CHANNEL_CHAT', 'CHANNEL_CHAT_CREATE', 'CHANNEL_CHAT_DELETE',
+              'CHANNEL_CHAT_READ', 'CHANNEL_DELETE', 'CHANNEL_EDIT', 'CHANNEL_JOIN',
+              'CHANNEL_USER_KICK', 'SECTION', 'SECTION_CHANNEL_CREATE', 'SECTION_CHANNEL_MOVE',
+              'SECTION_CHANNEL_ORDER', 'SECTION_DELETE', 'SECTION_EDIT', 'SELF', 'SELF_AVATAR',
+              'SERVER', 'SERVER_EDIT', 'SERVER_EDIT_DESCRIPTION', 'SERVER_GROUP_CREATE',
+              'SERVER_GROUP_DELETE', 'SERVER_GROUP_EDIT', 'SERVER_INVITE', 'SERVER_JOIN',
+              'SERVER_SECTION_CREATE', 'SERVER_SECTION_MOVE', 'USER', 'USER_ACTIVATE',
+              'USER_AVATAR', 'USER_BAN', 'USER_GROUP', 'USER_KICK', 'USER_UNBAN')
+        tableName: PERMISSION_PERMISSIONS
+- changeSet:
+    id: 1791115290187-16
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_A03
+            name: ID
+            type: UUID
+        - column:
+            name: NAME
+            type: VARCHAR(32)
+        - column:
+            name: SERVER_ID
+            type: UUID
+        - column:
+            name: SECTION_ORDER
+            type: INT
+        tableName: SECTION
+- changeSet:
+    id: 1791115290187-17
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_A1
+            name: ID
+            type: UUID
+        - column:
+            name: SECTION_ID
+            type: UUID
+        tableName: SECTION_GROUP
+- changeSet:
+    id: 1791115290187-18
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_D
+            name: SECTION_GROUP_ID
+            type: UUID
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_D
+            name: GROUPS_ID
+            type: UUID
+        tableName: SECTION_GROUP_GROUPS
+- changeSet:
+    id: 1791115290187-19
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_9
+            name: ID
+            type: UUID
+        - column:
+            name: KEYS
+            type: CHARACTER LARGE OBJECT
+        - column:
+            name: NAME
+            type: VARCHAR(64)
+        - column:
+            name: ICON_ID
+            type: UUID
+        tableName: SERVER
+- changeSet:
+    id: 1791115290187-20
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_24B
+            name: SERVER_ID
+            type: UUID
+        - column:
+            constraints:
+              nullable: false
+            name: DESCRIPTION_ID
+            type: UUID
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_24B
+            name: DESCRIPTION_ORDER
+            type: INT
+        tableName: SERVER_DESCRIPTION
+- changeSet:
+    id: 1791115290187-21
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_4
+            name: ID
+            type: UUID
+        - column:
+            constraints:
+              nullable: false
+            name: DEFAULT_FOR_NEW_USERS
+            type: BOOLEAN
+        - column:
+            name: DESCRIPTION
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: LABEL
+            type: BOOLEAN
+        - column:
+            name: NAME
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: PRIORITY
+            type: INT
+        - column:
+            name: ICON_ID
+            type: UUID
+        tableName: SERVER_GROUP
+- changeSet:
+    id: 1791115290187-22
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: SERVER_ID
+            type: UUID
+        - column:
+            constraints:
+              nullable: false
+            name: GROUPS_ID
+            type: UUID
+        tableName: SERVER_GROUPS
+- changeSet:
+    id: 1791115290187-23
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: SERVER_GROUP_ID
+            type: UUID
+        - column:
+            constraints:
+              nullable: false
+            name: INHERITS_FROM_ID
+            type: UUID
+        tableName: SERVER_GROUP_INHERITS_FROM
+- changeSet:
+    id: 1791115290187-24
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: SERVER_GROUP_ID
+            type: UUID
+        - column:
+            constraints:
+              nullable: false
+            name: PERMISSIONS_ID
+            type: UUID
+        tableName: SERVER_GROUP_PERMISSIONS
+- changeSet:
+    id: 1791115290187-25
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: SERVER_ID
+            type: UUID
+        - column:
+            constraints:
+              nullable: false
+            name: INVITES_CODE
+            type: VARCHAR(255)
+        tableName: SERVER_INVITES
+- changeSet:
+    id: 1791115290187-26
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: NEW_USERS_NEED_INVITE
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_E
+            name: SERVER_ID
+            type: UUID
+        tableName: SERVER_SETTINGS
+- changeSet:
+    id: 1791115290187-27
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_47
+            name: ID
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: KNOWN_SINCE
+            type: TIMESTAMP WITH TIME ZONE
+        - column:
+            name: LAST_SEEN
+            type: TIMESTAMP WITH TIME ZONE
+        - column:
+            constraints:
+              nullable: false
+            name: OWNER
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: PUBLIC_KEY
+            type: VARCHAR(1024)
+        - column:
+            constraints:
+              nullable: false
+            name: STATE
+            type: ENUM('ACTIVE', 'BANNED', 'PENDING_ACCESS')
+        - column:
+            constraints:
+              nullable: false
+            name: USERNAME
+            type: VARCHAR(32)
+        - column:
+            name: AVATAR_ID
+            type: UUID
+        tableName: SERVER_USERS
+- changeSet:
+    id: 1791115290187-28
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: SERVER_USERS_ID
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: CHANNEL_GROUPS_ID
+            type: UUID
+        tableName: SERVER_USERS_CHANNEL_GROUPS
+- changeSet:
+    id: 1791115290187-29
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_51
+            name: SERVER_USERS_ID
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_51
+            name: GROUPS_ID
+            type: UUID
+        tableName: SERVER_USERS_GROUPS
+- changeSet:
+    id: 1791115290187-30
+    author: marc (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: SERVER_USERS_ID
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: SECTION_GROUPS_ID
+            type: UUID
+        tableName: SERVER_USERS_SECTION_GROUPS
+- changeSet:
+    id: 1791115290187-31
+    author: marc (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: PERMISSIONS_ID
+        constraintName: UK3QIMSI9LUACXCLYC6IHEXS8TX
+        tableName: SERVER_GROUP_PERMISSIONS
+- changeSet:
+    id: 1791115290187-32
+    author: marc (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: INVITES_CODE
+        constraintName: UK7TENG1ND4JVAHMEX2NCUIRY99
+        tableName: SERVER_INVITES
+- changeSet:
+    id: 1791115290187-33
+    author: marc (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: ICON_ID
+        constraintName: UKBBKPWUEOQ5TEQ76QLIMO188WB
+        tableName: SERVER
+- changeSet:
+    id: 1791115290187-34
+    author: marc (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: DESCRIPTION_ID
+        constraintName: UKCLN2I7BK18HY3TP0MHOPEEJRB
+        tableName: SERVER_DESCRIPTION
+- changeSet:
+    id: 1791115290187-35
+    author: marc (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: CONTENT_ID
+        constraintName: UKEQ360MLNMIXHCH7S54M9YPO16
+        tableName: MESSAGE_CONTENT
+- changeSet:
+    id: 1791115290187-36
+    author: marc (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: SECTION_GROUPS_ID
+        constraintName: UKFVMRWOQWB1J2L7RK7KY2MY6P4
+        tableName: SERVER_USERS_SECTION_GROUPS
+- changeSet:
+    id: 1791115290187-37
+    author: marc (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: GROUPS_ID
+        constraintName: UKL3YBVXBK1GATL6EIQS5UW9WSY
+        tableName: SERVER_GROUPS
+- changeSet:
+    id: 1791115290187-38
+    author: marc (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: AVATAR_ID
+        constraintName: UKM86J2LLI0MVHMUU29TM1Q5MS6
+        tableName: SERVER_USERS
+- changeSet:
+    id: 1791115290187-39
+    author: marc (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: PUBLIC_KEY
+        constraintName: UKMU2BAX8QR8FVY71779AFNSRQ
+        tableName: SERVER_USERS
+- changeSet:
+    id: 1791115290187-40
+    author: marc (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: ICON_ID
+        constraintName: UKNJHAXMU2BI6USW1GJJ31S3GU2
+        tableName: SERVER_GROUP
+- changeSet:
+    id: 1791115290187-41
+    author: marc (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: CHANNEL_GROUPS_ID
+        constraintName: UKOBKDIURX8EPVLCKWQ11PRDTHV
+        tableName: SERVER_USERS_CHANNEL_GROUPS
+- changeSet:
+    id: 1791115290187-42
+    author: marc (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: PERMISSION_ID, PERMISSIONS
+        constraintName: UKR9JJXSL9SVJOCPJVN7GI7XXAG
+        tableName: PERMISSION_PERMISSIONS
+- changeSet:
+    id: 1791115290187-43
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: LIMITED_TO_SECTION_ID
+        indexName: FK14DWSR63BC2NLV88GM20QII8R_INDEX_F
+        tableName: PERMISSION_LIMITED_TO_SECTION
+- changeSet:
+    id: 1791115290187-44
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: MESSAGE_ID
+        indexName: FK1MOXXJGSYNBI1K5FKQWQ5AOPO_INDEX_2
+        tableName: MESSAGE_CONTENT
+- changeSet:
+    id: 1791115290187-45
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: SECTION_ID
+        indexName: FK37R22IRVC1XS6GT2OKHMXDG98_INDEX_5
+        tableName: CHANNEL
+- changeSet:
+    id: 1791115290187-46
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: GROUPS_ID
+        indexName: FK3BTCC9LWWAU5YSLFF9CBIG3AN_INDEX_C
+        tableName: INVITE_GROUPS
+- changeSet:
+    id: 1791115290187-47
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: SERVER_GROUP_ID
+        indexName: FK48O0PVTEW6H393EN4C372TXW7_INDEX_C
+        tableName: SERVER_GROUP_PERMISSIONS
+- changeSet:
+    id: 1791115290187-48
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: SECTION_ID
+        indexName: FK6FJ39VK6459JWQL7NXTGH45CF_INDEX_A
+        tableName: SECTION_GROUP
+- changeSet:
+    id: 1791115290187-49
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: SERVER_ID
+        indexName: FK717CP7JCVN90L0SC2FJ6MN84P_INDEX_2
+        tableName: SERVER_DESCRIPTION
+- changeSet:
+    id: 1791115290187-50
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: INHERITS_FROM_ID
+        indexName: FK8RUL1G6X7PLT5S5SJ8WAA22UO_INDEX_E
+        tableName: SERVER_GROUP_INHERITS_FROM
+- changeSet:
+    id: 1791115290187-51
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: SERVER_GROUP_ID
+        indexName: FKAU04U3D9J1Y9B5H1SA10DN800_INDEX_E
+        tableName: SERVER_GROUP_INHERITS_FROM
+- changeSet:
+    id: 1791115290187-52
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: SERVER_ID
+        indexName: FKB9NTBBEFCYQ9UB9LRD9ECQPOP_INDEX_8
+        tableName: SERVER_GROUPS
+- changeSet:
+    id: 1791115290187-53
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: SERVER_USERS_ID
+        indexName: FKC799520H5IC8KX6IS7NR6UTT5_INDEX_4
+        tableName: SERVER_USERS_SECTION_GROUPS
+- changeSet:
+    id: 1791115290187-54
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: PERMISSION_ID
+        indexName: FKDJPA1CIT6N8A6YUMTAU0BD2EF_INDEX_F
+        tableName: PERMISSION_LIMITED_TO_SECTION
+- changeSet:
+    id: 1791115290187-55
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: CHAT_ID
+        indexName: FKDM93XTAXT87BQLUAIVS5BG7SM_INDEX_5
+        tableName: CHANNEL
+- changeSet:
+    id: 1791115290187-56
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: LIMITED_TO_CHANNEL_ID
+        indexName: FKDMM5WEQE92M5QM7XGUG9SSUTO_INDEX_A
+        tableName: PERMISSION_LIMITED_TO_CHANNEL
+- changeSet:
+    id: 1791115290187-57
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: SECTION_GROUP_ID
+        indexName: FKDNL8F6SSQ4II9G4TII9CIOGE1_INDEX_D
+        tableName: SECTION_GROUP_GROUPS
+- changeSet:
+    id: 1791115290187-58
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: SERVER_USERS_ID
+        indexName: FKDQU3KAISHRUYA0HABNP5JDPLO_INDEX_5
+        tableName: SERVER_USERS_GROUPS
+- changeSet:
+    id: 1791115290187-59
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: FILE_ID
+        indexName: FKFFNKVVWU5Y5W7APQUA69IM4CF_INDEX_F
+        tableName: FILE_MESSAGE_CONTENT
+- changeSet:
+    id: 1791115290187-60
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: GROUPS_ID
+        indexName: FKGJG6YLXYKHI0I77B6RLF0B24D_INDEX_5
+        tableName: SERVER_USERS_GROUPS
+- changeSet:
+    id: 1791115290187-61
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: CHANNEL_GROUP_ID
+        indexName: FKHRNESTJLPQOIH0Y1JMIM06RPV_INDEX_7
+        tableName: CHANNEL_GROUP_GROUPS
+- changeSet:
+    id: 1791115290187-62
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: PERMISSION_ID
+        indexName: FKIF7MXPE50VKP2E7XTS6CY7DQ6_INDEX_7
+        tableName: PERMISSION_PERMISSIONS
+- changeSet:
+    id: 1791115290187-63
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: GROUPS_ID
+        indexName: FKK1UE24KRO9K40TROFI4NT6OC8_INDEX_D
+        tableName: SECTION_GROUP_GROUPS
+- changeSet:
+    id: 1791115290187-64
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: SERVER_ID
+        indexName: FKK7CGG0VNRAR1K25X8DI3Q5AY2_INDEX_A
+        tableName: SECTION
+- changeSet:
+    id: 1791115290187-65
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: CHAT_ID
+        indexName: FKMEJD0YKOKRBUEKWWGD5A5XT8A_INDEX_6
+        tableName: MESSAGE
+- changeSet:
+    id: 1791115290187-66
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: REPLIES_TO_ID
+        indexName: FKMHTDP17PBT5MI3C6TXYOOINL2_INDEX_6
+        tableName: MESSAGE
+- changeSet:
+    id: 1791115290187-67
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: PERMISSION_ID
+        indexName: FKMSTRLXKXF9FO9Y0AN6TLL555Q_INDEX_A
+        tableName: PERMISSION_LIMITED_TO_CHANNEL
+- changeSet:
+    id: 1791115290187-68
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: SERVER_ID
+        indexName: FKNI0FSU455I9STDT2K9NKSXPRU_INDEX_8
+        tableName: SERVER_INVITES
+- changeSet:
+    id: 1791115290187-69
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: GROUPS_ID
+        indexName: FKOBYHH7OPW0V3XM0496XYCAVUP_INDEX_7
+        tableName: CHANNEL_GROUP_GROUPS
+- changeSet:
+    id: 1791115290187-70
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: SERVER_USERS_ID
+        indexName: FKPPOPMUXBFC70MU7IYJ68THI9I_INDEX_9
+        tableName: SERVER_USERS_CHANNEL_GROUPS
+- changeSet:
+    id: 1791115290187-71
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: CHANNEL_ID
+        indexName: FKQ213CEVA6FHW5DNF2K3PQGU14_INDEX_5
+        tableName: CHANNEL_GROUP
+- changeSet:
+    id: 1791115290187-72
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: INVITE_CODE
+        indexName: FKR2QH2DD3EVTLNHO744US37NAV_INDEX_C
+        tableName: INVITE_GROUPS
+- changeSet:
+    id: 1791115290187-73
+    author: marc (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: USER_ID
+        indexName: FKT0GWWRVU6L3F0G08KITOHOTF4_INDEX_6
+        tableName: MESSAGE
+- changeSet:
+    id: 1791115290187-74
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LIMITED_TO_SECTION_ID
+        baseTableName: PERMISSION_LIMITED_TO_SECTION
+        constraintName: FK14DWSR63BC2NLV88GM20QII8R
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: SECTION
+        validate: true
+- changeSet:
+    id: 1791115290187-75
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: MESSAGE_ID
+        baseTableName: MESSAGE_CONTENT
+        constraintName: FK1MOXXJGSYNBI1K5FKQWQ5AOPO
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: MESSAGE
+        validate: true
+- changeSet:
+    id: 1791115290187-76
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: SECTION_ID
+        baseTableName: CHANNEL
+        constraintName: FK37R22IRVC1XS6GT2OKHMXDG98
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: SECTION
+        validate: true
+- changeSet:
+    id: 1791115290187-77
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: GROUPS_ID
+        baseTableName: INVITE_GROUPS
+        constraintName: FK3BTCC9LWWAU5YSLFF9CBIG3AN
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: SERVER_GROUP
+        validate: true
+- changeSet:
+    id: 1791115290187-78
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: AVATAR_ID
+        baseTableName: SERVER_USERS
+        constraintName: FK43FMY6TL6ABP2FAT25FBWMYG8
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: FILE
+        validate: true
+- changeSet:
+    id: 1791115290187-79
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: SERVER_GROUP_ID
+        baseTableName: SERVER_GROUP_PERMISSIONS
+        constraintName: FK48O0PVTEW6H393EN4C372TXW7
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: SERVER_GROUP
+        validate: true
+- changeSet:
+    id: 1791115290187-80
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: GROUPS_ID
+        baseTableName: SERVER_GROUPS
+        constraintName: FK69E381GARY93LXHC0KL3B5AVY
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: SERVER_GROUP
+        validate: true
+- changeSet:
+    id: 1791115290187-81
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: SECTION_ID
+        baseTableName: SECTION_GROUP
+        constraintName: FK6FJ39VK6459JWQL7NXTGH45CF
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: SECTION
+        validate: true
+- changeSet:
+    id: 1791115290187-82
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: SERVER_ID
+        baseTableName: SERVER_DESCRIPTION
+        constraintName: FK717CP7JCVN90L0SC2FJ6MN84P
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: SERVER
+        validate: true
+- changeSet:
+    id: 1791115290187-83
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: INHERITS_FROM_ID
+        baseTableName: SERVER_GROUP_INHERITS_FROM
+        constraintName: FK8RUL1G6X7PLT5S5SJ8WAA22UO
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: SERVER_GROUP
+        validate: true
+- changeSet:
+    id: 1791115290187-84
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: SERVER_GROUP_ID
+        baseTableName: SERVER_GROUP_INHERITS_FROM
+        constraintName: FKAU04U3D9J1Y9B5H1SA10DN800
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: SERVER_GROUP
+        validate: true
+- changeSet:
+    id: 1791115290187-85
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: SERVER_ID
+        baseTableName: SERVER_GROUPS
+        constraintName: FKB9NTBBEFCYQ9UB9LRD9ECQPOP
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: SERVER
+        validate: true
+- changeSet:
+    id: 1791115290187-86
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: SERVER_USERS_ID
+        baseTableName: SERVER_USERS_SECTION_GROUPS
+        constraintName: FKC799520H5IC8KX6IS7NR6UTT5
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: SERVER_USERS
+        validate: true
+- changeSet:
+    id: 1791115290187-87
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: PERMISSION_ID
+        baseTableName: PERMISSION_LIMITED_TO_SECTION
+        constraintName: FKDJPA1CIT6N8A6YUMTAU0BD2EF
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: PERMISSION
+        validate: true
+- changeSet:
+    id: 1791115290187-88
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CHAT_ID
+        baseTableName: CHANNEL
+        constraintName: FKDM93XTAXT87BQLUAIVS5BG7SM
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: CHAT
+        validate: true
+- changeSet:
+    id: 1791115290187-89
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LIMITED_TO_CHANNEL_ID
+        baseTableName: PERMISSION_LIMITED_TO_CHANNEL
+        constraintName: FKDMM5WEQE92M5QM7XGUG9SSUTO
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: CHANNEL
+        validate: true
+- changeSet:
+    id: 1791115290187-90
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: SECTION_GROUP_ID
+        baseTableName: SECTION_GROUP_GROUPS
+        constraintName: FKDNL8F6SSQ4II9G4TII9CIOGE1
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: SECTION_GROUP
+        validate: true
+- changeSet:
+    id: 1791115290187-91
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: SERVER_USERS_ID
+        baseTableName: SERVER_USERS_GROUPS
+        constraintName: FKDQU3KAISHRUYA0HABNP5JDPLO
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: SERVER_USERS
+        validate: true
+- changeSet:
+    id: 1791115290187-92
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: FILE_ID
+        baseTableName: FILE_MESSAGE_CONTENT
+        constraintName: FKFFNKVVWU5Y5W7APQUA69IM4CF
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: FILE
+        validate: true
+- changeSet:
+    id: 1791115290187-93
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ICON_ID
+        baseTableName: SERVER
+        constraintName: FKFY824VBIARKERD6GQEFO195P6
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: FILE
+        validate: true
+- changeSet:
+    id: 1791115290187-94
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: GROUPS_ID
+        baseTableName: SERVER_USERS_GROUPS
+        constraintName: FKGJG6YLXYKHI0I77B6RLF0B24D
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: SERVER_GROUP
+        validate: true
+- changeSet:
+    id: 1791115290187-95
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CHANNEL_GROUP_ID
+        baseTableName: CHANNEL_GROUP_GROUPS
+        constraintName: FKHRNESTJLPQOIH0Y1JMIM06RPV
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: CHANNEL_GROUP
+        validate: true
+- changeSet:
+    id: 1791115290187-96
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: SERVER_ID
+        baseTableName: SERVER_SETTINGS
+        constraintName: FKHVD2P5H1ERRH7YQFU16122SKV
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: SERVER
+        validate: true
+- changeSet:
+    id: 1791115290187-97
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: PERMISSION_ID
+        baseTableName: PERMISSION_PERMISSIONS
+        constraintName: FKIF7MXPE50VKP2E7XTS6CY7DQ6
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: PERMISSION
+        validate: true
+- changeSet:
+    id: 1791115290187-98
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: GROUPS_ID
+        baseTableName: SECTION_GROUP_GROUPS
+        constraintName: FKK1UE24KRO9K40TROFI4NT6OC8
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: SERVER_GROUP
+        validate: true
+- changeSet:
+    id: 1791115290187-99
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: SERVER_ID
+        baseTableName: SECTION
+        constraintName: FKK7CGG0VNRAR1K25X8DI3Q5AY2
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: SERVER
+        validate: true
+- changeSet:
+    id: 1791115290187-100
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CHANNEL_GROUPS_ID
+        baseTableName: SERVER_USERS_CHANNEL_GROUPS
+        constraintName: FKKMY0607PWIDY4R27ALKQ8IPXD
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: CHANNEL_GROUP
+        validate: true
+- changeSet:
+    id: 1791115290187-101
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ICON_ID
+        baseTableName: SERVER_GROUP
+        constraintName: FKL0E6KT8NT473M15W44BM499J3
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: FILE
+        validate: true
+- changeSet:
+    id: 1791115290187-102
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: SECTION_GROUPS_ID
+        baseTableName: SERVER_USERS_SECTION_GROUPS
+        constraintName: FKLUC4TS6JLT15LPJXQS0A19WB4
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: SECTION_GROUP
+        validate: true
+- changeSet:
+    id: 1791115290187-103
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CHAT_ID
+        baseTableName: MESSAGE
+        constraintName: FKMEJD0YKOKRBUEKWWGD5A5XT8A
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: CHAT
+        validate: true
+- changeSet:
+    id: 1791115290187-104
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: REPLIES_TO_ID
+        baseTableName: MESSAGE
+        constraintName: FKMHTDP17PBT5MI3C6TXYOOINL2
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: MESSAGE
+        validate: true
+- changeSet:
+    id: 1791115290187-105
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: PERMISSION_ID
+        baseTableName: PERMISSION_LIMITED_TO_CHANNEL
+        constraintName: FKMSTRLXKXF9FO9Y0AN6TLL555Q
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: PERMISSION
+        validate: true
+- changeSet:
+    id: 1791115290187-106
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: SERVER_ID
+        baseTableName: SERVER_INVITES
+        constraintName: FKNI0FSU455I9STDT2K9NKSXPRU
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: SERVER
+        validate: true
+- changeSet:
+    id: 1791115290187-107
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: PERMISSIONS_ID
+        baseTableName: SERVER_GROUP_PERMISSIONS
+        constraintName: FKNM6ELUMV2768N70PNQR0BRRFF
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: PERMISSION
+        validate: true
+- changeSet:
+    id: 1791115290187-108
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: GROUPS_ID
+        baseTableName: CHANNEL_GROUP_GROUPS
+        constraintName: FKOBYHH7OPW0V3XM0496XYCAVUP
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: SERVER_GROUP
+        validate: true
+- changeSet:
+    id: 1791115290187-109
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: SERVER_USERS_ID
+        baseTableName: SERVER_USERS_CHANNEL_GROUPS
+        constraintName: FKPPOPMUXBFC70MU7IYJ68THI9I
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: SERVER_USERS
+        validate: true
+- changeSet:
+    id: 1791115290187-110
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CHANNEL_ID
+        baseTableName: CHANNEL_GROUP
+        constraintName: FKQ213CEVA6FHW5DNF2K3PQGU14
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: CHANNEL
+        validate: true
+- changeSet:
+    id: 1791115290187-111
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: INVITE_CODE
+        baseTableName: INVITE_GROUPS
+        constraintName: FKR2QH2DD3EVTLNHO744US37NAV
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: CODE
+        referencedTableName: INVITE
+        validate: true
+- changeSet:
+    id: 1791115290187-112
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: INVITES_CODE
+        baseTableName: SERVER_INVITES
+        constraintName: FKR9TKR9CBBQJH4S83SIQO35IVI
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: CODE
+        referencedTableName: INVITE
+        validate: true
+- changeSet:
+    id: 1791115290187-113
+    author: marc (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: USER_ID
+        baseTableName: MESSAGE
+        constraintName: FKT0GWWRVU6L3F0G08KITOHOTF4
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: SERVER_USERS
+        validate: true
+

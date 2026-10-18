@@ -3,9 +3,11 @@ package de.marcschuler.onyxserver.mapper;
 import de.marcschuler.onyxserver.data.message.FileMessageContent;
 import de.marcschuler.onyxserver.data.message.MarkdownMessageContent;
 import de.marcschuler.onyxserver.data.message.MessageContent;
+import de.marcschuler.onyxserver.data.message.TextMessageContent;
 import de.marcschuler.onyxserver.dto.data.message.FileMessageContentDTO;
 import de.marcschuler.onyxserver.dto.data.message.MarkdownMessageContentDTO;
 import de.marcschuler.onyxserver.dto.data.message.MessageContentDTO;
+import de.marcschuler.onyxserver.dto.data.message.TextMessageContentDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.*;
 
@@ -20,6 +22,7 @@ public abstract class MessageContentMapper {
     /*
         dto to entity
      */
+    @SubclassMapping(source = TextMessageContentDTO.class, target = TextMessageContent.class)
     @SubclassMapping(source = MarkdownMessageContentDTO.class, target = MarkdownMessageContent.class)
     @SubclassMapping(source = FileMessageContentDTO.class, target = FileMessageContent.class)
     @Mapping(target = "id", ignore = true)
@@ -28,6 +31,7 @@ public abstract class MessageContentMapper {
     /*
         entity to dto
      */
+    @SubclassMapping(source = TextMessageContent.class, target = TextMessageContentDTO.class)
     @SubclassMapping(source = MarkdownMessageContent.class, target = MarkdownMessageContentDTO.class)
     @SubclassMapping(source = FileMessageContent.class, target = FileMessageContentDTO.class)
     public abstract MessageContentDTO mapToDTO(MessageContent entity);
@@ -43,14 +47,20 @@ public abstract class MessageContentMapper {
             updateFromDTO(d, e);
         } else if (dto instanceof FileMessageContentDTO d && entity instanceof FileMessageContent e) {
             updateFromDTO(d, e);
+        } else if (dto instanceof TextMessageContentDTO d && entity instanceof TextMessageContent e) {
+            updateFromDTO(d, e);
         } else {
             throw new IllegalArgumentException(
-                    "Incompatible types: " + dto.getClass().getSimpleName()
+                    "Incompatible mapping types: " + dto.getClass().getSimpleName()
                             + " -> " + entity.getClass().getSimpleName()
             );
         }
         return entity;
     }
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "id", ignore = true)
+    public abstract void updateFromDTO(TextMessageContentDTO dto, @MappingTarget TextMessageContent entity);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)

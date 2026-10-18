@@ -2,6 +2,7 @@ package de.marcschuler.onyxserver.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -20,8 +21,10 @@ public class Channel {
 
     @Size(max = 32)
     private String password;
-    private VoiceMode voiceMode;
-    private ChatMode chatMode;
+    @NotNull
+    private VoiceMode voiceMode = VoiceMode.FULL;
+    @NotNull
+    private ChatMode chatMode = ChatMode.FULL;
 
     @ManyToOne(cascade = CascadeType.ALL, optional = false, fetch = FetchType.EAGER)
     private Chat chat;
@@ -35,12 +38,13 @@ public class Channel {
 
     public enum VoiceMode {
         NONE,
-        ALL
+        FULL
     }
 
     public enum ChatMode {
         NONE,
-        ALL
+        TEMPORARY,
+        FULL
     }
 }
 

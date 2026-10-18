@@ -1,5 +1,6 @@
 package de.marcschuler.onyxserver.dto.data;
 
+import de.marcschuler.onyxserver.data.Channel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -25,5 +26,11 @@ public class ChannelDTO {
 
     @NotNull
     private UUID chatId;
+
+
+    @NotNull
+    private Channel.VoiceMode voiceMode;
+    @NotNull
+    private Channel.ChatMode chatMode;
 
 }

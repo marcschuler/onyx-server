@@ -57,7 +57,7 @@ public class ServerService {
     }
 
 
-    //TODO replace with SQL script once the start configuration is stable
+    //TODO replace with SQL script (liquibase) once the start configuration is stable
     @Transactional
     public Server generateDefault() {
         /*
@@ -75,7 +75,7 @@ public class ServerService {
                         ## Admin Access
                         An invite code was printed to the server log on first startup.
                         
-                        To redeem it, open your **user settings** (bottom-left corner), go to **account settings** and enter the code there.
+                        To redeem it, open your **user settings** (bottom-left corner; right to your username), go to **account settings** and enter the code there.
                         
                         > The code is single-use and expires after 14 days."""),
                 new MarkdownMessageContent("""
@@ -210,6 +210,13 @@ public class ServerService {
         serverRepository.save(server);
         sendUpdate(server);
         return server;
+    }
+
+    public void setServerPassword(Server server, String password) {
+        log.info("Changed server password: {} password", password == null ? "removed" : "added");
+        server.getSettings().setPassword(password);
+        serverRepository.save(server);
+        sendUpdate(server);
     }
 
     public void save(Server server) {

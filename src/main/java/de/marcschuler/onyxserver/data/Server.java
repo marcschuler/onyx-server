@@ -24,9 +24,6 @@ public class Server {
     @Size(min = 3, max = 64)
     private String name;
 
-    @Size(max = 32)
-    private String password;
-
     @OneToOne(cascade = CascadeType.ALL)
     private File icon;
 

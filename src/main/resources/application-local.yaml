@@ -2,7 +2,7 @@ spring:
   #datasource:
     #url: jdbc:h2:mem:onyx
   jpa:
-    show-sql: true
+    show-sql: false
 
 onyx:
   storage:
@@ -13,4 +13,4 @@ logging:
   level:
     de.marcschuler: TRACE
 server:
-  port: 8081
+  port: 8080

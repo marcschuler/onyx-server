@@ -3,11 +3,14 @@ package de.marcschuler.onyxserver.service;
 import de.marcschuler.onyxserver.OnyxTest;
 import de.marcschuler.onyxserver.TestService;
 import de.marcschuler.onyxserver.data.ClientState;
+import de.marcschuler.onyxserver.data.Server;
 import de.marcschuler.onyxserver.dto.data.InviteDTO;
+import de.marcschuler.onyxserver.dto.data.SimpleGroupDTO;
 import de.marcschuler.onyxserver.error.InviteException;
 import de.marcschuler.onyxserver.repository.InviteRepository;
 import de.marcschuler.onyxserver.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +38,16 @@ class InviteServiceTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private ServerService serverService;
+
+    private Server server;
+
+    @BeforeEach
+    void setUp() {
+        server = serverService.defaultServer();
+    }
+
     private InviteDTO validDto(String code) {
         var dto = new InviteDTO();
         dto.setCode(code);
@@ -45,7 +58,7 @@ class InviteServiceTest {
 
     @Test
     void create() {
-        var invite = inviteService.create(validDto("create-test"));
+        var invite = inviteService.create(validDto("create-test"), server);
         assertNotNull(invite);
         assertEquals("create-test", invite.getCode());
         assertEquals("Test Invite", invite.getTitle());
@@ -54,15 +67,15 @@ class InviteServiceTest {
 
     @Test
     void createDuplicateCode() {
-        inviteService.create(validDto("dup"));
-        assertThrows(IllegalStateException.class, () -> inviteService.create(validDto("dup")));
+        inviteService.create(validDto("dup"), server);
+        assertThrows(IllegalStateException.class, () -> inviteService.create(validDto("dup"), server));
     }
 
     @Test
     void createExpired() {
         var dto = validDto("expired");
         dto.setEndDate(LocalDateTime.now().minusDays(1));
-        assertThrows(InviteException.class, () -> inviteService.create(dto));
+        assertThrows(InviteException.class, () -> inviteService.create(dto, server));
     }
 
     @Test
@@ -77,7 +90,7 @@ class InviteServiceTest {
         user.setState(ClientState.BANNED);
         userRepository.save(user);
 
-        inviteService.create(validDto("ban-test"));
+        inviteService.create(validDto("ban-test"), server);
 
         var banned = userRepository.findById(TestService.USER_ADMIN_ID).orElseThrow();
         assertThrows(InviteException.class, () -> inviteService.enterInviteCode(banned, "ban-test"));
@@ -87,7 +100,7 @@ class InviteServiceTest {
     void enterNotYetActive() {
         var dto = validDto("future");
         dto.setStartDate(LocalDateTime.now().plusDays(1));
-        inviteService.create(dto);
+        inviteService.create(dto, server);
 
         var user = testService.userAdmin();
         assertThrows(InviteException.class, () -> inviteService.enterInviteCode(user, "future"));
@@ -98,7 +111,7 @@ class InviteServiceTest {
         var dto = validDto("maxed");
         dto.setMaxUsages(1);
         dto.setUsages(1);
-        inviteService.create(dto);
+        inviteService.create(dto, server);
 
         var user = testService.userAdmin();
         assertThrows(InviteException.class, () -> inviteService.enterInviteCode(user, "maxed"));
@@ -110,7 +123,7 @@ class InviteServiceTest {
         user.setState(ClientState.PENDING_ACCESS);
         userRepository.save(user);
 
-        inviteService.create(validDto("activate"));
+        inviteService.create(validDto("activate"), server);
 
         var pending = userRepository.findById(TestService.USER_ADMIN_ID).orElseThrow();
         inviteService.enterInviteCode(pending, "activate");
@@ -122,9 +135,11 @@ class InviteServiceTest {
     @Test
     void enterAddsGroups() {
         var modGroupId = UUID.fromString("d8ccd166-2556-48c2-b5bd-c7d42995a2db");
+        var modGroup = new SimpleGroupDTO();
+        modGroup.setId(modGroupId);
         var dto = validDto("group-invite");
-        dto.setGroups(List.of(modGroupId));
-        inviteService.create(dto);
+        dto.setGroups(List.of(modGroup));
+        inviteService.create(dto, server);
 
         var user = testService.userAdmin();
         inviteService.enterInviteCode(user, "group-invite");
@@ -136,7 +151,7 @@ class InviteServiceTest {
     @Test
     void enterAlreadyActiveNoChange() {
         var user = testService.userAdmin();
-        inviteService.create(validDto("noop"));
+        inviteService.create(validDto("noop"), server);
         assertThrows(InviteException.class, () -> inviteService.enterInviteCode(user, "noop"));
     }
 }

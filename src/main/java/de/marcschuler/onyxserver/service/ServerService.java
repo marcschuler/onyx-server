@@ -109,31 +109,43 @@ public class ServerService {
 
         var channel1 = new Channel();
         channel1.setName("Lobby");
+        channel1.setVoiceMode(Channel.VoiceMode.FULL);
+        channel1.setChatMode(Channel.ChatMode.FULL);
         var chat1 = new Chat();
         channel1.setChat(chat1);
 
         var channel2 = new Channel();
         channel2.setName("Talking I");
+        channel2.setVoiceMode(Channel.VoiceMode.FULL);
+        channel2.setChatMode(Channel.ChatMode.FULL);
         var chat2 = new Chat();
         channel2.setChat(chat2);
 
         var channel3 = new Channel();
         channel3.setName("Talking II");
+        channel3.setVoiceMode(Channel.VoiceMode.FULL);
+        channel3.setChatMode(Channel.ChatMode.FULL);
         var chat3 = new Chat();
         channel3.setChat(chat3);
 
         var channel4 = new Channel();
         channel4.setName("Chatting");
+        channel4.setVoiceMode(Channel.VoiceMode.NONE);
+        channel4.setChatMode(Channel.ChatMode.FULL);
         var chat4 = new Chat();
         channel4.setChat(chat4);
 
         var channel5 = new Channel();
         channel5.setName("Other");
+        channel5.setVoiceMode(Channel.VoiceMode.NONE);
+        channel5.setChatMode(Channel.ChatMode.FULL);
         var chat5 = new Chat();
         channel5.setChat(chat5);
 
         var channel6 = new Channel();
         channel6.setName("Team");
+        channel6.setVoiceMode(Channel.VoiceMode.NONE);
+        channel6.setChatMode(Channel.ChatMode.FULL);
         var chat6 = new Chat();
         channel6.setChat(chat6);
 

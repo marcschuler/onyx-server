@@ -52,20 +52,20 @@ public class ChatService {
         return messageRepository.getMessagesByChatIs(chat);
     }
 
-    public Message createMessage(Chat chat, User user, MessageCreationDTO messageDto) {
+    public Message createMessage(Chat chat, User user, MessageCreationDTO messageCreationDTO) {
         var message = new Message();
         message.setChat(chat);
         message.setId(UUID.randomUUID());
         message.setUser(user);
         message.setContent(
-                messageDto.getContent().stream()
+                messageCreationDTO.getContent().stream()
                         .map(this::createMessageContent).toList());
         message.setTimestamp(Instant.now());
-        if (messageDto.getRepliesTo() != null)
-            message.setRepliesTo(messageById(messageDto.getRepliesTo()).orElseThrow());
+        if (messageCreationDTO.getRepliesTo() != null)
+            message.setRepliesTo(messageById(messageCreationDTO.getRepliesTo()).orElseThrow());
 
         //if it is a channel, check the chat state
-        boolean shouldSave = true;
+        boolean temporary = false;
         var mode = getChannelForChat(chat)
                 .map(Channel::getChatMode);
         if (mode.isPresent()) {
@@ -74,21 +74,25 @@ public class ChatService {
                     throw new ChatDisabledException();
                 }
                 case TEMPORARY -> {
-                    shouldSave = false;
+                    temporary = true;
                 }
                 case FULL -> {
                 }
             }
         }
 
-        if (shouldSave)
+        if (!temporary)
             messageRepository.save(message);
+
 
         log.info("New message in chat {}", chat.getId());
 
+        var messageDto = messageMapper.mapToDTO(message);
+        if (temporary)
+            messageDto.setTemporary(true);
         var clients = this.webSocketConnectionService.clientsInteractable();
         this.webSocketConnectionService.send(clients,
-                new ChatMessageEvent(chat.getId(), messageMapper.mapToDTO(message)));
+                new ChatMessageEvent(chat.getId(), messageDto));
         return message;
     }
 
@@ -128,10 +132,6 @@ public class ChatService {
 
     public long countMessages(Chat chat) {
         return messageRepository.countMessageByChatIs(chat);
-    }
-
-    public MessageContent updateMessageContent(MessageContent messageContent, MessageContentDTO messageDto) {
-        return messageContentMapper.updateFromDTO(messageDto, messageContent);
     }
 
     public Optional<Message> messageById(UUID id) {

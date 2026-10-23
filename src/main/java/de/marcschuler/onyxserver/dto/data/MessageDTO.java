@@ -26,4 +26,6 @@ public class MessageDTO {
 
     @NotNull
     private UUID chatId;
+
+    private boolean temporary;
 }

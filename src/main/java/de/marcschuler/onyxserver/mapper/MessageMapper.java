@@ -14,6 +14,7 @@ import org.mapstruct.SubclassExhaustiveStrategy;
 public abstract class MessageMapper {
 
     @Mapping(target = "chatId", source = "message.chat.id")
+    @Mapping(target = "temporary", constant = "false")
     public abstract MessageDTO mapToDTO(Message message);
 
 }

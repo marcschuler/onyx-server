@@ -12,11 +12,14 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
+import java.time.Instant;
 
 @Data
 public class WebClient {
     @JsonIgnore
     private final WebSocketSession session;
+
+    private final Instant joined = Instant.now();
 
     @Nullable
     private User user;

@@ -31,6 +31,7 @@ public abstract class InviteMapper {
 
     @Mapping(target = "code", ignore = true)
     @Mapping(target = "server", ignore = true)
+    @Mapping(target = "usages", ignore = true)
     @Mapping(target = "groups", source = "groups", qualifiedByName = "simpleGroupsToGroups")
     public abstract Invite update(@MappingTarget Invite invite, InviteDTO dto);
 

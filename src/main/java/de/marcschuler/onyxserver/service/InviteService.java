@@ -42,7 +42,7 @@ public class InviteService {
         if (inviteRepository.existsById(invite.getCode()))
             throw new IllegalStateException("An invite with code " + invite.getCode() + " already exists");
 
-        if (invite.getEndDate().isBefore(LocalDateTime.now()))
+        if (invite.getEndDate() != null && invite.getEndDate().isBefore(LocalDateTime.now()))
             throw new InviteException("The invite has already expired");
 
         return inviteRepository.save(invite);
@@ -109,7 +109,7 @@ public class InviteService {
         return inviteRepository.findAll(); //TODO
     }
 
-    public Optional<Invite> get(String code){
+    public Optional<Invite> get(String code) {
         return inviteRepository.findById(code);
     }
 

@@ -1,8 +1,8 @@
 package de.marcschuler.onyxserver.service;
 
 import com.nimbusds.jose.jwk.OctetKeyPair;
-import de.marcschuler.onyxserver.data.ClientState;
 import de.marcschuler.onyxserver.data.User;
+import de.marcschuler.onyxserver.data.UserBan;
 import de.marcschuler.onyxserver.data.file.File;
 import de.marcschuler.onyxserver.mapper.ServerMapper;
 import de.marcschuler.onyxserver.repository.UserRepository;
@@ -55,18 +55,36 @@ public class UserService {
     /**
      * bans an user. if the user is currently online, the connection is closed
      *
-     * @param user the user to ban
+     * @param user     the user to ban
+     * @param message  the reason, shown to the user. may be null
+     * @param bannedBy the user who issued the ban, null if banned by the system
      */
-    public void ban(User user, @Nullable String message) {
+    public void ban(User user, @Nullable String message, @Nullable User bannedBy) {
         log.info("Banning user {}", user.getId());
-        user.setState(ClientState.BANNED);
+        var ban = new UserBan();
+        ban.setReason(message);
+        ban.setBannedAt(Instant.now());
+        ban.setBannedBy(bannedBy);
+        user.setBan(ban);
         save(user);
         var clientOpt = webSocketConnectionService.clientFromKeyId(user.getId());
         if (clientOpt.isPresent()) {
             log.info("Banned user is online - kicking user");
             message = message != null ? message : "Client was banned from the server";
-            webSocketConnectionService.kickClient(clientOpt.get(), KickReason.BANNED, message);
+            clientOpt.get().kick(KickReason.BANNED, message);
         }
+    }
+
+
+    /**
+     * removes the ban of an user
+     *
+     * @param user the user to unban
+     */
+    public void unban(User user) {
+        log.info("Unbanning user {}", user.getId());
+        user.setBan(null);
+        save(user);
     }
 
 
@@ -78,7 +96,7 @@ public class UserService {
         user.setUsername(username);
         user.setPublicKey(publicKey);
         user.setKnownSince(Instant.now());
-        user.setState(ClientState.ACTIVE);
+        user.setPendingAccess(false);
 
         //set default groups
         var groups = groupService.getGroupsDefaultForNewUser();

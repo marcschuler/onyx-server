@@ -1,7 +1,10 @@
 package de.marcschuler.onyxserver.service;
 
 import de.marcschuler.onyxserver.config.SecurityConfig;
-import de.marcschuler.onyxserver.data.*;
+import de.marcschuler.onyxserver.data.Channel;
+import de.marcschuler.onyxserver.data.Group;
+import de.marcschuler.onyxserver.data.Section;
+import de.marcschuler.onyxserver.data.User;
 import de.marcschuler.onyxserver.data.permission.Permission;
 import de.marcschuler.onyxserver.data.permission.PermissionType;
 import de.marcschuler.onyxserver.error.webclient.PermissionDeniedException;
@@ -64,11 +67,11 @@ public class PermissionService {
      * @param type
      */
     public void checkAccess(@NonNull User user, @Nullable Section section, @Nullable Channel channel, @NonNull PermissionType type) {
-        if (user.getState() == ClientState.BANNED) {
+        if (user.isBanned()) {
             log.warn("User {} has been banned", user.getUsername());
             throw new PermissionDeniedException("User is banned", null);
         }
-        if (user.getState() == ClientState.PENDING_ACCESS) {
+        if (user.isPendingAccess()) {
             throw new PermissionDeniedException("User is pending access", null);
         }
 

@@ -92,7 +92,7 @@ public class ChannelService {
         var section = channel.getSection();
 
         webSocketService.getClientsInChannel(channel)
-                .forEach(webSocketConnectionService::leaveChannel);
+                .forEach(client -> client.leaveChannel());
 
         section.getChannels().removeIf(c -> c.equals(channel));
         sectionRepository.save(section);
@@ -111,7 +111,7 @@ public class ChannelService {
             var clients = webSocketService.getClientsInChannel(channel);
             if (!clients.isEmpty()) {
                 log.info("Removing {} clients from channel because voice mode changed to NONE", clients.size());
-                clients.forEach(webSocketConnectionService::leaveChannel);
+                clients.forEach(client -> client.leaveChannel());
             }
         }
 

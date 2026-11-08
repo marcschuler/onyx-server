@@ -38,8 +38,7 @@ class PeerEventHandlerTest {
     private WebClient client(String userId, Channel channel) {
         var user = new User();
         user.setId(userId);
-        var client = new WebClient(mock(WebSocketSession.class));
-        client.setUser(user);
+        var client = spy(new WebClient(webSocketConnectionService, mock(WebSocketSession.class), user));
         client.setState(WebClientState.LOGGED_IN);
         client.setChannel(channel);
         return client;
@@ -61,7 +60,7 @@ class PeerEventHandlerTest {
         peerEventHandler.onOffer(message);
 
         var captor = ArgumentCaptor.forClass(PeerOfferForward.class);
-        verify(webSocketConnectionService).send(eq(toClient), captor.capture());
+        verify(toClient).send(captor.capture());
         var forwarded = captor.getValue();
         assertEquals("from-id", forwarded.clientFrom());
         assertEquals("sdp-offer", forwarded.offer().asText());
@@ -83,7 +82,7 @@ class PeerEventHandlerTest {
         peerEventHandler.onAnswer(message);
 
         var captor = ArgumentCaptor.forClass(PeerAnswerForward.class);
-        verify(webSocketConnectionService).send(eq(toClient), captor.capture());
+        verify(toClient).send(captor.capture());
         var forwarded = captor.getValue();
         assertEquals("from-id", forwarded.clientFrom());
         assertEquals("sdp-answer", forwarded.answer().asText());

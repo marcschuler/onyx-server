@@ -1,14 +1,15 @@
 spring:
   datasource:
     url: jdbc:h2:mem:onyx
+  liquibase:
+    # tests insert their own data (sql/base.sql)
+    contexts: test
 
 logging:
   level:
     de.marcschuler: TRACE
 
 onyx:
-  init:
-    startup-wizzard: false
   storage:
     path: target/test
     files: ${onyx.storage.path}/files

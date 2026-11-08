@@ -17,6 +17,7 @@ import tools.jackson.databind.module.SimpleModule;
 import java.lang.reflect.Modifier;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -43,15 +44,29 @@ public class BeanConfig {
         return new StorageService(basePath,cacheBasePath);
     }
 
+    @Bean(name = "integrationStorageService")
+    public StorageService integrationStorageService(
+            @Value("${onyx.storage.integration-steam.files}") Path basePath,
+            @Value("${onyx.storage.integration-steam.cache}") Path cacheBasePath){
+        return new StorageService(basePath,cacheBasePath);
+    }
+
     @Bean
     public JsonMapperBuilderCustomizer registerAnimalSubtypes() {
         return builder -> {
             var module = new SimpleModule("webclient-messages");
 
             var names = new ArrayList<String>();
-            new Reflections("de.marcschuler.onyxserver.webclient.messages")
-                    .getSubTypesOf(MessageBody.class)
-                    .stream()
+
+            var classes = new HashSet<Class<?>>();
+            classes.addAll(new Reflections("de.marcschuler.onyxserver.webclient.messages")
+                    .getSubTypesOf(MessageBody.class));
+            classes.addAll(new Reflections("de.marcschuler.onyxserver.dto")
+                    .getSubTypesOf(Object.class));
+            classes.addAll(new Reflections("de.marcschuler.onyxserver.dto")
+                    .getSubTypesOf(Record.class));
+
+            classes.stream()
                     .filter(c -> !Modifier.isAbstract(c.getModifiers()))
                     .filter(c -> !Modifier.isInterface(c.getModifiers()))
                     .forEach(c -> {

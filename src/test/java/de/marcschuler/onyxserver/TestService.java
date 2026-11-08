@@ -98,4 +98,14 @@ public class TestService {
             throw new RuntimeException(e);
         }
     }
+
+    /**
+     * @return a ban to set on a user to ban him
+     */
+    public static de.marcschuler.onyxserver.data.UserBan ban(String reason) {
+        var ban = new de.marcschuler.onyxserver.data.UserBan();
+        ban.setReason(reason);
+        ban.setBannedAt(java.time.Instant.now());
+        return ban;
+    }
 }

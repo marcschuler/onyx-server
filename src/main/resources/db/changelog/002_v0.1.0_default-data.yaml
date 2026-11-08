@@ -1,0 +1,16 @@
+# Part 2: default data. Only runs with the liquibase context "default-data" (not in tests).
+# Static rows come from data/002_default-server.sql, secrets (server keys, admin invite) are generated
+# per installation by DefaultServerSecretsChange in the same changeSet.
+databaseChangeLog:
+  - changeSet:
+      id: 002-default-server
+      author: marc
+      context: default-data
+      changes:
+        - sqlFile:
+            path: db/changelog/data/002_default-server.sql
+            encoding: UTF-8
+            splitStatements: true
+            stripComments: true
+        - customChange:
+            class: de.marcschuler.onyxserver.config.liquibase.DefaultServerSecretsChange

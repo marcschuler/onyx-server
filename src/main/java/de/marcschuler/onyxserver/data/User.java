@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.ToString;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -36,13 +37,29 @@ public class User {
     @Column(nullable = false, unique = true, length = 1024)
     private OctetKeyPair publicKey;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    private ClientState state;
+    /**
+     * The user has to be activated (e.g. by an invite) before having any permissions
+     */
+    @Column(nullable = false)
+    private boolean pendingAccess;
+
+    /**
+     * Set if the user is banned, null otherwise
+     */
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @ToString.Exclude
+    private UserBan ban;
 
     @Column(nullable = false)
     private Instant knownSince;
     private Instant lastSeen;
 
     private boolean owner;
+
+    /**
+     * @return true if the user is banned
+     */
+    public boolean isBanned() {
+        return ban != null;
+    }
 }

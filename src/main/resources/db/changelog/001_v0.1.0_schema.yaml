@@ -1,16 +1,39 @@
+# Part 1: schema only. Generated from the Hibernate entities (liquibase generateChangelog) and then tidied.
+# Default data lives in 002_v0.1.0_default-data.yaml
 databaseChangeLog:
 - changeSet:
-    id: 1791115290187-1
-    author: marc (generated)
+    id: 001-schema-001
+    author: marc
     changes:
     - createTable:
         columns:
         - column:
+            name: CHANNEL_ORDER
+            type: INT
+        - column:
+            constraints:
+              nullable: false
+            name: CHAT_MODE
+            type: TINYINT
+        - column:
+            constraints:
+              nullable: false
+            name: VOICE_MODE
+            type: TINYINT
+        - column:
+            constraints:
+              nullable: false
+            name: CHAT_ID
+            type: UUID
+        - column:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: CONSTRAINT_56
+              primaryKeyName: CONSTRAINT_56D7
             name: ID
+            type: UUID
+        - column:
+            name: SECTION_ID
             type: UUID
         - column:
             constraints:
@@ -18,23 +41,18 @@ databaseChangeLog:
             name: NAME
             type: VARCHAR(32)
         - column:
-            constraints:
-              nullable: false
-            name: CHAT_ID
-            type: UUID
-        - column:
-            name: SECTION_ID
-            type: UUID
-        - column:
-            name: CHANNEL_ORDER
-            type: INT
+            name: PASSWORD
+            type: VARCHAR(32)
         tableName: CHANNEL
 - changeSet:
-    id: 1791115290187-2
-    author: marc (generated)
+    id: 001-schema-002
+    author: marc
     changes:
     - createTable:
         columns:
+        - column:
+            name: CHANNEL_ID
+            type: UUID
         - column:
             constraints:
               nullable: false
@@ -42,13 +60,10 @@ databaseChangeLog:
               primaryKeyName: CONSTRAINT_59
             name: ID
             type: UUID
-        - column:
-            name: CHANNEL_ID
-            type: UUID
         tableName: CHANNEL_GROUP
 - changeSet:
-    id: 1791115290187-3
-    author: marc (generated)
+    id: 001-schema-003
+    author: marc
     changes:
     - createTable:
         columns:
@@ -68,8 +83,8 @@ databaseChangeLog:
             type: UUID
         tableName: CHANNEL_GROUP_GROUPS
 - changeSet:
-    id: 1791115290187-4
-    author: marc (generated)
+    id: 001-schema-004
+    author: marc
     changes:
     - createTable:
         columns:
@@ -82,11 +97,19 @@ databaseChangeLog:
             type: UUID
         tableName: CHAT
 - changeSet:
-    id: 1791115290187-5
-    author: marc (generated)
+    id: 001-schema-005
+    author: marc
     changes:
     - createTable:
         columns:
+        - column:
+            constraints:
+              nullable: false
+            name: CREATED
+            type: TIMESTAMP WITH TIME ZONE
+        - column:
+            name: SIZE
+            type: BIGINT
         - column:
             constraints:
               nullable: false
@@ -102,11 +125,6 @@ databaseChangeLog:
         - column:
             constraints:
               nullable: false
-            name: CREATED
-            type: TIMESTAMP WITH TIME ZONE
-        - column:
-            constraints:
-              nullable: false
             name: FILENAME
             type: VARCHAR(255)
         - column:
@@ -114,16 +132,16 @@ databaseChangeLog:
               nullable: false
             name: HASH
             type: VARCHAR(255)
-        - column:
-            name: SIZE
-            type: BIGINT
         tableName: FILE
 - changeSet:
-    id: 1791115290187-6
-    author: marc (generated)
+    id: 001-schema-006
+    author: marc
     changes:
     - createTable:
         columns:
+        - column:
+            name: FILE_ID
+            type: UUID
         - column:
             constraints:
               nullable: false
@@ -131,16 +149,30 @@ databaseChangeLog:
               primaryKeyName: CONSTRAINT_F9
             name: ID
             type: UUID
-        - column:
-            name: FILE_ID
-            type: UUID
         tableName: FILE_MESSAGE_CONTENT
 - changeSet:
-    id: 1791115290187-7
-    author: marc (generated)
+    id: 001-schema-007
+    author: marc
     changes:
     - createTable:
         columns:
+        - column:
+            name: MAX_USAGES
+            type: INT
+        - column:
+            constraints:
+              nullable: false
+            name: USAGES
+            type: INT
+        - column:
+            name: END_DATE
+            type: TIMESTAMP
+        - column:
+            name: START_DATE
+            type: TIMESTAMP
+        - column:
+            name: SERVER_ID
+            type: UUID
         - column:
             constraints:
               nullable: false
@@ -152,45 +184,31 @@ databaseChangeLog:
             name: DESCRIPTION
             type: VARCHAR(255)
         - column:
-            name: END_DATE
-            type: TIMESTAMP
-        - column:
-            name: MAX_USAGES
-            type: INT
-        - column:
-            name: START_DATE
-            type: TIMESTAMP
-        - column:
             constraints:
               nullable: false
             name: TITLE
             type: VARCHAR(255)
-        - column:
-            constraints:
-              nullable: false
-            name: USAGES
-            type: INT
         tableName: INVITE
 - changeSet:
-    id: 1791115290187-8
-    author: marc (generated)
+    id: 001-schema-008
+    author: marc
     changes:
     - createTable:
         columns:
         - column:
             constraints:
               nullable: false
-            name: INVITE_CODE
-            type: VARCHAR(255)
+            name: GROUPS_ID
+            type: UUID
         - column:
             constraints:
               nullable: false
-            name: GROUPS_ID
-            type: UUID
+            name: INVITE_CODE
+            type: VARCHAR(255)
         tableName: INVITE_GROUPS
 - changeSet:
-    id: 1791115290187-9
-    author: marc (generated)
+    id: 001-schema-009
+    author: marc
     changes:
     - createTable:
         columns:
@@ -206,18 +224,11 @@ databaseChangeLog:
             type: VARCHAR(65535)
         tableName: MARKDOWN_MESSAGE_CONTENT
 - changeSet:
-    id: 1791115290187-10
-    author: marc (generated)
+    id: 001-schema-010
+    author: marc
     changes:
     - createTable:
         columns:
-        - column:
-            constraints:
-              nullable: false
-              primaryKey: true
-              primaryKeyName: CONSTRAINT_6
-            name: ID
-            type: UUID
         - column:
             constraints:
               nullable: false
@@ -229,6 +240,13 @@ databaseChangeLog:
             name: CHAT_ID
             type: UUID
         - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_6
+            name: ID
+            type: UUID
+        - column:
             name: REPLIES_TO_ID
             type: UUID
         - column:
@@ -236,35 +254,28 @@ databaseChangeLog:
             type: VARCHAR(255)
         tableName: MESSAGE
 - changeSet:
-    id: 1791115290187-11
-    author: marc (generated)
+    id: 001-schema-011
+    author: marc
     changes:
     - createTable:
         columns:
-        - column:
-            constraints:
-              nullable: false
-            name: MESSAGE_ID
-            type: UUID
         - column:
             constraints:
               nullable: false
             name: CONTENT_ID
             type: UUID
-        tableName: MESSAGE_CONTENT
-- changeSet:
-    id: 1791115290187-12
-    author: marc (generated)
-    changes:
-    - createTable:
-        columns:
         - column:
             constraints:
               nullable: false
-              primaryKey: true
-              primaryKeyName: CONSTRAINT_FE
-            name: ID
+            name: MESSAGE_ID
             type: UUID
+        tableName: MESSAGE_CONTENT
+- changeSet:
+    id: 001-schema-012
+    author: marc
+    changes:
+    - createTable:
+        columns:
         - column:
             constraints:
               nullable: false
@@ -275,20 +286,20 @@ databaseChangeLog:
               nullable: false
             name: PRIORITY
             type: INT
-        tableName: PERMISSION
-- changeSet:
-    id: 1791115290187-13
-    author: marc (generated)
-    changes:
-    - createTable:
-        columns:
         - column:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: CONSTRAINT_A7
-            name: PERMISSION_ID
+              primaryKeyName: CONSTRAINT_FE
+            name: ID
             type: UUID
+        tableName: PERMISSION
+- changeSet:
+    id: 001-schema-013
+    author: marc
+    changes:
+    - createTable:
+        columns:
         - column:
             constraints:
               nullable: false
@@ -296,10 +307,17 @@ databaseChangeLog:
               primaryKeyName: CONSTRAINT_A7
             name: LIMITED_TO_CHANNEL_ID
             type: UUID
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_A7
+            name: PERMISSION_ID
+            type: UUID
         tableName: PERMISSION_LIMITED_TO_CHANNEL
 - changeSet:
-    id: 1791115290187-14
-    author: marc (generated)
+    id: 001-schema-014
+    author: marc
     changes:
     - createTable:
         columns:
@@ -308,19 +326,19 @@ databaseChangeLog:
               nullable: false
               primaryKey: true
               primaryKeyName: CONSTRAINT_F1
-            name: PERMISSION_ID
+            name: LIMITED_TO_SECTION_ID
             type: UUID
         - column:
             constraints:
               nullable: false
               primaryKey: true
               primaryKeyName: CONSTRAINT_F1
-            name: LIMITED_TO_SECTION_ID
+            name: PERMISSION_ID
             type: UUID
         tableName: PERMISSION_LIMITED_TO_SECTION
 - changeSet:
-    id: 1791115290187-15
-    author: marc (generated)
+    id: 001-schema-015
+    author: marc
     changes:
     - createTable:
         columns:
@@ -341,11 +359,14 @@ databaseChangeLog:
               'USER_AVATAR', 'USER_BAN', 'USER_GROUP', 'USER_KICK', 'USER_UNBAN')
         tableName: PERMISSION_PERMISSIONS
 - changeSet:
-    id: 1791115290187-16
-    author: marc (generated)
+    id: 001-schema-016
+    author: marc
     changes:
     - createTable:
         columns:
+        - column:
+            name: SECTION_ORDER
+            type: INT
         - column:
             constraints:
               nullable: false
@@ -354,18 +375,18 @@ databaseChangeLog:
             name: ID
             type: UUID
         - column:
-            name: NAME
-            type: VARCHAR(32)
-        - column:
             name: SERVER_ID
             type: UUID
         - column:
-            name: SECTION_ORDER
-            type: INT
+            name: NAME
+            type: VARCHAR(32)
+        - column:
+            name: PASSWORD
+            type: VARCHAR(32)
         tableName: SECTION
 - changeSet:
-    id: 1791115290187-17
-    author: marc (generated)
+    id: 001-schema-017
+    author: marc
     changes:
     - createTable:
         columns:
@@ -381,18 +402,11 @@ databaseChangeLog:
             type: UUID
         tableName: SECTION_GROUP
 - changeSet:
-    id: 1791115290187-18
-    author: marc (generated)
+    id: 001-schema-018
+    author: marc
     changes:
     - createTable:
         columns:
-        - column:
-            constraints:
-              nullable: false
-              primaryKey: true
-              primaryKeyName: CONSTRAINT_D
-            name: SECTION_GROUP_ID
-            type: UUID
         - column:
             constraints:
               nullable: false
@@ -400,33 +414,40 @@ databaseChangeLog:
               primaryKeyName: CONSTRAINT_D
             name: GROUPS_ID
             type: UUID
-        tableName: SECTION_GROUP_GROUPS
-- changeSet:
-    id: 1791115290187-19
-    author: marc (generated)
-    changes:
-    - createTable:
-        columns:
         - column:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: CONSTRAINT_9
-            name: ID
+              primaryKeyName: CONSTRAINT_D
+            name: SECTION_GROUP_ID
+            type: UUID
+        tableName: SECTION_GROUP_GROUPS
+- changeSet:
+    id: 001-schema-019
+    author: marc
+    changes:
+    - createTable:
+        columns:
+        - column:
+            name: ICON_ID
             type: UUID
         - column:
-            name: KEYS
-            type: CHARACTER LARGE OBJECT
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_91
+            name: ID
+            type: UUID
         - column:
             name: NAME
             type: VARCHAR(64)
         - column:
-            name: ICON_ID
-            type: UUID
+            name: KEYS
+            type: CHARACTER LARGE OBJECT
         tableName: SERVER
 - changeSet:
-    id: 1791115290187-20
-    author: marc (generated)
+    id: 001-schema-020
+    author: marc
     changes:
     - createTable:
         columns:
@@ -434,9 +455,9 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: CONSTRAINT_24B
-            name: SERVER_ID
-            type: UUID
+              primaryKeyName: CONSTRAINT_24B8
+            name: DESCRIPTION_ORDER
+            type: INT
         - column:
             constraints:
               nullable: false
@@ -446,39 +467,26 @@ databaseChangeLog:
             constraints:
               nullable: false
               primaryKey: true
-              primaryKeyName: CONSTRAINT_24B
-            name: DESCRIPTION_ORDER
-            type: INT
+              primaryKeyName: CONSTRAINT_24B8
+            name: SERVER_ID
+            type: UUID
         tableName: SERVER_DESCRIPTION
 - changeSet:
-    id: 1791115290187-21
-    author: marc (generated)
+    id: 001-schema-021
+    author: marc
     changes:
     - createTable:
         columns:
         - column:
             constraints:
               nullable: false
-              primaryKey: true
-              primaryKeyName: CONSTRAINT_4
-            name: ID
-            type: UUID
-        - column:
-            constraints:
-              nullable: false
             name: DEFAULT_FOR_NEW_USERS
             type: BOOLEAN
-        - column:
-            name: DESCRIPTION
-            type: VARCHAR(255)
         - column:
             constraints:
               nullable: false
             name: LABEL
             type: BOOLEAN
-        - column:
-            name: NAME
-            type: VARCHAR(255)
         - column:
             constraints:
               nullable: false
@@ -487,61 +495,74 @@ databaseChangeLog:
         - column:
             name: ICON_ID
             type: UUID
-        tableName: SERVER_GROUP
-- changeSet:
-    id: 1791115290187-22
-    author: marc (generated)
-    changes:
-    - createTable:
-        columns:
         - column:
             constraints:
               nullable: false
-            name: SERVER_ID
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_46
+            name: ID
             type: UUID
+        - column:
+            name: DESCRIPTION
+            type: VARCHAR(255)
+        - column:
+            name: NAME
+            type: VARCHAR(255)
+        tableName: SERVER_GROUP
+- changeSet:
+    id: 001-schema-022
+    author: marc
+    changes:
+    - createTable:
+        columns:
         - column:
             constraints:
               nullable: false
             name: GROUPS_ID
             type: UUID
-        tableName: SERVER_GROUPS
-- changeSet:
-    id: 1791115290187-23
-    author: marc (generated)
-    changes:
-    - createTable:
-        columns:
         - column:
             constraints:
               nullable: false
-            name: SERVER_GROUP_ID
+            name: SERVER_ID
             type: UUID
+        tableName: SERVER_GROUPS
+- changeSet:
+    id: 001-schema-023
+    author: marc
+    changes:
+    - createTable:
+        columns:
         - column:
             constraints:
               nullable: false
             name: INHERITS_FROM_ID
             type: UUID
+        - column:
+            constraints:
+              nullable: false
+            name: SERVER_GROUP_ID
+            type: UUID
         tableName: SERVER_GROUP_INHERITS_FROM
 - changeSet:
-    id: 1791115290187-24
-    author: marc (generated)
+    id: 001-schema-024
+    author: marc
     changes:
     - createTable:
         columns:
         - column:
             constraints:
               nullable: false
-            name: SERVER_GROUP_ID
+            name: PERMISSIONS_ID
             type: UUID
         - column:
             constraints:
               nullable: false
-            name: PERMISSIONS_ID
+            name: SERVER_GROUP_ID
             type: UUID
         tableName: SERVER_GROUP_PERMISSIONS
 - changeSet:
-    id: 1791115290187-25
-    author: marc (generated)
+    id: 001-schema-025
+    author: marc
     changes:
     - createTable:
         columns:
@@ -557,8 +578,8 @@ databaseChangeLog:
             type: VARCHAR(255)
         tableName: SERVER_INVITES
 - changeSet:
-    id: 1791115290187-26
-    author: marc (generated)
+    id: 001-schema-026
+    author: marc
     changes:
     - createTable:
         columns:
@@ -574,20 +595,21 @@ databaseChangeLog:
               primaryKeyName: CONSTRAINT_E
             name: SERVER_ID
             type: UUID
+        - column:
+            name: PASSWORD
+            type: VARCHAR(255)
         tableName: SERVER_SETTINGS
 - changeSet:
-    id: 1791115290187-27
-    author: marc (generated)
+    id: 001-schema-027
+    author: marc
     changes:
     - createTable:
         columns:
         - column:
             constraints:
               nullable: false
-              primaryKey: true
-              primaryKeyName: CONSTRAINT_47
-            name: ID
-            type: VARCHAR(255)
+            name: OWNER
+            type: BOOLEAN
         - column:
             constraints:
               nullable: false
@@ -597,10 +619,13 @@ databaseChangeLog:
             name: LAST_SEEN
             type: TIMESTAMP WITH TIME ZONE
         - column:
+            name: AVATAR_ID
+            type: UUID
+        - column:
             constraints:
               nullable: false
-            name: OWNER
-            type: BOOLEAN
+            name: USERNAME
+            type: VARCHAR(32)
         - column:
             constraints:
               nullable: false
@@ -609,47 +634,42 @@ databaseChangeLog:
         - column:
             constraints:
               nullable: false
-            name: STATE
-            type: ENUM('ACTIVE', 'BANNED', 'PENDING_ACCESS')
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_4721
+            name: ID
+            type: VARCHAR(255)
         - column:
             constraints:
               nullable: false
-            name: USERNAME
-            type: VARCHAR(32)
+            name: PENDING_ACCESS
+            type: BOOLEAN
         - column:
-            name: AVATAR_ID
+            name: BAN_ID
             type: UUID
         tableName: SERVER_USERS
 - changeSet:
-    id: 1791115290187-28
-    author: marc (generated)
+    id: 001-schema-028
+    author: marc
     changes:
     - createTable:
         columns:
-        - column:
-            constraints:
-              nullable: false
-            name: SERVER_USERS_ID
-            type: VARCHAR(255)
         - column:
             constraints:
               nullable: false
             name: CHANNEL_GROUPS_ID
             type: UUID
-        tableName: SERVER_USERS_CHANNEL_GROUPS
-- changeSet:
-    id: 1791115290187-29
-    author: marc (generated)
-    changes:
-    - createTable:
-        columns:
         - column:
             constraints:
               nullable: false
-              primaryKey: true
-              primaryKeyName: CONSTRAINT_51
             name: SERVER_USERS_ID
             type: VARCHAR(255)
+        tableName: SERVER_USERS_CHANNEL_GROUPS
+- changeSet:
+    id: 001-schema-029
+    author: marc
+    changes:
+    - createTable:
+        columns:
         - column:
             constraints:
               nullable: false
@@ -657,123 +677,147 @@ databaseChangeLog:
               primaryKeyName: CONSTRAINT_51
             name: GROUPS_ID
             type: UUID
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_51
+            name: SERVER_USERS_ID
+            type: VARCHAR(255)
         tableName: SERVER_USERS_GROUPS
 - changeSet:
-    id: 1791115290187-30
-    author: marc (generated)
+    id: 001-schema-030
+    author: marc
     changes:
     - createTable:
         columns:
         - column:
             constraints:
               nullable: false
-            name: SERVER_USERS_ID
-            type: VARCHAR(255)
+            name: SECTION_GROUPS_ID
+            type: UUID
         - column:
             constraints:
               nullable: false
-            name: SECTION_GROUPS_ID
-            type: UUID
+            name: SERVER_USERS_ID
+            type: VARCHAR(255)
         tableName: SERVER_USERS_SECTION_GROUPS
 - changeSet:
-    id: 1791115290187-31
-    author: marc (generated)
+    id: 001-schema-031
+    author: marc
     changes:
-    - addUniqueConstraint:
-        columnNames: PERMISSIONS_ID
-        constraintName: UK3QIMSI9LUACXCLYC6IHEXS8TX
-        tableName: SERVER_GROUP_PERMISSIONS
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: CONSTRAINT_5E
+            name: ID
+            type: UUID
+        - column:
+            name: TEXT
+            type: VARCHAR(65535)
+        tableName: TEXT_MESSAGE_CONTENT
 - changeSet:
-    id: 1791115290187-32
-    author: marc (generated)
-    changes:
-    - addUniqueConstraint:
-        columnNames: INVITES_CODE
-        constraintName: UK7TENG1ND4JVAHMEX2NCUIRY99
-        tableName: SERVER_INVITES
-- changeSet:
-    id: 1791115290187-33
-    author: marc (generated)
-    changes:
-    - addUniqueConstraint:
-        columnNames: ICON_ID
-        constraintName: UKBBKPWUEOQ5TEQ76QLIMO188WB
-        tableName: SERVER
-- changeSet:
-    id: 1791115290187-34
-    author: marc (generated)
+    id: 001-schema-032
+    author: marc
     changes:
     - addUniqueConstraint:
         columnNames: DESCRIPTION_ID
-        constraintName: UKCLN2I7BK18HY3TP0MHOPEEJRB
+        constraintName: CONSTRAINT_24B
         tableName: SERVER_DESCRIPTION
 - changeSet:
-    id: 1791115290187-35
-    author: marc (generated)
+    id: 001-schema-033
+    author: marc
     changes:
     - addUniqueConstraint:
         columnNames: CONTENT_ID
-        constraintName: UKEQ360MLNMIXHCH7S54M9YPO16
+        constraintName: CONSTRAINT_2F
         tableName: MESSAGE_CONTENT
 - changeSet:
-    id: 1791115290187-36
-    author: marc (generated)
-    changes:
-    - addUniqueConstraint:
-        columnNames: SECTION_GROUPS_ID
-        constraintName: UKFVMRWOQWB1J2L7RK7KY2MY6P4
-        tableName: SERVER_USERS_SECTION_GROUPS
-- changeSet:
-    id: 1791115290187-37
-    author: marc (generated)
-    changes:
-    - addUniqueConstraint:
-        columnNames: GROUPS_ID
-        constraintName: UKL3YBVXBK1GATL6EIQS5UW9WSY
-        tableName: SERVER_GROUPS
-- changeSet:
-    id: 1791115290187-38
-    author: marc (generated)
-    changes:
-    - addUniqueConstraint:
-        columnNames: AVATAR_ID
-        constraintName: UKM86J2LLI0MVHMUU29TM1Q5MS6
-        tableName: SERVER_USERS
-- changeSet:
-    id: 1791115290187-39
-    author: marc (generated)
-    changes:
-    - addUniqueConstraint:
-        columnNames: PUBLIC_KEY
-        constraintName: UKMU2BAX8QR8FVY71779AFNSRQ
-        tableName: SERVER_USERS
-- changeSet:
-    id: 1791115290187-40
-    author: marc (generated)
+    id: 001-schema-034
+    author: marc
     changes:
     - addUniqueConstraint:
         columnNames: ICON_ID
-        constraintName: UKNJHAXMU2BI6USW1GJJ31S3GU2
+        constraintName: CONSTRAINT_4
         tableName: SERVER_GROUP
 - changeSet:
-    id: 1791115290187-41
-    author: marc (generated)
+    id: 001-schema-035
+    author: marc
     changes:
     - addUniqueConstraint:
-        columnNames: CHANNEL_GROUPS_ID
-        constraintName: UKOBKDIURX8EPVLCKWQ11PRDTHV
-        tableName: SERVER_USERS_CHANNEL_GROUPS
+        columnNames: AVATAR_ID
+        constraintName: CONSTRAINT_47
+        tableName: SERVER_USERS
 - changeSet:
-    id: 1791115290187-42
-    author: marc (generated)
+    id: 001-schema-036
+    author: marc
+    changes:
+    - addUniqueConstraint:
+        columnNames: PUBLIC_KEY
+        constraintName: CONSTRAINT_472
+        tableName: SERVER_USERS
+- changeSet:
+    id: 001-schema-037
+    author: marc
+    changes:
+    - addUniqueConstraint:
+        columnNames: SECTION_GROUPS_ID
+        constraintName: CONSTRAINT_4D
+        tableName: SERVER_USERS_SECTION_GROUPS
+- changeSet:
+    id: 001-schema-038
+    author: marc
     changes:
     - addUniqueConstraint:
         columnNames: PERMISSION_ID, PERMISSIONS
-        constraintName: UKR9JJXSL9SVJOCPJVN7GI7XXAG
+        constraintName: CONSTRAINT_71
         tableName: PERMISSION_PERMISSIONS
 - changeSet:
-    id: 1791115290187-43
-    author: marc (generated)
+    id: 001-schema-039
+    author: marc
+    changes:
+    - addUniqueConstraint:
+        columnNames: INVITES_CODE
+        constraintName: CONSTRAINT_81
+        tableName: SERVER_INVITES
+- changeSet:
+    id: 001-schema-040
+    author: marc
+    changes:
+    - addUniqueConstraint:
+        columnNames: GROUPS_ID
+        constraintName: CONSTRAINT_85
+        tableName: SERVER_GROUPS
+- changeSet:
+    id: 001-schema-041
+    author: marc
+    changes:
+    - addUniqueConstraint:
+        columnNames: ICON_ID
+        constraintName: CONSTRAINT_9
+        tableName: SERVER
+- changeSet:
+    id: 001-schema-042
+    author: marc
+    changes:
+    - addUniqueConstraint:
+        columnNames: CHANNEL_GROUPS_ID
+        constraintName: CONSTRAINT_99
+        tableName: SERVER_USERS_CHANNEL_GROUPS
+- changeSet:
+    id: 001-schema-043
+    author: marc
+    changes:
+    - addUniqueConstraint:
+        columnNames: PERMISSIONS_ID
+        constraintName: CONSTRAINT_C
+        tableName: SERVER_GROUP_PERMISSIONS
+- changeSet:
+    id: 001-schema-044
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -783,8 +827,8 @@ databaseChangeLog:
         indexName: FK14DWSR63BC2NLV88GM20QII8R_INDEX_F
         tableName: PERMISSION_LIMITED_TO_SECTION
 - changeSet:
-    id: 1791115290187-44
-    author: marc (generated)
+    id: 001-schema-045
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -794,8 +838,8 @@ databaseChangeLog:
         indexName: FK1MOXXJGSYNBI1K5FKQWQ5AOPO_INDEX_2
         tableName: MESSAGE_CONTENT
 - changeSet:
-    id: 1791115290187-45
-    author: marc (generated)
+    id: 001-schema-046
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -805,8 +849,8 @@ databaseChangeLog:
         indexName: FK37R22IRVC1XS6GT2OKHMXDG98_INDEX_5
         tableName: CHANNEL
 - changeSet:
-    id: 1791115290187-46
-    author: marc (generated)
+    id: 001-schema-047
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -816,8 +860,8 @@ databaseChangeLog:
         indexName: FK3BTCC9LWWAU5YSLFF9CBIG3AN_INDEX_C
         tableName: INVITE_GROUPS
 - changeSet:
-    id: 1791115290187-47
-    author: marc (generated)
+    id: 001-schema-048
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -827,8 +871,8 @@ databaseChangeLog:
         indexName: FK48O0PVTEW6H393EN4C372TXW7_INDEX_C
         tableName: SERVER_GROUP_PERMISSIONS
 - changeSet:
-    id: 1791115290187-48
-    author: marc (generated)
+    id: 001-schema-049
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -838,8 +882,8 @@ databaseChangeLog:
         indexName: FK6FJ39VK6459JWQL7NXTGH45CF_INDEX_A
         tableName: SECTION_GROUP
 - changeSet:
-    id: 1791115290187-49
-    author: marc (generated)
+    id: 001-schema-050
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -849,8 +893,8 @@ databaseChangeLog:
         indexName: FK717CP7JCVN90L0SC2FJ6MN84P_INDEX_2
         tableName: SERVER_DESCRIPTION
 - changeSet:
-    id: 1791115290187-50
-    author: marc (generated)
+    id: 001-schema-051
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -860,8 +904,8 @@ databaseChangeLog:
         indexName: FK8RUL1G6X7PLT5S5SJ8WAA22UO_INDEX_E
         tableName: SERVER_GROUP_INHERITS_FROM
 - changeSet:
-    id: 1791115290187-51
-    author: marc (generated)
+    id: 001-schema-052
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -871,8 +915,8 @@ databaseChangeLog:
         indexName: FKAU04U3D9J1Y9B5H1SA10DN800_INDEX_E
         tableName: SERVER_GROUP_INHERITS_FROM
 - changeSet:
-    id: 1791115290187-52
-    author: marc (generated)
+    id: 001-schema-053
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -882,8 +926,8 @@ databaseChangeLog:
         indexName: FKB9NTBBEFCYQ9UB9LRD9ECQPOP_INDEX_8
         tableName: SERVER_GROUPS
 - changeSet:
-    id: 1791115290187-53
-    author: marc (generated)
+    id: 001-schema-054
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -893,8 +937,8 @@ databaseChangeLog:
         indexName: FKC799520H5IC8KX6IS7NR6UTT5_INDEX_4
         tableName: SERVER_USERS_SECTION_GROUPS
 - changeSet:
-    id: 1791115290187-54
-    author: marc (generated)
+    id: 001-schema-055
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -904,8 +948,8 @@ databaseChangeLog:
         indexName: FKDJPA1CIT6N8A6YUMTAU0BD2EF_INDEX_F
         tableName: PERMISSION_LIMITED_TO_SECTION
 - changeSet:
-    id: 1791115290187-55
-    author: marc (generated)
+    id: 001-schema-056
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -915,8 +959,8 @@ databaseChangeLog:
         indexName: FKDM93XTAXT87BQLUAIVS5BG7SM_INDEX_5
         tableName: CHANNEL
 - changeSet:
-    id: 1791115290187-56
-    author: marc (generated)
+    id: 001-schema-057
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -926,8 +970,8 @@ databaseChangeLog:
         indexName: FKDMM5WEQE92M5QM7XGUG9SSUTO_INDEX_A
         tableName: PERMISSION_LIMITED_TO_CHANNEL
 - changeSet:
-    id: 1791115290187-57
-    author: marc (generated)
+    id: 001-schema-058
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -937,8 +981,8 @@ databaseChangeLog:
         indexName: FKDNL8F6SSQ4II9G4TII9CIOGE1_INDEX_D
         tableName: SECTION_GROUP_GROUPS
 - changeSet:
-    id: 1791115290187-58
-    author: marc (generated)
+    id: 001-schema-059
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -948,8 +992,19 @@ databaseChangeLog:
         indexName: FKDQU3KAISHRUYA0HABNP5JDPLO_INDEX_5
         tableName: SERVER_USERS_GROUPS
 - changeSet:
-    id: 1791115290187-59
-    author: marc (generated)
+    id: 001-schema-060
+    author: marc
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: SERVER_ID
+        indexName: FKEQROACD8SVQHLN8HO259OWYSC_INDEX_8
+        tableName: INVITE
+- changeSet:
+    id: 001-schema-061
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -959,8 +1014,8 @@ databaseChangeLog:
         indexName: FKFFNKVVWU5Y5W7APQUA69IM4CF_INDEX_F
         tableName: FILE_MESSAGE_CONTENT
 - changeSet:
-    id: 1791115290187-60
-    author: marc (generated)
+    id: 001-schema-062
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -970,8 +1025,8 @@ databaseChangeLog:
         indexName: FKGJG6YLXYKHI0I77B6RLF0B24D_INDEX_5
         tableName: SERVER_USERS_GROUPS
 - changeSet:
-    id: 1791115290187-61
-    author: marc (generated)
+    id: 001-schema-063
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -981,8 +1036,8 @@ databaseChangeLog:
         indexName: FKHRNESTJLPQOIH0Y1JMIM06RPV_INDEX_7
         tableName: CHANNEL_GROUP_GROUPS
 - changeSet:
-    id: 1791115290187-62
-    author: marc (generated)
+    id: 001-schema-064
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -992,8 +1047,8 @@ databaseChangeLog:
         indexName: FKIF7MXPE50VKP2E7XTS6CY7DQ6_INDEX_7
         tableName: PERMISSION_PERMISSIONS
 - changeSet:
-    id: 1791115290187-63
-    author: marc (generated)
+    id: 001-schema-065
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -1003,8 +1058,8 @@ databaseChangeLog:
         indexName: FKK1UE24KRO9K40TROFI4NT6OC8_INDEX_D
         tableName: SECTION_GROUP_GROUPS
 - changeSet:
-    id: 1791115290187-64
-    author: marc (generated)
+    id: 001-schema-066
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -1014,8 +1069,8 @@ databaseChangeLog:
         indexName: FKK7CGG0VNRAR1K25X8DI3Q5AY2_INDEX_A
         tableName: SECTION
 - changeSet:
-    id: 1791115290187-65
-    author: marc (generated)
+    id: 001-schema-067
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -1025,8 +1080,8 @@ databaseChangeLog:
         indexName: FKMEJD0YKOKRBUEKWWGD5A5XT8A_INDEX_6
         tableName: MESSAGE
 - changeSet:
-    id: 1791115290187-66
-    author: marc (generated)
+    id: 001-schema-068
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -1036,8 +1091,8 @@ databaseChangeLog:
         indexName: FKMHTDP17PBT5MI3C6TXYOOINL2_INDEX_6
         tableName: MESSAGE
 - changeSet:
-    id: 1791115290187-67
-    author: marc (generated)
+    id: 001-schema-069
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -1047,8 +1102,8 @@ databaseChangeLog:
         indexName: FKMSTRLXKXF9FO9Y0AN6TLL555Q_INDEX_A
         tableName: PERMISSION_LIMITED_TO_CHANNEL
 - changeSet:
-    id: 1791115290187-68
-    author: marc (generated)
+    id: 001-schema-070
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -1058,8 +1113,8 @@ databaseChangeLog:
         indexName: FKNI0FSU455I9STDT2K9NKSXPRU_INDEX_8
         tableName: SERVER_INVITES
 - changeSet:
-    id: 1791115290187-69
-    author: marc (generated)
+    id: 001-schema-071
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -1069,8 +1124,8 @@ databaseChangeLog:
         indexName: FKOBYHH7OPW0V3XM0496XYCAVUP_INDEX_7
         tableName: CHANNEL_GROUP_GROUPS
 - changeSet:
-    id: 1791115290187-70
-    author: marc (generated)
+    id: 001-schema-072
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -1080,8 +1135,8 @@ databaseChangeLog:
         indexName: FKPPOPMUXBFC70MU7IYJ68THI9I_INDEX_9
         tableName: SERVER_USERS_CHANNEL_GROUPS
 - changeSet:
-    id: 1791115290187-71
-    author: marc (generated)
+    id: 001-schema-073
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -1091,8 +1146,8 @@ databaseChangeLog:
         indexName: FKQ213CEVA6FHW5DNF2K3PQGU14_INDEX_5
         tableName: CHANNEL_GROUP
 - changeSet:
-    id: 1791115290187-72
-    author: marc (generated)
+    id: 001-schema-074
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -1102,8 +1157,8 @@ databaseChangeLog:
         indexName: FKR2QH2DD3EVTLNHO744US37NAV_INDEX_C
         tableName: INVITE_GROUPS
 - changeSet:
-    id: 1791115290187-73
-    author: marc (generated)
+    id: 001-schema-075
+    author: marc
     changes:
     - createIndex:
         associatedWith: ''
@@ -1113,8 +1168,8 @@ databaseChangeLog:
         indexName: FKT0GWWRVU6L3F0G08KITOHOTF4_INDEX_6
         tableName: MESSAGE
 - changeSet:
-    id: 1791115290187-74
-    author: marc (generated)
+    id: 001-schema-076
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: LIMITED_TO_SECTION_ID
@@ -1128,8 +1183,8 @@ databaseChangeLog:
         referencedTableName: SECTION
         validate: true
 - changeSet:
-    id: 1791115290187-75
-    author: marc (generated)
+    id: 001-schema-077
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: MESSAGE_ID
@@ -1143,8 +1198,8 @@ databaseChangeLog:
         referencedTableName: MESSAGE
         validate: true
 - changeSet:
-    id: 1791115290187-76
-    author: marc (generated)
+    id: 001-schema-078
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: SECTION_ID
@@ -1158,8 +1213,8 @@ databaseChangeLog:
         referencedTableName: SECTION
         validate: true
 - changeSet:
-    id: 1791115290187-77
-    author: marc (generated)
+    id: 001-schema-079
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: GROUPS_ID
@@ -1173,8 +1228,8 @@ databaseChangeLog:
         referencedTableName: SERVER_GROUP
         validate: true
 - changeSet:
-    id: 1791115290187-78
-    author: marc (generated)
+    id: 001-schema-080
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: AVATAR_ID
@@ -1188,8 +1243,8 @@ databaseChangeLog:
         referencedTableName: FILE
         validate: true
 - changeSet:
-    id: 1791115290187-79
-    author: marc (generated)
+    id: 001-schema-081
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: SERVER_GROUP_ID
@@ -1203,8 +1258,8 @@ databaseChangeLog:
         referencedTableName: SERVER_GROUP
         validate: true
 - changeSet:
-    id: 1791115290187-80
-    author: marc (generated)
+    id: 001-schema-082
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: GROUPS_ID
@@ -1218,8 +1273,8 @@ databaseChangeLog:
         referencedTableName: SERVER_GROUP
         validate: true
 - changeSet:
-    id: 1791115290187-81
-    author: marc (generated)
+    id: 001-schema-083
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: SECTION_ID
@@ -1233,8 +1288,8 @@ databaseChangeLog:
         referencedTableName: SECTION
         validate: true
 - changeSet:
-    id: 1791115290187-82
-    author: marc (generated)
+    id: 001-schema-084
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: SERVER_ID
@@ -1248,8 +1303,8 @@ databaseChangeLog:
         referencedTableName: SERVER
         validate: true
 - changeSet:
-    id: 1791115290187-83
-    author: marc (generated)
+    id: 001-schema-085
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: INHERITS_FROM_ID
@@ -1263,8 +1318,8 @@ databaseChangeLog:
         referencedTableName: SERVER_GROUP
         validate: true
 - changeSet:
-    id: 1791115290187-84
-    author: marc (generated)
+    id: 001-schema-086
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: SERVER_GROUP_ID
@@ -1278,8 +1333,8 @@ databaseChangeLog:
         referencedTableName: SERVER_GROUP
         validate: true
 - changeSet:
-    id: 1791115290187-85
-    author: marc (generated)
+    id: 001-schema-087
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: SERVER_ID
@@ -1293,8 +1348,8 @@ databaseChangeLog:
         referencedTableName: SERVER
         validate: true
 - changeSet:
-    id: 1791115290187-86
-    author: marc (generated)
+    id: 001-schema-088
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: SERVER_USERS_ID
@@ -1308,8 +1363,8 @@ databaseChangeLog:
         referencedTableName: SERVER_USERS
         validate: true
 - changeSet:
-    id: 1791115290187-87
-    author: marc (generated)
+    id: 001-schema-089
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: PERMISSION_ID
@@ -1323,8 +1378,8 @@ databaseChangeLog:
         referencedTableName: PERMISSION
         validate: true
 - changeSet:
-    id: 1791115290187-88
-    author: marc (generated)
+    id: 001-schema-090
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: CHAT_ID
@@ -1338,8 +1393,8 @@ databaseChangeLog:
         referencedTableName: CHAT
         validate: true
 - changeSet:
-    id: 1791115290187-89
-    author: marc (generated)
+    id: 001-schema-091
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: LIMITED_TO_CHANNEL_ID
@@ -1353,8 +1408,8 @@ databaseChangeLog:
         referencedTableName: CHANNEL
         validate: true
 - changeSet:
-    id: 1791115290187-90
-    author: marc (generated)
+    id: 001-schema-092
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: SECTION_GROUP_ID
@@ -1368,8 +1423,8 @@ databaseChangeLog:
         referencedTableName: SECTION_GROUP
         validate: true
 - changeSet:
-    id: 1791115290187-91
-    author: marc (generated)
+    id: 001-schema-093
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: SERVER_USERS_ID
@@ -1383,8 +1438,23 @@ databaseChangeLog:
         referencedTableName: SERVER_USERS
         validate: true
 - changeSet:
-    id: 1791115290187-92
-    author: marc (generated)
+    id: 001-schema-094
+    author: marc
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: SERVER_ID
+        baseTableName: INVITE
+        constraintName: FKEQROACD8SVQHLN8HO259OWYSC
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: ID
+        referencedTableName: SERVER
+        validate: true
+- changeSet:
+    id: 001-schema-095
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: FILE_ID
@@ -1398,8 +1468,8 @@ databaseChangeLog:
         referencedTableName: FILE
         validate: true
 - changeSet:
-    id: 1791115290187-93
-    author: marc (generated)
+    id: 001-schema-096
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: ICON_ID
@@ -1413,8 +1483,8 @@ databaseChangeLog:
         referencedTableName: FILE
         validate: true
 - changeSet:
-    id: 1791115290187-94
-    author: marc (generated)
+    id: 001-schema-097
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: GROUPS_ID
@@ -1428,8 +1498,8 @@ databaseChangeLog:
         referencedTableName: SERVER_GROUP
         validate: true
 - changeSet:
-    id: 1791115290187-95
-    author: marc (generated)
+    id: 001-schema-098
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: CHANNEL_GROUP_ID
@@ -1443,8 +1513,8 @@ databaseChangeLog:
         referencedTableName: CHANNEL_GROUP
         validate: true
 - changeSet:
-    id: 1791115290187-96
-    author: marc (generated)
+    id: 001-schema-099
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: SERVER_ID
@@ -1458,8 +1528,8 @@ databaseChangeLog:
         referencedTableName: SERVER
         validate: true
 - changeSet:
-    id: 1791115290187-97
-    author: marc (generated)
+    id: 001-schema-100
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: PERMISSION_ID
@@ -1473,8 +1543,8 @@ databaseChangeLog:
         referencedTableName: PERMISSION
         validate: true
 - changeSet:
-    id: 1791115290187-98
-    author: marc (generated)
+    id: 001-schema-101
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: GROUPS_ID
@@ -1488,8 +1558,8 @@ databaseChangeLog:
         referencedTableName: SERVER_GROUP
         validate: true
 - changeSet:
-    id: 1791115290187-99
-    author: marc (generated)
+    id: 001-schema-102
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: SERVER_ID
@@ -1503,8 +1573,8 @@ databaseChangeLog:
         referencedTableName: SERVER
         validate: true
 - changeSet:
-    id: 1791115290187-100
-    author: marc (generated)
+    id: 001-schema-103
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: CHANNEL_GROUPS_ID
@@ -1518,8 +1588,8 @@ databaseChangeLog:
         referencedTableName: CHANNEL_GROUP
         validate: true
 - changeSet:
-    id: 1791115290187-101
-    author: marc (generated)
+    id: 001-schema-104
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: ICON_ID
@@ -1533,8 +1603,8 @@ databaseChangeLog:
         referencedTableName: FILE
         validate: true
 - changeSet:
-    id: 1791115290187-102
-    author: marc (generated)
+    id: 001-schema-105
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: SECTION_GROUPS_ID
@@ -1548,8 +1618,8 @@ databaseChangeLog:
         referencedTableName: SECTION_GROUP
         validate: true
 - changeSet:
-    id: 1791115290187-103
-    author: marc (generated)
+    id: 001-schema-106
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: CHAT_ID
@@ -1563,8 +1633,8 @@ databaseChangeLog:
         referencedTableName: CHAT
         validate: true
 - changeSet:
-    id: 1791115290187-104
-    author: marc (generated)
+    id: 001-schema-107
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: REPLIES_TO_ID
@@ -1578,8 +1648,8 @@ databaseChangeLog:
         referencedTableName: MESSAGE
         validate: true
 - changeSet:
-    id: 1791115290187-105
-    author: marc (generated)
+    id: 001-schema-108
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: PERMISSION_ID
@@ -1593,8 +1663,8 @@ databaseChangeLog:
         referencedTableName: PERMISSION
         validate: true
 - changeSet:
-    id: 1791115290187-106
-    author: marc (generated)
+    id: 001-schema-109
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: SERVER_ID
@@ -1608,8 +1678,8 @@ databaseChangeLog:
         referencedTableName: SERVER
         validate: true
 - changeSet:
-    id: 1791115290187-107
-    author: marc (generated)
+    id: 001-schema-110
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: PERMISSIONS_ID
@@ -1623,8 +1693,8 @@ databaseChangeLog:
         referencedTableName: PERMISSION
         validate: true
 - changeSet:
-    id: 1791115290187-108
-    author: marc (generated)
+    id: 001-schema-111
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: GROUPS_ID
@@ -1638,8 +1708,8 @@ databaseChangeLog:
         referencedTableName: SERVER_GROUP
         validate: true
 - changeSet:
-    id: 1791115290187-109
-    author: marc (generated)
+    id: 001-schema-112
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: SERVER_USERS_ID
@@ -1653,8 +1723,8 @@ databaseChangeLog:
         referencedTableName: SERVER_USERS
         validate: true
 - changeSet:
-    id: 1791115290187-110
-    author: marc (generated)
+    id: 001-schema-113
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: CHANNEL_ID
@@ -1668,8 +1738,8 @@ databaseChangeLog:
         referencedTableName: CHANNEL
         validate: true
 - changeSet:
-    id: 1791115290187-111
-    author: marc (generated)
+    id: 001-schema-114
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: INVITE_CODE
@@ -1683,8 +1753,8 @@ databaseChangeLog:
         referencedTableName: INVITE
         validate: true
 - changeSet:
-    id: 1791115290187-112
-    author: marc (generated)
+    id: 001-schema-115
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: INVITES_CODE
@@ -1698,8 +1768,8 @@ databaseChangeLog:
         referencedTableName: INVITE
         validate: true
 - changeSet:
-    id: 1791115290187-113
-    author: marc (generated)
+    id: 001-schema-116
+    author: marc
     changes:
     - addForeignKeyConstraint:
         baseColumnNames: USER_ID
@@ -1712,4 +1782,56 @@ databaseChangeLog:
         referencedColumnNames: ID
         referencedTableName: SERVER_USERS
         validate: true
-
+- changeSet:
+    id: 001-schema-user-ban-table
+    author: marc
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: PK_USER_BAN
+            name: ID
+            type: UUID
+        - column:
+            name: REASON
+            type: VARCHAR(1024)
+        - column:
+            constraints:
+              nullable: false
+            name: BANNED_AT
+            type: TIMESTAMP WITH TIME ZONE
+        - column:
+            name: BANNED_BY_ID
+            type: VARCHAR(255)
+        tableName: USER_BAN
+- changeSet:
+    id: 001-schema-user-ban-unique
+    author: marc
+    changes:
+    - addUniqueConstraint:
+        columnNames: BAN_ID
+        constraintName: UK_SERVER_USERS_BAN
+        tableName: SERVER_USERS
+- changeSet:
+    id: 001-schema-user-ban-fk-user
+    author: marc
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: BAN_ID
+        baseTableName: SERVER_USERS
+        constraintName: FK_SERVER_USERS_BAN
+        referencedColumnNames: ID
+        referencedTableName: USER_BAN
+- changeSet:
+    id: 001-schema-user-ban-fk-banned-by
+    author: marc
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: BANNED_BY_ID
+        baseTableName: USER_BAN
+        constraintName: FK_USER_BAN_BANNED_BY
+        referencedColumnNames: ID
+        referencedTableName: SERVER_USERS

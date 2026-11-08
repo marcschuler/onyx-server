@@ -4,6 +4,8 @@ import de.marcschuler.onyxserver.data.file.File;
 import de.marcschuler.onyxserver.data.file.Hash;
 import de.marcschuler.onyxserver.data.file.PreviewFormat;
 import de.marcschuler.onyxserver.error.FilePreviewException;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
@@ -35,7 +37,9 @@ public class StorageService {
             MediaType.IMAGE_JPEG, MediaType.IMAGE_PNG
     );
 
+    @NotNull
     private final Path basePath;
+    @Nullable
     private final Path cacheBasePath;
 
     public boolean isImageType(MediaType mediaType) {

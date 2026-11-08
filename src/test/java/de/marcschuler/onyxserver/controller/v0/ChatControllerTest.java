@@ -9,6 +9,7 @@ import de.marcschuler.onyxserver.dto.data.message.MessageCreationDTO;
 import de.marcschuler.onyxserver.repository.ChannelRepository;
 import de.marcschuler.onyxserver.service.ChannelService;
 import de.marcschuler.onyxserver.service.websocket.WebSocketConnectionService;
+import de.marcschuler.onyxserver.webclient.WebClient;
 import de.marcschuler.onyxserver.webclient.messages.chat.ChatMessageEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,8 +27,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @OnyxTest
@@ -85,6 +85,9 @@ class ChatControllerTest {
         var creationDTO = new MessageCreationDTO();
         creationDTO.setContent(List.of(markdown));
 
+        var client = mock(WebClient.class);
+        when(webSocketConnectionService.clients()).thenReturn(List.of(client));
+
         var message = restClient.post()
                 .uri("/v0/chat/{id}/message", TestService.CHAT_LOBBY_ID)
                 .body(creationDTO)
@@ -92,7 +95,7 @@ class ChatControllerTest {
                 .body(String.class);
         assertNotNull(message);
 
-        verify(webSocketConnectionService).send(isA(List.class), isA(ChatMessageEvent.class));
+        verify(client).send(isA(ChatMessageEvent.class));
     }
 
     @Test
@@ -111,7 +114,7 @@ class ChatControllerTest {
                         .body(String.class)
         );
 
-        verify(webSocketConnectionService, never()).send(isA(List.class), isA(ChatMessageEvent.class));
+        verify(webSocketConnectionService, never()).clients();
     }
 
     @Test
@@ -127,6 +130,9 @@ class ChatControllerTest {
         var creationDTO = new MessageCreationDTO();
         creationDTO.setContent(List.of(markdown));
 
+        var client = mock(WebClient.class);
+        when(webSocketConnectionService.clients()).thenReturn(List.of(client));
+
         var message = restClient.post()
                 .uri("/v0/chat/{id}/message", channel.getChat().getId())
                 .body(creationDTO)
@@ -135,7 +141,7 @@ class ChatControllerTest {
         assertNotNull(message);
         assertNotNull(message.getId());
 
-        verify(webSocketConnectionService).send(isA(List.class), isA(ChatMessageEvent.class));
+        verify(client).send(isA(ChatMessageEvent.class));
 
         assertFalse(containsMessage(channel.getChat().getId(), message.getId()));
     }

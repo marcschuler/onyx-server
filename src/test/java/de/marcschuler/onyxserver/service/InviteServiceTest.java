@@ -2,7 +2,6 @@ package de.marcschuler.onyxserver.service;
 
 import de.marcschuler.onyxserver.OnyxTest;
 import de.marcschuler.onyxserver.TestService;
-import de.marcschuler.onyxserver.data.ClientState;
 import de.marcschuler.onyxserver.data.Server;
 import de.marcschuler.onyxserver.dto.data.InviteDTO;
 import de.marcschuler.onyxserver.dto.data.SimpleGroupDTO;
@@ -87,7 +86,7 @@ class InviteServiceTest {
     @Test
     void enterBannedUser() {
         var user = testService.userAdmin();
-        user.setState(ClientState.BANNED);
+        user.setBan(TestService.ban("test"));
         userRepository.save(user);
 
         inviteService.create(validDto("ban-test"), server);
@@ -120,7 +119,7 @@ class InviteServiceTest {
     @Test
     void enterActivatesPendingUser() {
         var user = testService.userAdmin();
-        user.setState(ClientState.PENDING_ACCESS);
+        user.setPendingAccess(true);
         userRepository.save(user);
 
         inviteService.create(validDto("activate"), server);
@@ -129,7 +128,7 @@ class InviteServiceTest {
         inviteService.enterInviteCode(pending, "activate");
 
         var activated = userRepository.findById(TestService.USER_ADMIN_ID).orElseThrow();
-        assertEquals(ClientState.ACTIVE, activated.getState());
+        assertFalse(activated.isPendingAccess());
     }
 
     @Test

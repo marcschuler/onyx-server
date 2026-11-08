@@ -1,6 +1,5 @@
 package de.marcschuler.onyxserver.service;
 
-import de.marcschuler.onyxserver.data.ClientState;
 import de.marcschuler.onyxserver.data.Invite;
 import de.marcschuler.onyxserver.data.Server;
 import de.marcschuler.onyxserver.data.User;
@@ -51,7 +50,7 @@ public class InviteService {
 
     public synchronized Invite enterInviteCode(User user, String code) {
         log.info("Entering invite code for user {}", user);
-        if (user.getState() == ClientState.BANNED)
+        if (user.isBanned())
             throw new InviteException("You are banned from this server and cannot use invite codes.");
 
         var now = LocalDateTime.now();
@@ -70,9 +69,9 @@ public class InviteService {
         // only count it if the invite was used this time
         var inviteUsed = false;
 
-        if (user.getState() == ClientState.PENDING_ACCESS) {
+        if (user.isPendingAccess()) {
             log.info("User is activated");
-            user.setState(ClientState.ACTIVE);
+            user.setPendingAccess(false);
             inviteUsed = true;
         }
 

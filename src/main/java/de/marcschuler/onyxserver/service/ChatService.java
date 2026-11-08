@@ -90,9 +90,9 @@ public class ChatService {
         var messageDto = messageMapper.mapToDTO(message);
         if (temporary)
             messageDto.setTemporary(true);
-        var clients = this.webSocketConnectionService.clientsInteractable();
-        this.webSocketConnectionService.send(clients,
-                new ChatMessageEvent(chat.getId(), messageDto));
+        var chatMessageEvent = new ChatMessageEvent(chat.getId(), messageDto);
+        this.webSocketConnectionService.clients()
+                .forEach(client -> client.send(chatMessageEvent));
         return message;
     }
 

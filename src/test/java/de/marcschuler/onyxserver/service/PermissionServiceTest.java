@@ -2,7 +2,6 @@ package de.marcschuler.onyxserver.service;
 
 import de.marcschuler.onyxserver.OnyxTest;
 import de.marcschuler.onyxserver.TestService;
-import de.marcschuler.onyxserver.data.ClientState;
 import de.marcschuler.onyxserver.data.Group;
 import de.marcschuler.onyxserver.data.User;
 import de.marcschuler.onyxserver.data.permission.Permission;
@@ -33,8 +32,7 @@ class PermissionServiceTest {
     @Test
     void testNoPermission() {
         assertThrows(PermissionDeniedException.class, () -> {
-            var client = new WebClient(null);
-            client.setUser(new User());
+            var client = new WebClient(null, null, new User());
             permissionService.checkClientAccess(client, null, null, PermissionType.CHANNEL);
         });
     }
@@ -42,8 +40,7 @@ class PermissionServiceTest {
     @Test
     void testNoPermissionInChannel() {
         assertThrows(PermissionDeniedException.class, () -> {
-            var client = new WebClient(null);
-            client.setUser(new User());
+            var client = new WebClient(null, null, new User());
             permissionService.checkClientAccess(client, testService.sectionLobby(), testService.channelLobby(), PermissionType.CHANNEL);
         });
     }
@@ -51,24 +48,22 @@ class PermissionServiceTest {
     @Test
     void testAdminGroupContext() {
         var result = permissionService.buildGroupContext(testService.userAdmin(), null, null);
-        assertEquals(1,result.size());
+        assertEquals(1, result.size());
         assertEquals(testService.groupAdmin().getId(), result.iterator().next().getId());
     }
 
     @Test
     void testAdminAccess() {
-        var client = new WebClient(null);
-        client.setUser(testService.userAdmin());
+        var client = new WebClient(null, null, testService.userAdmin());
         permissionService.checkClientAccess(client, null, null, PermissionType.CHANNEL_DELETE);
     }
 
     @Test
     void testBannedUserDenied() {
         var user = testService.userAdmin();
-        user.setState(ClientState.BANNED);
+        user.setBan(TestService.ban("test"));
 
-        var client = new WebClient(null);
-        client.setUser(user);
+        var client = new WebClient(null, null, user);
 
         assertThrows(PermissionDeniedException.class, () ->
                 permissionService.checkClientAccess(client, null, null, PermissionType.CHANNEL));
@@ -77,10 +72,9 @@ class PermissionServiceTest {
     @Test
     void testPendingUserDenied() {
         var user = testService.userAdmin();
-        user.setState(ClientState.PENDING_ACCESS);
+        user.setPendingAccess(true);
 
-        var client = new WebClient(null);
-        client.setUser(user);
+        var client = new WebClient(null, null, user);
 
         assertThrows(PermissionDeniedException.class, () ->
                 permissionService.checkClientAccess(client, null, null, PermissionType.CHANNEL));
@@ -89,7 +83,7 @@ class PermissionServiceTest {
     @Test
     void testInvertedPermissionDenies() {
         var user = new User();
-        user.setState(ClientState.ACTIVE);
+        user.setPendingAccess(false);
 
         var group = new Group();
         group.setPriority(0);
@@ -107,7 +101,7 @@ class PermissionServiceTest {
     @Test
     void testLimitedToSection() {
         var user = new User();
-        user.setState(ClientState.ACTIVE);
+        user.setPendingAccess(false);
 
         var group = new Group();
         group.setPriority(0);
@@ -130,7 +124,7 @@ class PermissionServiceTest {
     @Test
     void testPriorityOrdering() {
         var user = new User();
-        user.setState(ClientState.ACTIVE);
+        user.setPendingAccess(false);
 
         var denyGroup = new Group();
         denyGroup.setPriority(0);

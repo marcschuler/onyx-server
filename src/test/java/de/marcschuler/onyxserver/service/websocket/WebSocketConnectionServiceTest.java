@@ -1,6 +1,7 @@
 package de.marcschuler.onyxserver.service.websocket;
 
 import com.nimbusds.jose.JOSEException;
+import de.marcschuler.onyxserver.IntegrationHelper;
 import de.marcschuler.onyxserver.OnyxTest;
 import de.marcschuler.onyxserver.WebSocketMock;
 import de.marcschuler.onyxserver.dto.SignedContent;
@@ -66,14 +67,11 @@ class WebSocketConnectionServiceTest {
         assertEquals(AuthChallengeRequest.class, authChallengeRequest.getClass(), "Got a challenge");
         assertNotNull(authChallengeRequest.challenge(), "Challenge exists");
 
-        assertEquals(1, webSocketConnectionService.clients().size(), "client found");
-        assertEquals(0, webSocketConnectionService.clientsInteractable().size(), "client not interactab.e");
-        var me = webSocketConnectionService.clients().getFirst();
-        assertEquals(WebClientState.NOT_AUTHORIZED, me.getState(), "client not authorized");
+        assertEquals(0, webSocketConnectionService.clients().size(), "client not authorized");
 
         //Authenticate
         var authChallengeResponse = new AuthChallengeResponse(key.toPublicJWK().toJSONObject(),
-                cryptoService.signContent(authChallengeRequest.challenge(), key),
+                cryptoService.signContent(IntegrationHelper.proof(authChallengeRequest), key),
                 "marc",null
         );
         webSocketMock.sendMessage(authChallengeResponse);
@@ -85,8 +83,7 @@ class WebSocketConnectionServiceTest {
         assertEquals(cryptoService.generateKeyId(key), authService.verifyJWT(authSuccessMessage.jwt()), "jwt is valid");
 
         assertEquals(1, webSocketConnectionService.clients().size(), "client found");
-        assertEquals(1, webSocketConnectionService.clientsInteractable().size(), "client interactable");
-        me = webSocketConnectionService.clients().getFirst();
+        var me = webSocketConnectionService.clients().getFirst();
         assertEquals("marc", me.getUser().getUsername(), "user is right");
         assertEquals(cryptoService.generateKeyId(key), me.getUser().getId(), "is is derived from key");
         assertEquals(WebClientState.LOGGED_IN, me.getState(), "state is logged in");
@@ -103,10 +100,7 @@ class WebSocketConnectionServiceTest {
         var key = cryptoService.generateKeyPair();
         webSocketMock.recv();
 
-        assertEquals(1, webSocketConnectionService.clients().size(), "client found");
-        assertEquals(0, webSocketConnectionService.clientsInteractable().size(), "client not interactab.e");
-        var me = webSocketConnectionService.clients().getFirst();
-        assertEquals(WebClientState.NOT_AUTHORIZED, me.getState(), "client not authorized");
+        assertEquals(0, webSocketConnectionService.clients().size(), "client not authorized");
 
         //Authenticate
         var authChallengeResponse = new AuthChallengeResponse(key.toPublicJWK().toJSONObject(),

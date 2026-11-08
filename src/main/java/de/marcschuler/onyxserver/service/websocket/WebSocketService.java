@@ -29,13 +29,13 @@ public class WebSocketService {
     }
 
     public List<WebClient> getClientsInChannel(UUID id) {
-        return webSocketConnectionService.clientsInteractable()
+        return webSocketConnectionService.clients()
                 .stream().filter(client -> client.getChannel() != null && client.getChannel().getId().equals(id))
                 .toList();
     }
 
     public List<WebClient> getClientsInNoChannel() {
-        return webSocketConnectionService.clientsInteractable()
+        return webSocketConnectionService.clients()
                 .stream().filter(client -> client.getChannel() == null)
                 .toList();
     }
@@ -69,7 +69,7 @@ public class WebSocketService {
     public void updateServerTree() {
         for (var client : webSocketConnectionService.clients()) {
             try {
-                webSocketConnectionService.send(client, createServerTreeChangeEvent(client));
+                client.send(createServerTreeChangeEvent(client));
             } catch (Exception e) {
                 log.error("Could not send server tree update", e);
             }

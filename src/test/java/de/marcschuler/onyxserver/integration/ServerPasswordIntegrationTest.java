@@ -67,7 +67,7 @@ public class ServerPasswordIntegrationTest {
         mock.connect();
         var authChallengeRequest = (AuthChallengeRequest) mock.recv();
         var authChallengeResponse = new AuthChallengeResponse(keyPair.toPublicJWK().toJSONObject(),
-                cryptoService.signContent(authChallengeRequest.challenge(), keyPair),
+                cryptoService.signContent(IntegrationHelper.proof(authChallengeRequest), keyPair),
                 "user", "wrong");
         mock.sendMessage(authChallengeResponse);
 

@@ -37,7 +37,7 @@ public class PeerEventHandler {
         if (!inSameChannel(clientFromChannel, clientToChannel)) {
             log.warn("Client tried to connect without being in the same channel {}<->{}", clientFromChannel, clientToChannel);
         }
-        webSocketConnectionService.send(clientTo, forwardEvent);
+        clientTo.send(forwardEvent);
     }
 
     @EventListener
@@ -52,7 +52,7 @@ public class PeerEventHandler {
         if (!inSameChannel(clientFromChannel, clientToChannel)) {
             log.warn("Client tried to answer without being in the same channel {}<->{}", clientFromChannel, clientToChannel);
         }
-        webSocketConnectionService.send(clientTo, forwardEvent);
+        clientTo.send(forwardEvent);
     }
 
     private boolean inSameChannel(Channel c1, Channel c2) {

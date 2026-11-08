@@ -1,6 +1,6 @@
 package de.marcschuler.onyxserver.config;
 
-import de.marcschuler.onyxserver.data.ClientState;
+import de.marcschuler.onyxserver.TestService;
 import de.marcschuler.onyxserver.data.User;
 import de.marcschuler.onyxserver.service.AuthService;
 import de.marcschuler.onyxserver.service.UserService;
@@ -79,7 +79,7 @@ class JwtAuthenticationFilterTest {
         when(authService.verifyJWT("valid-token")).thenReturn("user-id");
         var user = new User();
         user.setId("user-id");
-        user.setState(ClientState.ACTIVE);
+        user.setPendingAccess(false);
         when(userService.findById("user-id")).thenReturn(Optional.of(user));
 
         filter.doFilterInternal(request, response, filterChain);
@@ -97,7 +97,7 @@ class JwtAuthenticationFilterTest {
         when(authService.verifyJWT("banned-token")).thenReturn("banned-id");
         var user = new User();
         user.setId("banned-id");
-        user.setState(ClientState.BANNED);
+        user.setBan(TestService.ban("test"));
         when(userService.findById("banned-id")).thenReturn(Optional.of(user));
 
         assertThrows(ResponseStatusException.class, () ->

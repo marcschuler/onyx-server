@@ -6,6 +6,7 @@ import com.nimbusds.jose.crypto.Ed25519Verifier;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.jwk.gen.OctetKeyPairGenerator;
+import de.marcschuler.onyxserver.dto.Challenge;
 import de.marcschuler.onyxserver.dto.SignedContent;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -19,6 +20,7 @@ import tools.jackson.databind.ObjectMapper;
 import java.security.SecureRandom;
 import java.security.SignatureException;
 import java.text.ParseException;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.Map;
 
@@ -55,10 +57,10 @@ public class CryptoService {
      *
      * @return
      */
-    public String generateChallenge() {
+    public Challenge generateChallenge() {
         var bytes = new byte[128];
         secureRandom.nextBytes(bytes);
-        return Base64.getEncoder().encodeToString(bytes);
+        return new Challenge(Instant.now(),Base64.getEncoder().encodeToString(bytes));
     }
 
     /**

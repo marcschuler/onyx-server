@@ -4,6 +4,7 @@ public enum KickReason {
     ALREADY_CONNECTED,
     UNAUTHORIZED_REQUEST,
     INTERNAL_ERROR,
+    SERVER_SHUTDOWN,
     BANNED,
     OTHER
 }

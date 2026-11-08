@@ -1,7 +1,6 @@
 package de.marcschuler.onyxserver.config;
 
 import com.nimbusds.jose.JOSEException;
-import de.marcschuler.onyxserver.data.ClientState;
 import de.marcschuler.onyxserver.data.User;
 import de.marcschuler.onyxserver.service.AuthService;
 import de.marcschuler.onyxserver.service.UserService;
@@ -77,7 +76,7 @@ public class SecurityConfig {
 
             var user = userService.findById(userId).orElseThrow();
 
-            if (user.getState() == ClientState.BANNED)
+            if (user.isBanned())
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN);
 
             Authentication auth =

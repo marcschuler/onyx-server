@@ -2,6 +2,7 @@ package de.marcschuler.onyxserver;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.OctetKeyPair;
+import de.marcschuler.onyxserver.dto.AuthChallengeProof;
 import de.marcschuler.onyxserver.service.AuthService;
 import de.marcschuler.onyxserver.service.CryptoService;
 import de.marcschuler.onyxserver.service.websocket.WebSocketConnectionService;
@@ -59,13 +60,25 @@ public class IntegrationHelper {
         return quickConnect(keyPair, username, port, null);
     }
 
+    /**
+     * The origin test clients claim to be connected to. Must match onyx.auth.server
+     */
+    public static final String TEST_ORIGIN = "http://localhost:8080";
+
+    /**
+     * Builds the proof a client signs to answer the given challenge request
+     */
+    public static AuthChallengeProof proof(AuthChallengeRequest request) {
+        return new AuthChallengeProof(AuthChallengeProof.TYPE, request.challenge().challenge(), TEST_ORIGIN);
+    }
+
     public WebSocketMock quickConnect(OctetKeyPair keyPair, String username, int port, String serverPassword) throws ExecutionException, InterruptedException, TimeoutException, JOSEException {
         var mock = new WebSocketMock(objectMapper, keyPair, port);
         mock.connect();
 
         var authChallengeRequest = (AuthChallengeRequest) mock.recv();
         var authChallengeResponse = new AuthChallengeResponse(keyPair.toPublicJWK().toJSONObject(),
-                cryptoService.signContent(authChallengeRequest.challenge(),keyPair),
+                cryptoService.signContent(proof(authChallengeRequest),keyPair),
                 username,serverPassword
                 );
         mock.sendMessage(authChallengeResponse);

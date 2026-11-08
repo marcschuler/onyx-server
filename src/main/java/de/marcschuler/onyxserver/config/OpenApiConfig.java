@@ -20,6 +20,7 @@ import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 @Configuration
@@ -83,12 +84,16 @@ public class OpenApiConfig {
                             .map(Class::getSimpleName)
                             .sorted(String::compareTo).toList());
 
-            // add all DTO classes, including inheritance
-            new Reflections("de.marcschuler.onyxserver.dto")
-                    .getSubTypesOf(Object.class).forEach(c -> {
-                        var schemas = ModelConverters.getInstance().readAll(c);
-                        schemas.forEach(openApi.getComponents()::addSchemas);
-                    });
+            // add all DTO classes, including inheritance. Records have to be scanned separately as
+            // Reflections does not index direct subtypes of Object, and records extend Record
+            var dtoReflections = new Reflections("de.marcschuler.onyxserver.dto");
+            var dtoClasses = new HashSet<Class<?>>();
+            dtoClasses.addAll(dtoReflections.getSubTypesOf(Object.class));
+            dtoClasses.addAll(dtoReflections.getSubTypesOf(Record.class));
+            dtoClasses.forEach(c -> {
+                var schemas = ModelConverters.getInstance().readAll(c);
+                schemas.forEach(openApi.getComponents()::addSchemas);
+            });
 
             createSchemaFromEnum(openApi, PreviewFormat.class);
 

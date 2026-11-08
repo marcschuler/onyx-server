@@ -5,7 +5,6 @@ import de.marcschuler.onyxserver.data.permission.PermissionType;
 import de.marcschuler.onyxserver.error.webclient.PermissionDeniedException;
 import de.marcschuler.onyxserver.service.ChannelService;
 import de.marcschuler.onyxserver.service.PermissionService;
-import de.marcschuler.onyxserver.service.websocket.WebSocketConnectionService;
 import de.marcschuler.onyxserver.webclient.ClientMessage;
 import de.marcschuler.onyxserver.webclient.messages.client.ClientChannelJoinRequest;
 import de.marcschuler.onyxserver.webclient.messages.client.ClientChannelLeaveRequest;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class ClientHandler {
 
-    private final WebSocketConnectionService webSocketConnectionService;
     private final ChannelService channelService;
     private final PermissionService permissionService;
 
@@ -34,14 +32,14 @@ public class ClientHandler {
 
         permissionService.checkClientAccess(event.client(), wantedChannel, PermissionType.CHANNEL_JOIN);
 
-        webSocketConnectionService.joinChannel(event.client(), wantedChannel);
+        event.client().joinChannel(wantedChannel);
     }
 
     @EventListener
     @Transactional
     public void onChannelLeaveRequest(ClientMessage<ClientChannelLeaveRequest> event) {
         log.info("User {} wants to leave the channel", event.client().getUser().getUsername());
-        webSocketConnectionService.leaveChannel(event.client());
+        event.client().leaveChannel();
     }
 
 }

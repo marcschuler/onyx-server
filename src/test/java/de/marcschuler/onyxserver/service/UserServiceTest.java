@@ -2,7 +2,6 @@ package de.marcschuler.onyxserver.service;
 
 import de.marcschuler.onyxserver.OnyxTest;
 import de.marcschuler.onyxserver.TestService;
-import de.marcschuler.onyxserver.data.ClientState;
 import de.marcschuler.onyxserver.data.Group;
 import de.marcschuler.onyxserver.service.websocket.WebSocketConnectionService;
 import de.marcschuler.onyxserver.webclient.messages.client.ClientChangeEvent;
@@ -16,7 +15,6 @@ import java.io.ByteArrayInputStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @OnyxTest
@@ -52,10 +50,11 @@ class UserServiceTest {
     void testBanOfflineUser() {
         var user = testService.userUser();
 
-        userService.ban(user, "Test ban");
+        userService.ban(user, "Test ban", null);
 
-        assertEquals(ClientState.BANNED, user.getState());
-        verify(webSocketConnectionService, never()).kickClient(any(), any(), any());
+        assertTrue(user.isBanned());
+        assertEquals("Test ban", user.getBan().getReason());
+        verify(webSocketConnectionService).clientFromKeyId(user.getId());
     }
 
     @Test
@@ -79,7 +78,7 @@ class UserServiceTest {
 
         assertNotNull(user.getId());
         assertEquals("newcomer", user.getUsername());
-        assertEquals(ClientState.ACTIVE, user.getState());
+        assertFalse(user.isPendingAccess());
         assertFalse(user.getGroups().isEmpty());
         assertTrue(user.getGroups().stream().anyMatch(Group::isDefaultForNewUsers));
     }

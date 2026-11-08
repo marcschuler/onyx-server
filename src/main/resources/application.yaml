@@ -15,7 +15,11 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     show-sql: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
+  liquibase:
+    change-log: classpath:db/changelog/liquibase.yaml
+    # default-data creates the default server on the first start
+    contexts: default-data
   mvc:
     problemdetails:
       enabled: true
@@ -32,11 +36,10 @@ springdoc:
       enabled: true
 
 onyx:
-  init:
-    startup-wizzard: true
   auth:
-    challenge:
-      expiration: 1m
+    # comma-separated list of hostnames clients may sign challenges for
+    server: http://localhost:8080
+    expire-login: 1m
     jwt:
       expiration: 5m
       refresh: 4m
@@ -49,18 +52,20 @@ onyx:
     integration-steam:
       files: ${onyx.storage.path}/cache/steam
       cache: ${onyx.storage.path}/cache/files
+  game-integration:
+    steam:
+      scheduler: 0 * * * * *
 
 webrtc:
   config:
     ice:
       - urls: stun:stun.l.google.com:19302
       - urls: stun:stun.l.google.com:5349
-      - urls: stun:stun1.l.google.com:3478
-      - urls: stun:stun1.l.google.com:5349
-      - urls: stun:stun2.l.google.com:19302
-      - urls: stun:stun2.l.google.com:5349
-      - urls: stun:stun3.l.google.com:3478
-      - urls: stun:stun3.l.google.com:5349
-      - urls: stun:stun4.l.google.com:19302
-      - urls: stun:stun4.l.google.com:5349
-      # - urls: turn:localhost:3478
+      #- urls: stun:stun1.l.google.com:3478
+      #- urls: stun:stun1.l.google.com:5349
+      #- urls: stun:stun2.l.google.com:19302
+      #- urls: stun:stun2.l.google.com:5349
+      #- urls: stun:stun3.l.google.com:3478
+      #- urls: stun:stun3.l.google.com:5349
+      #- urls: stun:stun4.l.google.com:19302
+      #- urls: stun:stun4.l.google.com:5349

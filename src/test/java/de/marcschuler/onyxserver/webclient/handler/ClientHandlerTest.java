@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,8 +41,7 @@ class ClientHandlerTest {
     private ClientHandler clientHandler;
 
     private WebClient client(User user) {
-        var client = new WebClient(mock(WebSocketSession.class));
-        client.setUser(user);
+        var client = new WebClient(webSocketConnectionService, mock(WebSocketSession.class), user);
         client.setState(WebClientState.LOGGED_IN);
         return client;
     }
@@ -63,7 +62,7 @@ class ClientHandlerTest {
         clientHandler.onChannelJoinRequest(message);
 
         verify(permissionService).checkClientAccess(client, channel, PermissionType.CHANNEL_JOIN);
-        verify(webSocketConnectionService).joinChannel(client, channel);
+        assertEquals(channel, client.getChannel());
     }
 
     @Test
@@ -84,11 +83,14 @@ class ClientHandlerTest {
     void onChannelLeaveRequest_leavesChannel() {
         var user = new User();
         var client = client(user);
+        var channel = new Channel();
+        channel.setId(UUID.randomUUID());
+        client.setChannel(channel);
         var request = new ClientChannelLeaveRequest();
         var message = new ClientMessage<>(request, client, LocalDateTime.now());
 
         clientHandler.onChannelLeaveRequest(message);
 
-        verify(webSocketConnectionService).leaveChannel(client);
+        assertNull(client.getChannel());
     }
 }

@@ -1,32 +1,82 @@
 package de.marcschuler.onyxserver.service.gameintegration;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.client.RestClient;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import de.marcschuler.onyxserver.service.websocket.WebSocketService;
+import de.marcschuler.onyxserver.webclient.WebClient;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+@Component
+@RequiredArgsConstructor
+@ConditionalOnProperty(name = "onyx.game-integration.steam.api-key")
+@Slf4j
 public class SteamGameIntegration implements GameIntegration<String> {
 
-    private RestClient restClient;
+    private final WebSocketService webSocketService;
+    private final SteamWebClient steamWebClient;
 
-    private final Map<Integer, String> gameNames = new HashMap<>();
 
-    @Value("${onyx.integration.steam.key}")
-    private String steamKey;
+    private final LoadingCache<Long, Game> gameCache = CacheBuilder.newBuilder()
+            .maximumSize(1000)
+            .expireAfterAccess(7, TimeUnit.DAYS)
+            .build(new CacheLoader<>() {
+                @Override
+                public Game load(@NonNull Long appId) throws Exception {
+                    return getGameData(appId);
+                }
+            });
 
     @Override
-    public Optional<ClientCurrentGame> getCurrentlyPlaying(String id) {
-        return Optional.empty();
+    public void updateClients(List<WebClient> clients) {
+        var ids = clients.stream()
+                .map(client -> client.getIntegration().getSteamId64())
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+
+        var games = updateGameList(ids);
+        log.debug("Game list is {}", games);
+        clients.forEach(client -> {
+            var steamId = client.getIntegration().getSteamId64();
+            var game = Optional.ofNullable(steamId)
+                    .map(games::get)
+                    .orElse(null);
+            client.setGame(game);
+        });
     }
 
-    @Override
-    public void updateGameList(List<String> ids) {
-        //TODO
+    /**
+     *
+     * @param ids a list of steamid64
+     * @return a Map of SteamID64 to the currently played game
+     */
+    public Map<SteamID64, Game> updateGameList(List<SteamID64> ids) {
+        var response = this.steamWebClient.steamGetPlayerSummariesv0002(ids);
+        return response.response().players().stream()
+                .filter(p -> p.gameId() != null)
+                .map(p -> {
+                    try {
+                        var game = gameCache.get(p.gameId());
+                        return Map.entry(SteamID64.fromLong(Long.parseLong(p.steamid())), game);
+                    } catch (ExecutionException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
 
@@ -35,53 +85,11 @@ public class SteamGameIntegration implements GameIntegration<String> {
         return 0;
     }
 
-    private SteamPlayerSummariesResponse steamGetPlayerSummariesv0002(List<String> ids) {
-        var idArray = ids.stream().collect(Collectors.joining(","));
-        return this.restClient.get().uri(u -> u.path("ISteamUser/GetPlayerSummaries/v2/")
-                        .queryParam("key", steamKey)
-                        .queryParam("steamids", idArray).build())
-                .retrieve()
-                .body(SteamPlayerSummariesResponse.class);
+    public Game getGameData(long appId) throws IOException {
+        var gameData = steamWebClient.steamAppDetails(appId);
+        var icon = steamWebClient.downloadGameIcon(steamWebClient.getSteamIconUrl(appId, gameData.imageIconUrl()));
+
+        return new Game(String.valueOf(appId), gameData.name(), "", icon);
     }
 
-    public boolean isSteamID64(String id) {
-        if (id == null || id.isBlank())
-            return false;
-        if (id.length() != 17)
-            return false;
-        if (!id.startsWith("7656119"))
-            return false;
-        try {
-            Long.parseLong(id);
-        } catch (NumberFormatException e) {
-            return false;
-        }
-        return true;
-    }
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public record SteamPlayerSummariesResponse(
-            Response response
-    ) {
-
-        @JsonIgnoreProperties(ignoreUnknown = true)
-        public record Response(
-                List<Player> players
-        ) {
-        }
-
-        @JsonIgnoreProperties(ignoreUnknown = true)
-        public record Player(
-                String steamid,
-                int communityvisibilitystate,
-                int profilestate,
-                String personaname,
-                long lastlogoff,
-                String profileurl,
-                String avatar,
-                String avatarmedium,
-                String avatarfull
-        ) {
-        }
-    }
 }

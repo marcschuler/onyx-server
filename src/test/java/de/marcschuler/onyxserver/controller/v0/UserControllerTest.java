@@ -2,7 +2,6 @@ package de.marcschuler.onyxserver.controller.v0;
 
 import de.marcschuler.onyxserver.OnyxTest;
 import de.marcschuler.onyxserver.TestService;
-import de.marcschuler.onyxserver.data.ClientState;
 import de.marcschuler.onyxserver.dto.InviteResponseDto;
 import de.marcschuler.onyxserver.dto.KickRequestDTO;
 import de.marcschuler.onyxserver.dto.data.*;
@@ -81,14 +80,15 @@ class UserControllerTest {
                 .retrieve()
                 .body(UserExtendedDTO.class);
         assertNotNull(banned);
-        assertEquals(ClientState.BANNED, banned.getState());
+        assertNotNull(banned.getBan(), "user is banned");
+        assertNotNull(banned.getBan().getBannedBy(), "ban issued by admin");
 
         var unbanned = adminClient.put()
                 .uri("/v0/user/{id}/state/unban", TestService.USER_USER_ID)
                 .retrieve()
                 .body(UserExtendedDTO.class);
         assertNotNull(unbanned);
-        assertEquals(ClientState.ACTIVE, unbanned.getState());
+        assertNull(unbanned.getBan(), "user is unbanned");
     }
 
     @Test
@@ -177,13 +177,13 @@ class UserControllerTest {
                 .findFirst()
                 .orElseThrow();
 
-        if (user.getState() != ClientState.ACTIVE) {
+        if (user.isPendingAccess()) {
             var activated = adminClient.put()
                     .uri("/v0/user/{id}/state/active", TestService.USER_USER_ID)
                     .retrieve()
                     .body(UserExtendedDTO.class);
             assertNotNull(activated);
-            assertEquals(ClientState.ACTIVE, activated.getState());
+            assertFalse(activated.isPendingAccess());
         }
     }
 

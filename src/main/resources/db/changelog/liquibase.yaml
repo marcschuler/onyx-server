@@ -1,3 +1,7 @@
 databaseChangeLog:
-  #- include:
-  #    file: db/changelog/001_v0.0.2_initial-setup.yaml
+  # part 1: schema
+  - include:
+      file: db/changelog/001_v0.1.0_schema.yaml
+  # part 2: default data (only with context "default-data")
+  - include:
+      file: db/changelog/002_v0.1.0_default-data.yaml

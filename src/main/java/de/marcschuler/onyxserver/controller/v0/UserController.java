@@ -1,7 +1,6 @@
 package de.marcschuler.onyxserver.controller.v0;
 
 import de.marcschuler.onyxserver.config.SecurityConfig;
-import de.marcschuler.onyxserver.data.ClientState;
 import de.marcschuler.onyxserver.data.permission.PermissionType;
 import de.marcschuler.onyxserver.dto.InviteResponseDto;
 import de.marcschuler.onyxserver.dto.KickRequestDTO;
@@ -65,7 +64,7 @@ public class UserController {
     public void kickFromChannel(@PathVariable String id, @RequestBody KickRequestDTO kickRequestDTO, @AuthenticationPrincipal SecurityConfig.AuthenticatedUser authUser) {
         var client = webSocketConnectionService.clientFromKeyId(id).orElseThrow();
         permissionService.checkClientAccess(client, client.getChannel(), PermissionType.CHANNEL_USER_KICK);
-        webSocketConnectionService.leaveChannel(client);
+        client.leaveChannel();
     }
 
 
@@ -73,15 +72,15 @@ public class UserController {
     public void kickFromServer(@PathVariable String id, @RequestBody KickRequestDTO kickRequestDTO, @AuthenticationPrincipal SecurityConfig.AuthenticatedUser authUser) {
         var client = webSocketConnectionService.clientFromKeyId(id).orElseThrow();
         permissionService.checkClientAccess(client, client.getChannel(), PermissionType.USER_KICK);
-        webSocketConnectionService.kickClient(client, kickRequestDTO.getReason(), kickRequestDTO.getMessage());
+        client.kick(kickRequestDTO.getReason(), kickRequestDTO.getMessage());
     }
 
     @PutMapping("{id}/state/ban")
-    public UserExtendedDTO ban(@PathVariable String id, @RequestBody(required = false) @Nullable String message) {
+    public UserExtendedDTO ban(@PathVariable String id, @RequestBody(required = false) @Nullable String message, @AuthenticationPrincipal SecurityConfig.AuthenticatedUser authUser) {
         permissionService.checkControllerAccess(null, null, PermissionType.USER_BAN);
 
         var user = userService.findById(id).orElseThrow();
-        userService.ban(user, message);
+        userService.ban(user, message, authUser.user());
         return serverMapper.mapToDTOExtended(user);
     }
 
@@ -90,8 +89,7 @@ public class UserController {
         permissionService.checkControllerAccess(null, null, PermissionType.USER_UNBAN);
 
         var user = userService.findById(id).orElseThrow();
-        user.setState(ClientState.ACTIVE);
-        userService.save(user);
+        userService.unban(user);
         return serverMapper.mapToDTOExtended(user);
     }
 
@@ -99,7 +97,7 @@ public class UserController {
     public UserExtendedDTO active(@PathVariable String id) {
         permissionService.checkControllerAccess(null, null, PermissionType.USER_ACTIVATE);
         var user = userService.findById(id).orElseThrow();
-        user.setState(ClientState.ACTIVE);
+        user.setPendingAccess(false);
         userService.save(user);
         return serverMapper.mapToDTOExtended(user);
     }

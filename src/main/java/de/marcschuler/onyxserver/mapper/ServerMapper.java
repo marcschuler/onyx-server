@@ -91,6 +91,9 @@ public abstract class ServerMapper {
 
     public abstract UserExtendedDTO mapToDTOExtended(User user);
 
+    @Mapping(target = "bannedBy", source = "bannedBy.id")
+    public abstract UserBanDTO mapToDTO(UserBan ban);
+
     public abstract IceServer mapToDTO(WebRTConfig.IceConfig iceConfig);
 
     public abstract List<IceServer> mapToDTO(List<WebRTConfig.IceConfig> iceConfig);

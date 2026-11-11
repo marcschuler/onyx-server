@@ -1,0 +1,88 @@
+databaseChangeLog:
+- changeSet:
+    id: 003-message-reaction-table
+    author: marc
+    changes:
+    - createTable:
+        tableName: MESSAGE_REACTION
+        columns:
+        - column:
+            name: ID
+            type: UUID
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: PK_MESSAGE_REACTION
+        - column:
+            name: MESSAGE_ID
+            type: UUID
+            constraints:
+              nullable: false
+        - column:
+            name: USER_ID
+            type: VARCHAR(255)
+            constraints:
+              nullable: false
+        - column:
+            name: EMOJI
+            type: VARCHAR(64)
+            constraints:
+              nullable: false
+        - column:
+            name: TIMESTAMP
+            type: TIMESTAMP WITH TIME ZONE
+            constraints:
+              nullable: false
+    - addUniqueConstraint:
+        tableName: MESSAGE_REACTION
+        columnNames: MESSAGE_ID, USER_ID, EMOJI
+        constraintName: UK_MESSAGE_REACTION_MESSAGE_USER_EMOJI
+    - addForeignKeyConstraint:
+        baseTableName: MESSAGE_REACTION
+        baseColumnNames: MESSAGE_ID
+        constraintName: FK_MESSAGE_REACTION_MESSAGE
+        referencedTableName: MESSAGE
+        referencedColumnNames: ID
+        onDelete: CASCADE
+    - addForeignKeyConstraint:
+        baseTableName: MESSAGE_REACTION
+        baseColumnNames: USER_ID
+        constraintName: FK_MESSAGE_REACTION_USER
+        referencedTableName: SERVER_USERS
+        referencedColumnNames: ID
+- changeSet:
+    id: 003-server-settings-reaction-emojis
+    author: marc
+    changes:
+    # JSON array of allowed emojis, empty array allows any emoji
+    - addColumn:
+        tableName: SERVER_SETTINGS
+        columns:
+        - column:
+            name: REACTION_EMOJIS
+            type: VARCHAR(8192)
+            defaultValue: '[]'
+            constraints:
+              nullable: false
+# Default reaction emojis for newly created servers only. Existing installations keep '[]' (any emoji allowed).
+# The default server is new if it was seeded (002-default-server) in the same liquibase run as this file.
+- changeSet:
+    id: 003-default-reaction-emojis
+    author: marc
+    context: default-data
+    preConditions:
+    - onFail: MARK_RAN
+    - sqlCheck:
+        expectedResult: 1
+        sql: >-
+          SELECT COUNT(*) FROM DATABASECHANGELOG seed
+          JOIN DATABASECHANGELOG reactions ON seed.DEPLOYMENT_ID = reactions.DEPLOYMENT_ID
+          WHERE seed.ID = '002-default-server' AND reactions.ID = '003-message-reaction-table'
+    changes:
+    - update:
+        tableName: SERVER_SETTINGS
+        columns:
+        - column:
+            name: REACTION_EMOJIS
+            value: '["👍","👎","❤️","😂","🔥","🎉","💀","🤝","👀"]'
+        where: SERVER_ID = '0e5e7a1c-0000-4000-8000-000000000001'

@@ -5,3 +5,6 @@ databaseChangeLog:
   # part 2: default data (only with context "default-data")
   - include:
       file: db/changelog/002_v0.1.0_default-data.yaml
+  # part 3: message reactions
+  - include:
+      file: db/changelog/003_v0.1.0_message-reactions.yaml

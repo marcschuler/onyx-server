@@ -4,10 +4,12 @@ import de.marcschuler.onyxserver.config.SecurityConfig;
 import de.marcschuler.onyxserver.data.permission.PermissionType;
 import de.marcschuler.onyxserver.dto.data.MessageDTO;
 import de.marcschuler.onyxserver.dto.data.message.MessageCreationDTO;
+import de.marcschuler.onyxserver.dto.data.message.MessageReactionDTO;
 import de.marcschuler.onyxserver.mapper.MessageMapper;
 import de.marcschuler.onyxserver.service.ChannelService;
 import de.marcschuler.onyxserver.service.ChatService;
 import de.marcschuler.onyxserver.service.PermissionService;
+import de.marcschuler.onyxserver.service.ServerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,6 +30,7 @@ public class ChatController {
     private final ChatService chatService;
     private final ChannelService channelService;
     private final PermissionService permissionService;
+    private final ServerService serverService;
 
     private final MessageMapper messageMapper;
 
@@ -78,5 +81,33 @@ public class ChatController {
             permissionService.checkControllerAccess(null, PermissionType.CHANNEL_CHAT_DELETE);
 
         chatService.deleteMessage(chat, message);
+    }
+
+    @PutMapping("{id}/message/{messageId}/reaction")
+    @Transactional
+    public MessageReactionDTO addReaction(@PathVariable UUID id, @PathVariable UUID messageId, @RequestParam String emoji, @AuthenticationPrincipal SecurityConfig.AuthenticatedUser authUser) {
+        var chat = chatService.chatById(id).orElseThrow();
+        channelService.getByChat(chat)
+                .ifPresent(c -> permissionService.checkControllerAccess(c, PermissionType.CHANNEL_CHAT_CREATE));
+
+        var message = chatService.messageById(messageId)
+                .filter(m -> m.getChat().getId().equals(chat.getId()))
+                .orElseThrow();
+        var allowedEmojis = serverService.defaultServer().getSettings().getReactionEmojis();
+        var reaction = chatService.addReaction(message, authUser.user(), emoji, allowedEmojis);
+        return messageMapper.mapToDTO(reaction);
+    }
+
+    @DeleteMapping("{id}/message/{messageId}/reaction")
+    @Transactional
+    public void removeReaction(@PathVariable UUID id, @PathVariable UUID messageId, @RequestParam String emoji, @AuthenticationPrincipal SecurityConfig.AuthenticatedUser authUser) {
+        var chat = chatService.chatById(id).orElseThrow();
+        channelService.getByChat(chat)
+                .ifPresent(c -> permissionService.checkControllerAccess(c, PermissionType.CHANNEL_CHAT_READ));
+
+        var message = chatService.messageById(messageId)
+                .filter(m -> m.getChat().getId().equals(chat.getId()))
+                .orElseThrow();
+        chatService.removeReaction(message, authUser.user(), emoji);
     }
 }

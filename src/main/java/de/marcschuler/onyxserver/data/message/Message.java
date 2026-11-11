@@ -5,8 +5,10 @@ import de.marcschuler.onyxserver.data.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.ToString;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,4 +35,9 @@ public class Message {
 
     @ManyToOne
     private Message repliesTo;
+
+    @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("timestamp ASC")
+    @ToString.Exclude
+    private List<MessageReaction> reactions = new ArrayList<>();
 }

@@ -1,8 +1,12 @@
 package de.marcschuler.onyxserver.data;
 
 import de.marcschuler.onyxserver.data.converter.PasswordHashConverter;
+import de.marcschuler.onyxserver.data.converter.StringListConverter;
 import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -18,4 +22,11 @@ public class ServerSettings {
 
     @Convert(converter = PasswordHashConverter.class)
     private String password;
+
+    /**
+     * The emojis users may react to messages with. An empty list allows any emoji
+     */
+    @Convert(converter = StringListConverter.class)
+    @Column(nullable = false, length = 8192)
+    private List<String> reactionEmojis = new ArrayList<>();
 }

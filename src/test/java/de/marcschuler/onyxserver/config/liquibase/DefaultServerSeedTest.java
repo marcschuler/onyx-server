@@ -48,6 +48,8 @@ class DefaultServerSeedTest {
         assertDoesNotThrow(() -> cryptoService.importKeyPair(server.getKeys().toJSONString()));
         assertEquals(3, server.getDescription().size());
         assertTrue(!server.getSettings().isNewUsersNeedInvite());
+        assertEquals(List.of("👍", "👎", "❤️", "😂", "🔥", "🎉", "💀", "🤝", "👀"),
+                server.getSettings().getReactionEmojis(), "default reaction emojis (003-default-reaction-emojis)");
 
         assertEquals(List.of("Lobby", "Talk", "Chat"), server.getSections().stream().map(Section::getName).toList());
         assertEquals(List.of("Lobby", "Talking I", "Talking II", "Chatting", "Other", "Team"),

@@ -15,13 +15,17 @@ import de.marcschuler.onyxserver.repository.MessageRepository;
 import de.marcschuler.onyxserver.service.websocket.WebSocketConnectionService;
 import de.marcschuler.onyxserver.webclient.messages.chat.ChatMessageEvent;
 import de.marcschuler.onyxserver.webclient.messages.chat.MessageDeleteEvent;
+import de.marcschuler.onyxserver.webclient.messages.chat.MessageReactionAddEvent;
+import de.marcschuler.onyxserver.webclient.messages.chat.MessageReactionRemoveEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -142,5 +146,61 @@ public class ChatService {
         chat.getMessages().removeIf(m -> m.getId().equals(message.getId()));
         chatRepository.save(chat);
         this.webSocketConnectionService.sendToAll(new MessageDeleteEvent(message.getId()));
+    }
+
+    /**
+     * Adds a reaction of a user to a message. If the user already reacted with this emoji, the existing reaction is returned
+     *
+     * @param allowedEmojis the emojis allowed on this server, an empty list allows any emoji
+     */
+    @Transactional
+    public MessageReaction addReaction(Message message, User user, String emoji, List<String> allowedEmojis) {
+        if (emoji == null || emoji.isBlank())
+            throw new InvalidMessageException("emoji cannot be empty");
+        emoji = emoji.strip();
+        if (emoji.length() > MessageReaction.MAX_EMOJI_LENGTH)
+            throw new InvalidMessageException("emoji is too long");
+        if (!allowedEmojis.isEmpty() && !allowedEmojis.contains(emoji))
+            throw new InvalidMessageException("emoji is not allowed on this server");
+
+        final var e = emoji;
+        var existing = message.getReactions().stream()
+                .filter(r -> r.getUser().getId().equals(user.getId()) && r.getEmoji().equals(e))
+                .findAny();
+        if (existing.isPresent())
+            return existing.get();
+
+        var reaction = new MessageReaction();
+        reaction.setMessage(message);
+        reaction.setUser(user);
+        reaction.setEmoji(emoji);
+        reaction.setTimestamp(Instant.now());
+        message.getReactions().add(reaction);
+        messageRepository.saveAndFlush(message);
+
+        // the saved reaction now has its generated id
+        var saved = message.getReactions().stream()
+                .filter(r -> r.getUser().getId().equals(user.getId()) && r.getEmoji().equals(e))
+                .findAny().orElseThrow();
+        webSocketConnectionService.sendToAll(
+                new MessageReactionAddEvent(message.getChat().getId(), messageMapper.mapToDTO(saved)));
+        return saved;
+    }
+
+    /**
+     * Removes the reaction of a user with the given emoji from a message, if it exists
+     */
+    @Transactional
+    public void removeReaction(Message message, User user, String emoji) {
+        var e = emoji == null ? "" : emoji.strip();
+        var reaction = message.getReactions().stream()
+                .filter(r -> r.getUser().getId().equals(user.getId()) && r.getEmoji().equals(e))
+                .findAny();
+        if (reaction.isEmpty())
+            return;
+        message.getReactions().remove(reaction.get());
+        messageRepository.save(message);
+        webSocketConnectionService.sendToAll(
+                new MessageReactionRemoveEvent(message.getChat().getId(), message.getId(), reaction.get().getId()));
     }
 }

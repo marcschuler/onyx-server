@@ -1,6 +1,7 @@
 package de.marcschuler.onyxserver.dto.data;
 
 import de.marcschuler.onyxserver.dto.data.message.MessageContentDTO;
+import de.marcschuler.onyxserver.dto.data.message.MessageReactionDTO;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -28,4 +29,7 @@ public class MessageDTO {
     private UUID chatId;
 
     private boolean temporary;
+
+    @NotNull
+    private List<MessageReactionDTO> reactions;
 }

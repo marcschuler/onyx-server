@@ -2,7 +2,9 @@ package de.marcschuler.onyxserver.service;
 
 import de.marcschuler.onyxserver.data.Server;
 import de.marcschuler.onyxserver.data.file.File;
+import de.marcschuler.onyxserver.data.message.MessageReaction;
 import de.marcschuler.onyxserver.dto.data.ServerDTO;
+import de.marcschuler.onyxserver.error.InvalidMessageException;
 import de.marcschuler.onyxserver.mapper.ServerMapper;
 import de.marcschuler.onyxserver.repository.ServerRepository;
 import de.marcschuler.onyxserver.service.websocket.WebSocketConnectionService;
@@ -57,6 +59,17 @@ public class ServerService {
                     .forEach(s -> server.getDescription().add(s));
         } else {
             server.getDescription().clear();
+        }
+        if (serverDto.getSettings() != null && serverDto.getSettings().getReactionEmojis() != null) {
+            var emojis = serverDto.getSettings().getReactionEmojis().stream()
+                    .filter(e -> e != null && !e.isBlank())
+                    .map(String::strip)
+                    .distinct()
+                    .toList();
+            if (emojis.stream().anyMatch(e -> e.length() > MessageReaction.MAX_EMOJI_LENGTH))
+                throw new InvalidMessageException("emoji is too long");
+            server.getSettings().getReactionEmojis().clear();
+            server.getSettings().getReactionEmojis().addAll(emojis);
         }
         serverRepository.save(server);
         sendUpdate(server);
